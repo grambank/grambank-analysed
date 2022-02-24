@@ -1,0 +1,4 @@
+#aux files
+.DS_Store
+R_grambank/.Rhistory
+*Rproj*
