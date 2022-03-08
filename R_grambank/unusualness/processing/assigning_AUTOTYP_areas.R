@@ -11,7 +11,7 @@ dplyr::select(Language_ID, Longitude, Latitude)
 
 ##Adding in areas of linguistic contact from AUTOTYP
 
-AUTOTYP_FN <- "https://raw.githubusercontent.com/autotyp/autotyp-data/master/data/csv/Register.csv"
+AUTOTYP_FN <- "../autotyp-data/data/csv/Register.csv"
 
 cat("Fetching AUTOTYP data from", AUTOTYP_FN, ".\n")
 
