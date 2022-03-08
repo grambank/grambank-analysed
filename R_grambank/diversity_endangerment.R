@@ -31,7 +31,7 @@ gb$status_collapsed<-sapply(gb$endangerment_status,function(x)
 compute_l<-function(df) {
     gb <- df %>% 
       dplyr::select(all_of(gb_features))
-    return(mean(cluster::daisy(gb,metric="gower")))}
+    return(mean(cluster::daisy(gb,metric="gower", warnBin = F)))}
 
 # Define function that produces random samples out of the not endangered category (NEnd) and compute L and H 
 rsampling<-function(DF,nsim)  {
@@ -91,7 +91,7 @@ refs<-data.frame(l=ref_points,
                  type=c("similar","similar","similar","extreme"))
 
 # Transform all distances into percentiles of the distribution of distances in all of GB
-gb_dists<-cluster::daisy(gb[,gb_features],metric="gower")
+gb_dists<-cluster::daisy(gb[,gb_features],metric="gower", warnBin = F)
 
 # Define function that turns distances into cumulative proportions
 dist_to_cump<-function(x){sum(gb_dists<=x)/length(gb_dists)}
