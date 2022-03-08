@@ -4,5 +4,9 @@ R_grambank/.Rhistory
 *Rproj*
 *Rhistory*
 .Rproj.user
+
+#output directories
 *GB_wide*
 *non_GB_datasets*
+*coverage_plots*
+*processed_data*
