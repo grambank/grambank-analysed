@@ -14,7 +14,7 @@ Language_meta_data <-read_csv(GRAMBANK_LANGUAGES, col_types=LANGUAGES_COLSPEC) %
   distinct(Language_ID, .keep_all = T)
 
 #read in sheet with scores for whether a feature denotes boundness
-GB_bound_points <- data.table::fread(file.path("../", "../", "cldf", "parameters.csv") ,
+GB_bound_points <- data.table::fread(GRAMBANK_PARAMETERS,
                                                       encoding = 'UTF-8', 
                                                       quote = "\"", header = TRUE, 
                                                       sep = ",") %>% 

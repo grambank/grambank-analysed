@@ -76,7 +76,7 @@ GB_wide_strict %>%
   dplyr::select(Language_ID, na_prop, everything()) %>% # reordering columns for inspection convenience
   write_tsv(output_path)
 
-parameters_multi <- data.table::fread(file.path("../", "../", "cldf", "parameters.csv") ,
+parameters_multi <- data.table::fread(GRAMBANK_PARAMETERS ,
                                       encoding = 'UTF-8', 
                                       quote = "\"", header = TRUE, 
                                       sep = ",") 
