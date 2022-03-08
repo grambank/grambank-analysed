@@ -26,7 +26,7 @@ Binary_feat_n <- GB_wide_binarised %>%
   dplyr::select(-na_prop, -Language_ID) %>% 
   ncol()
 
-#In order to make sure the imputation is doing categorically and not for continous integers the values are replaces by strings.
+#In order to make sure the imputation is doing categorically and not for continuous integers the values are replaces by strings.
 GB_wide_binarised_values_prepped_for_imputation <- GB_wide_binarised %>% 
   dplyr::select(-na_prop) %>% 
   reshape2::melt(id.vars = "Language_ID") %>% 
@@ -89,6 +89,18 @@ cat("These are the values that will be imputed by random forests.\n")
 #Saving the language IDs separately, it's better to leave them out of the imputation workflow
 GB_wide_cropped_lgs <- GB_wide_cropped_for_imputation$Language_ID
 
+#for the MDS we want to use the cropped dataset, but not imputed. So we're writing that to file here before the imputation starts
+
+GB_wide_cropped_for_imputation %>% 
+  mutate_all(as.character) %>% 
+  reshape2::melt(id = "Language_ID")  %>% #melting to make it easier to turn the values back to single numbers instead of strings
+  mutate(value =  str_replace_all(value, "0 - absent", "0")) %>%
+  mutate(value =  str_replace_all(value,  "1 - present", "1")) %>%
+  dplyr::select(Language_ID, Parameter_ID = variable, value) %>%
+  spread(key = Parameter_ID, value = value, drop = FALSE) %>% 
+  write_tsv(file = file.path("GB_wide", "GB_cropped_for_missing.tsv"))
+
+#actual imputation
 imputed_data <- GB_wide_cropped_for_imputation %>%
   dplyr::select(-Language_ID) %>%
   as.matrix() %>%
@@ -106,9 +118,6 @@ GB_imputed_num <- GB_imputed %>%
   reshape2::melt(id = "Language_ID")  %>%
   mutate(value =  str_replace_all(value, "0 - absent", "0")) %>%
   mutate(value =  str_replace_all(value,  "1 - present", "1")) %>%
-  mutate(value =  str_replace_all(value, "2 - multistate", "2")) %>%
-  mutate(value =  str_replace_all(value, "3 - multistate", "3")) %>%
-  mutate(value =  str_replace_all(value, "4 - multistate", "4")) %>%
   dplyr::select(Language_ID, Parameter_ID = variable, value) %>%
   spread(key = Parameter_ID, value = value, drop = FALSE)
 
