@@ -7,19 +7,21 @@ Language_meta_data <-  read_csv(GRAMBANK_LANGUAGES, col_types=LANGUAGES_COLSPEC)
   mutate(Family_name = ifelse(is.na(Family_name), "Isolate", Family_name))
 
 GB_mds <- read_tsv(file.path("MDS", "MDS_table.tsv")) %>% 
-  rename("MDS_classic_\nV1" = V1, "MDS_classic_\nV2" = V2)
+  dplyr::select(Language_ID, "MDS_classic_\nV1" = V1, "MDS_classic_\nV2" = V2)
 
 GB_MDS_non_metric <- read_tsv(file.path("MDS", "MDS_non-metric_table.tsv")) %>% 
-  rename("MDS_non_metric\n_V1" = V1, "MDS_non_metric\n_V2" = V2)
+  dplyr::select(Language_ID, "MDS_non_metric\n_V1" = V1, "MDS_non_metric\n_V2" = V2)
+
+GB_UMAP <- read_tsv("UMAP/umap_table.tsv") %>% 
+  dplyr::select(Language_ID, "UMAP\n_V1" = V1, "UMAP\n_V2" = V2)
 
 GB_PCA_df <- suppressMessages(read_tsv(file.path("PCA", 'PCA_language_values.tsv'))) %>%
-  dplyr::select(Language_ID, PC1, PC2, PC3) %>% 
-  left_join(Language_meta_data, by = "Language_ID" ) %>%
-  dplyr::select(Language_ID, everything())
+  dplyr::select(Language_ID, PC1, PC2, PC3) 
 
 joined <- full_join(GB_mds, GB_PCA_df) %>% 
   full_join(GB_MDS_non_metric) %>% 
-  dplyr::select(PC1,  "MDS_classic_\nV1","MDS_non_metric\n_V1", PC2, "MDS_classic_\nV2","MDS_non_metric\n_V2")
+  full_join(GB_UMAP) %>% 
+  dplyr::select(PC1,  "MDS_classic_\nV1","MDS_non_metric\n_V1", "UMAP\n_V1", "PC2", "MDS_classic_\nV2","MDS_non_metric\n_V2", "UMAP\n_V2")
 
 png("MDS/MDS_PCA_splom.png", height =20, width = 20, units = "cm", res = 400)
 pairs.panels(joined, 
