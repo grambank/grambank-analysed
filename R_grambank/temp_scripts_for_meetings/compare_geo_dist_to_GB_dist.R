@@ -1,6 +1,7 @@
 source("requirements.R")
 pacman::p_load("fields")
 p_load("wesanderson")
+p_load("adephylo")
 
 #reading in lg meta data
 Language_meta_data <-  read_csv(GRAMBANK_LANGUAGES, col_types=LANGUAGES_COLSPEC) %>%		
@@ -57,7 +58,7 @@ if (!dir.exists("spatiophylogenetic_modelling/processed_data")) {
 
 tree <- read.tree("spatiophylogenetic_modelling/processed_data/jaeger_pruned.tree")
 
-p_load("adephylo")
+
 tree_dist <- adephylo::distTips(tree) %>% 
   as.matrix() 
 
