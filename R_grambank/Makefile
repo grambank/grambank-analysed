@@ -38,7 +38,7 @@ data:
 	@$(MAKE) -f $(THIS_MAKEFILE) pruning_jagertree
 
 non_GB_datasets/glottolog-cldf_wide_df.tsv:
-	@echo Fetching Glottolog language table. Note: this script requires internet access.
+	@echo Fetching Glottolog language table. Note: this script requires the git submodule glottolog-cldf.
 	Rscript make_glottolog-cldf_table.R
 
 GB_wide/GB_wide_strict.tsv:
@@ -54,7 +54,7 @@ GB_wide/GB_wide_imputed_binarized.tsv:
 	Rscript impute_missing_values.R | tee impute_missing_values.log
 	
 coverage_plots/WALS_GB_coverage_overlay.png:
-	@echo Making plot for comparing GB and WALS. Note: this script requires internet access.
+	@echo Making plot for comparing GB and WALS. Note: this script requires the git submodule wals
 	Rscript compare_coverage_WALS.R
 
 coverage_plots/coverage_macroarea.png:
@@ -101,6 +101,7 @@ get_unusualness:
 	@echo "# Calculating unsualness scores and making plots. Note: these scripts requires internet access.#"
 	mkdir -p unusualness/plots
 	mkdir -p unusualness/tables
+	@echo Assining each langauge to an AUTOTYP-area. Note this script requires the git submodule autotyp-data.
 	Rscript unusualness/processing/assigning_AUTOTYP_areas.R
 	Rscript unusualness/analysis/unusualness_get_lg_score.R
 	
