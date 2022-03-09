@@ -4,6 +4,7 @@ source("requirements.R")
 #script written by Hedvig Skirgård
 
 OUTPUTDIR <- file.path("PCA")
+if (!dir.exists(OUTPUTDIR)) { dir.create(OUTPUTDIR) }		
 
 cat("Running Principal Component Analysis on the cropped, dialect-merged, binarised and imputed dataset.\n")
 
