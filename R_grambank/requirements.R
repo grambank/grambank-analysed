@@ -84,10 +84,10 @@ options(warn.conflicts = FALSE)
 options(stringsAsFactors = FALSE)
 
 
-GRAMBANK_LANGUAGES <- file.path("../..", "cldf", "languages.csv")
-GRAMBANK_VALUES <- file.path("../..", "cldf", "values.csv")
-GRAMBANK_PARAMETERS <- file.path("../..", "cldf", "parameters.csv")
-GRAMBANK_CODES <- file.path("../..", "cldf", "codes.csv")
+GRAMBANK_LANGUAGES <- file.path("../grambank", "cldf", "languages.csv")
+GRAMBANK_VALUES <- file.path("../grambank", "cldf", "values.csv")
+GRAMBANK_PARAMETERS <- file.path("../grambank", "cldf", "parameters.csv")
+GRAMBANK_CODES <- file.path("../grambank", "cldf", "codes.csv")
 
 # The columns specifier for readr to parse ../cldf/values.csv
 VALUES_COLSPEC <- c(

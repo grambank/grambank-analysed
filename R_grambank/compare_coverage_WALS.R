@@ -22,17 +22,14 @@ GB_wide$x_ticks <- seq(1:nrow(GB_wide))
 ##WALS
 #wals data needs to be extracted from a zipped file which is created temporarily and discarded once the necessary data is extracted.
 
-wals_fn <- "https://github.com/cldf-datasets/wals/archive/v2020.zip"
+wals_fn <- "../wals/cldf/"
 
 cat("Fetching WALS data from ", wals_fn, ".\n")
 
-temp <- tempfile()
-download.file(wals_fn,temp, quiet = T)
-WALS_data <- read_csv(unz(temp, file.path("wals-2020", "cldf", "values.csv")),col_types = cols()) %>% 
+WALS_data <- read_csv(file.path(wals_fn, "values.csv"),col_types = cols()) %>% 
   dplyr::select(ID = Language_ID, Value, Parameter_ID)
-WALS_lgs_codes <- read_csv(unz(temp, file.path("wals-2020", "cldf", "languages.csv")), col_types = cols()) 
 
-unlink(temp) #discarding the zip file
+WALS_lgs_codes <- read_csv(file.path(wals_fn, "languages.csv"), col_types = cols()) 
 
 #Important: languoids which do not have a glottocode in the WALS dataset are ignored since we can't confidently matche them to dialect parents or tell them apart from duplicates.
 
