@@ -164,8 +164,6 @@ phylo_effect = inla.tmarginal(function(x) 1/sqrt(x),
                                      method = "linear") %>%
   inla.qmarginal(c(0.025, 0.5, 0.975), .)
 
-
-
 df <- phylo_effect %>% 
   as.data.frame() %>% 
   t() %>% 
@@ -173,7 +171,8 @@ df <- phylo_effect %>%
   rename("2.5%" = V1, "50%" = V2, "97.5%" = V3) %>% 
   mutate(Feature_ID = feature) %>% 
   mutate(effect = "phylo_only") %>% 
-  mutate(waic = output$waic$waic)
+  mutate(waic = output$waic$waic) %>% 
+  mutate(marginals.hyperpar <- output$marginals.hyperpar)
 
 df_phylo_only <- df_phylo_only  %>% 
   full_join(df)
@@ -227,7 +226,8 @@ for(feature in features){
     rename("2.5%" = V1, "50%" = V2, "97.5%" = V3) %>% 
     mutate(Feature_ID = feature) %>% 
     mutate(effect = "spatial_only") %>% 
-    mutate(waic = output$waic$waic)
+    mutate(waic = output$waic$waic) %>% 
+    mutate(marginals.hyperpar <- output$marginals.hyperpar)
   
   df_spatial_only <- df_spatial_only  %>% 
     full_join(df)
@@ -255,30 +255,6 @@ spatiophylogenetic_PC1 = inla(PC1 ~
                               control.compute = list(waic=TRUE),
                               data = grambank_pca)
 
-cat("Building Spatiophylogenetic models: PC2\n")
-spatiophylogenetic_PC2 = inla(PC2 ~  
-                                f(phy_id, model = "generic0", Cmatrix = phylo_prec_mat, constr = TRUE, hyper = pcprior_phy) + 
-                                f(sp_id, model = "generic0", Cmatrix = spatial_prec_mat, constr = TRUE, hyper = pcprior_spa), 
-                              control.compute = list(waic=TRUE),
-                              data = grambank_pca)
-
-cat("Building Spatiophylogenetic models: PC3\n")
-spatiophylogenetic_PC3 = inla(PC3 ~  
-                                f(phy_id, model = "generic0", Cmatrix = phylo_prec_mat, constr = TRUE, hyper = pcprior_phy) + 
-                                f(sp_id, model = "generic0", Cmatrix = spatial_prec_mat, constr = TRUE, hyper = pcprior_spa), 
-                              control.compute = list(waic=TRUE),
-                              data = grambank_pca)
-
-#### Interpreting Random effects ####
-#### From Dinnage et al. (2020)
-#### If you are used to thinking in terms of variance and covariance (as I am), 
-#### we now have to think in terms of precision and precision matrices.
-#### Luckily, there is a fairly straightforward transformation to convert a scaling 
-#### factor φ for a precision matrixinto a scaling factor on the equivalent covariance 
-#### matrix"σ= 1/φ. We can transform the marginal posterior distribution of any 
-#### parameter using theINLAfunctioninla.tmarginal(), then we can resummarise 
-#### (usinginla.qmarginal()) to credible intervals to get something more 
-#### interpretable if you are more familiar with variance thinking.
 
 # PC1
 spatiophylogenetic_speffect_varPC1 = inla.tmarginal(function(x) 1/sqrt(x), 
