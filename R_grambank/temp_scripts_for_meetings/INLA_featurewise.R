@@ -1,4 +1,5 @@
 source("requirements.R")
+p_load(beepr)
 
 source("spatiophylogenetic_modelling/processing/pruning_jagertree.R")
 
@@ -13,7 +14,8 @@ suppressPackageStartupMessages(
   library(INLA, quietly = T, warn.conflicts = F, verbose = F)
 )
 
-
+OUTPUTDIR <- file.path("spatiophylogenetic_modelling", "results")
+if (!dir.exists(OUTPUTDIR)) { dir.create(OUTPUTDIR) }		
 
 cat("#### Building Jaeger tree models ####\n")
 
@@ -178,72 +180,72 @@ df_phylo_only <- df_phylo_only  %>%
 
 }
 
-p_load(beepr)
+df_phylo_only %>% write_tsv("spatiophylogenetic_modelling/results/df_phylo_only.tsv")
 beep(3)
 
 ###
 
-
-## Phylogenetic effect
-
-# inla.tmarginal(function(x) 1/sqrt(exp(x)), phylogenetic_PC1$internal.marginals.hyperpar[[2]])
-
-
-phylo_effect_var = rbind(phylo_effect_varPC1, phylo_effect_varPC2, phylo_effect_varPC3)
-dimnames(phylo_effect_var) = list(c("PC1", "PC2", "PC3"), c("2.5%", "50%", "97.5%"))
-
-write.csv(phylo_effect_var, file.path("spatiophylogenetic_modelling", "results",
-                                      paste0(out_name, "_phylogenyOnly.csv")))
-
 cat("#### Spatial only Model ####\n")
-# PC1
-cat("Building Spatial models: PC1\n")
-spatial_PC1 = inla(PC1 ~
-                     f(sp_id, model = "generic0", Cmatrix = spatial_prec_mat,
-                       constr = TRUE, hyper = pcprior_spa),
-                   control.compute = list(waic=TRUE, dic = TRUE),
-                   data = grambank_pca)
-
-# PC2
-cat("Building Spatial models: PC2\n")
-spatial_PC2 = inla(PC2 ~
-                     f(sp_id, model = "generic0", Cmatrix = spatial_prec_mat,
-                       constr = TRUE, hyper = pcprior_spa),
-                   control.compute = list(waic=TRUE),
-                   data = grambank_pca)
-
-# PC3
-cat("Building Spatial models: PC3\n")
-spatial_PC3 = inla(PC3 ~
-                     f(sp_id, model = "generic0", Cmatrix = spatial_prec_mat,
-                       constr = TRUE, hyper = pcprior_spa),
-                   control.compute = list(waic=TRUE),
-                   data = grambank_pca)
 
 
-## Spatial effect
-spatial_effect_varPC1 = inla.tmarginal(function(x) 1/sqrt(x),
-                                       spatial_PC1$marginals.hyperpar$`Precision for sp_id`,
-                                       method = "linear") %>%
-  inla.qmarginal(c(0.025, 0.5, 0.975), .)
+#make empty df to bind to
+df_spatial_only <- data.frame(matrix(ncol = 6, nrow = 0))
+colnames(df_spatial_only) <- c("2.5%","50%", "97.5%", "Feature_ID", "effect", "waic") 
+df_spatial_only$`2.5%` <- as.numeric(df_spatial_only$`2.5%`)
+df_spatial_only$`50%` <- as.numeric(df_spatial_only$`50%`)
+df_spatial_only$Feature_ID <- as.character(df_spatial_only$Feature_ID)
+df_spatial_only$effect <- as.character(df_spatial_only$effect)
+df_spatial_only$waic <- as.numeric(df_spatial_only$waic)
+
+index <- 0
+
+cat("#### spatial only model ####\n")
+for(feature in features){
+  
+  #feature <- features[1]
+  
+  cat(paste0("# Running the spatial-only model on feature ", feature, ". That means I'm ", index/length(features) * 100, "% done.\n"))
+  index <- index + 1 
+  
+  output <- eval(substitute(inla(formula = this_feature ~
+                                   f(sp_id, model = "generic0", Cmatrix = spatial_prec_mat,
+                                     constr = TRUE, hyper = pcprior_spa),
+                                 control.compute = list(waic=TRUE, dic = TRUE),
+                                 data = grambank_df),
+                            list(this_feature=as.name(feature))))
+  
+  spatial_effect = inla.tmarginal(function(x) 1/sqrt(x),
+                                  output$marginals.hyperpar$`Precision for sp_id`,
+                                  method = "linear") %>%
+    inla.qmarginal(c(0.025, 0.5, 0.975), .)
+  
+
+  df <- spatial_effect %>% 
+    as.data.frame() %>% 
+    t() %>% 
+    as.data.frame() %>% 
+    rename("2.5%" = V1, "50%" = V2, "97.5%" = V3) %>% 
+    mutate(Feature_ID = feature) %>% 
+    mutate(effect = "spatial_only") %>% 
+    mutate(waic = output$waic$waic)
+  
+  df_spatial_only <- df_spatial_only  %>% 
+    full_join(df)
+  
+}
+
+df_spatial_only %>% write_tsv("spatiospatialgenetic_modelling/results/df_spatial_only.tsv")
+beep(3)
+###
 
 
-spatial_effect_varPC2 = inla.tmarginal(function(x) 1/sqrt(x),
-                                       spatial_PC2$marginals.hyperpar$`Precision for sp_id`,
-                                       method = "linear") %>%
-  inla.qmarginal(c(0.025, 0.5, 0.975), .)
 
 
-spatial_effect_varPC3 = inla.tmarginal(function(x) 1/sqrt(x),
-                                       spatial_PC3$marginals.hyperpar$`Precision for sp_id`,
-                                       method = "linear") %>%
-  inla.qmarginal(c(0.025, 0.5, 0.975), .)
 
-spatial_effect_var = rbind(spatial_effect_varPC1, spatial_effect_varPC2, spatial_effect_varPC3)
-dimnames(spatial_effect_var) = list(c("PC1", "PC2", "PC3"), c("2.5%", "50%", "97.5%"))
 
-write.csv(spatial_effect_var, file.path("spatiophylogenetic_modelling", "results",
-                                        paste0(out_name, "_spaceOnly.csv")))
+
+
+
 
 cat("#### Spatial & Phylo Model ####\n")
 cat("Building Spatiophylogenetic models: PC1\n")
