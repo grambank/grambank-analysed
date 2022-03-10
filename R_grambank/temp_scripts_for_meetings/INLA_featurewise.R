@@ -131,12 +131,13 @@ features <- GB_imputed %>%
 
 
 #make empty df to bind to
-df_phylo_only <- data.frame(matrix(ncol = 5, nrow = 0))
-colnames(df_phylo_only) <- c("2.5%","50%", "97.5%", "Feature_ID", "effect") 
+df_phylo_only <- data.frame(matrix(ncol = 6, nrow = 0))
+colnames(df_phylo_only) <- c("2.5%","50%", "97.5%", "Feature_ID", "effect", "waic") 
 df_phylo_only$`2.5%` <- as.numeric(df_phylo_only$`2.5%`)
 df_phylo_only$`50%` <- as.numeric(df_phylo_only$`50%`)
 df_phylo_only$Feature_ID <- as.character(df_phylo_only$Feature_ID)
 df_phylo_only$effect <- as.character(df_phylo_only$effect)
+df_phylo_only$waic <- as.numeric(df_phylo_only$waic)
 
 index <- 0
 
@@ -161,18 +162,24 @@ phylo_effect = inla.tmarginal(function(x) 1/sqrt(x),
                                      method = "linear") %>%
   inla.qmarginal(c(0.025, 0.5, 0.975), .)
 
+
+
 df <- phylo_effect %>% 
   as.data.frame() %>% 
   t() %>% 
   as.data.frame() %>% 
   rename("2.5%" = V1, "50%" = V2, "97.5%" = V3) %>% 
   mutate(Feature_ID = feature) %>% 
-  mutate(effect = "phylo_only")
+  mutate(effect = "phylo_only") %>% 
+  mutate(waic = output$waic$waic)
 
 df_phylo_only <- df_phylo_only  %>% 
   full_join(df)
 
 }
+
+p_load(beepr)
+beep(3)
 
 ###
 
