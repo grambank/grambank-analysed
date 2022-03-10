@@ -129,10 +129,16 @@ features <- GB_imputed %>%
   dplyr::select(-Language_ID) %>% 
   colnames()
 
-index <- 0
 
+#make empty df to bind to
 df_phylo_only <- data.frame(matrix(ncol = 5, nrow = 0))
 colnames(df_phylo_only) <- c("2.5%","50%", "97.5%", "Feature_ID", "effect") 
+df_phylo_only$`2.5%` <- as.numeric(df_phylo_only$`2.5%`)
+df_phylo_only$`50%` <- as.numeric(df_phylo_only$`50%`)
+df_phylo_only$Feature_ID <- as.character(df_phylo_only$Feature_ID)
+df_phylo_only$effect <- as.character(df_phylo_only$effect)
+
+index <- 0
 
 cat("#### Phylogenetic only model ####\n")
 for(feature in features){
@@ -168,7 +174,7 @@ df_phylo_only <- df_phylo_only  %>%
 
 }
 
-
+###
 
 
 ## Phylogenetic effect
