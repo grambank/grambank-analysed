@@ -22,7 +22,6 @@ cat("#### Building Jaeger tree models ####\n")
 #reading in GB
 GB_imputed_filename <- file.path("GB_wide", "GB_wide_imputed_binarized.tsv")
 GB_imputed <- read_tsv(GB_imputed_filename, col_types= cols())
-first_three <- GB_imputed %>% colnames() %>% .[1:3]
 
 #### Inputs ####
 # language metadata
@@ -125,12 +124,18 @@ grambank_df = GB_imputed %>%
                    phy_id = 1:nrow(phylo_prec_mat),
                    sp_id = 1:nrow(spatial_prec_mat)), by = "Language_ID")
 
+
+#################
+###INLA LOOPS####
+#################
 #features to loop over
 
 features <- GB_imputed %>% 
   dplyr::select(-Language_ID) %>% 
   colnames()
 
+
+cat("#### Phylogenetic only model ####\n")
 
 #make empty df to bind to
 df_phylo_only <- data.frame(matrix(ncol = 6, nrow = 0))
@@ -143,12 +148,11 @@ df_phylo_only$waic <- as.numeric(df_phylo_only$waic)
 
 index <- 0
 
-cat("#### Phylogenetic only model ####\n")
 for(feature in features){
 
 #feature <- features[1]
 
-cat(paste0("# Running the phylo-only model on feature ", feature, ". That means I'm ", index/length(features) * 100, "% done.\n"))
+cat(paste0("# Running the phylo-only model on feature ", feature, ". That means I'm ", round(index/length(features) * 100, 2), "% done.\n"))
 index <- index + 1 
   
 output <- eval(substitute(inla(formula = this_feature ~
@@ -171,8 +175,9 @@ df <- phylo_effect %>%
   rename("2.5%" = V1, "50%" = V2, "97.5%" = V3) %>% 
   mutate(Feature_ID = feature) %>% 
   mutate(effect = "phylo_only") %>% 
-  mutate(waic = output$waic$waic) %>% 
-  mutate(marginals.hyperpar <- output$marginals.hyperpar)
+  mutate(waic = output$waic$waic)  %>% 
+  mutate(marginals.hyperpar.gaussian = output$marginals.hyperpar[1] ) %>% 
+  mutate(marginals.hyperpar.phy_id = output$marginals.hyperpar[2])
 
 df_phylo_only <- df_phylo_only  %>% 
   full_join(df)
@@ -180,6 +185,7 @@ df_phylo_only <- df_phylo_only  %>%
 }
 
 df_phylo_only %>% write_tsv("spatiophylogenetic_modelling/results/df_phylo_only.tsv")
+df_phylo_only %>% saveRDS("spatiophylogenetic_modelling/results/df_phylo_only.Rdata")
 beep(3)
 
 ###
@@ -203,7 +209,7 @@ for(feature in features){
   
   #feature <- features[1]
   
-  cat(paste0("# Running the spatial-only model on feature ", feature, ". That means I'm ", index/length(features) * 100, "% done.\n"))
+  cat(paste0("# Running the spatial-only model on feature ", feature, ". That means I'm ", round(index/length(features) * 100, 2), "% done.\n"))
   index <- index + 1 
   
   output <- eval(substitute(inla(formula = this_feature ~
@@ -228,7 +234,7 @@ for(feature in features){
     mutate(effect = "spatial_only") %>% 
     mutate(waic = output$waic$waic) %>% 
     mutate(marginals.hyperpar.gaussian = output$marginals.hyperpar[1] ) %>% 
-    mutate(marginals.hyperpar.sp_id = output$marginals.hyperpar[2] )
+    mutate(marginals.hyperpar.sp_id = output$marginals.hyperpar[2])
 
   df_spatial_only <- df_spatial_only  %>% 
     full_join(df)
@@ -236,62 +242,95 @@ for(feature in features){
 }
 
 df_spatial_only %>% write_tsv("spatiospatialgenetic_modelling/results/df_spatial_only.tsv")
+df_spatial_only %>% saveRDS("spatiospatialgenetic_modelling/results/df_spatial_only.Rdata")
+
+
 beep(3)
 ###
 
-
-
-
-
-
-
-
-
-
 cat("#### Spatial & Phylo Model ####\n")
-cat("Building Spatiophylogenetic models: PC1\n")
-spatiophylogenetic_PC1 = inla(PC1 ~ 
-                                f(phy_id, model = "generic0", Cmatrix = phylo_prec_mat, constr = TRUE, hyper = pcprior_phy) + 
-                                f(sp_id, model = "generic0", Cmatrix = spatial_prec_mat, constr = TRUE, hyper = pcprior_spa), 
-                              control.compute = list(waic=TRUE),
-                              data = grambank_pca)
 
+#make empty df to bind to
+df_spatial_phylo <- data.frame(matrix(ncol = 6, nrow = 0))
+colnames(df_spatial_phylo) <- c("2.5%","50%", "97.5%", "Feature_ID", "effect", "waic") 
+df_spatial_phylo$`2.5%` <- as.numeric(df_spatial_phylo$`2.5%`)
+df_spatial_phylo$`50%` <- as.numeric(df_spatial_phylo$`50%`)
+df_spatial_phylo$Feature_ID <- as.character(df_spatial_phylo$Feature_ID)
+df_spatial_phylo$effect <- as.character(df_spatial_phylo$effect)
+df_spatial_phylo$waic <- as.numeric(df_spatial_phylo$waic)
 
-# PC1
-spatiophylogenetic_speffect_varPC1 = inla.tmarginal(function(x) 1/sqrt(x), 
-                                                    spatiophylogenetic_PC1$marginals.hyperpar$`Precision for sp_id`, 
-                                                    method = "linear") %>%
+index <- 0
+
+for(feature in features){
+  
+  #feature <- features[1]
+  
+  cat(paste0("# Running the spatial-phylo (double-process) model on feature ", feature, ". That means I'm ", round(index/length(features) * 100, 2), "% done.\n"))
+  index <- index + 1 
+  
+  output <- eval(substitute(inla(formula = this_feature ~
+                                   f(phy_id, model = "generic0", Cmatrix = phylo_prec_mat, constr = TRUE, hyper = pcprior_phy) + 
+                                   f(sp_id, model = "generic0", Cmatrix = spatial_prec_mat, constr = TRUE, hyper = pcprior_spa), 
+                                 control.compute = list(waic=TRUE),
+                                 data = grambank_df),
+                            list(this_feature=as.name(feature))))
+  
+spatial_effect = inla.tmarginal(function(x) 1/sqrt(x), 
+                                  output$marginals.hyperpar$`Precision for sp_id`, 
+                                  method = "linear") %>%
+    inla.qmarginal(c(0.025, 0.5, 0.975), .)
+  
+phylo_effect = inla.tmarginal(function(x) 1/sqrt(x), 
+                              output$marginals.hyperpar$`Precision for phy_id`, 
+                              method = "linear") %>%
   inla.qmarginal(c(0.025, 0.5, 0.975), .)
 
-spatiophylogenetic_phyeffect_varPC1 = inla.tmarginal(function(x) 1/sqrt(x), 
-                                                     spatiophylogenetic_PC1$marginals.hyperpar$`Precision for phy_id`, 
-                                                     method = "linear") %>%
-  inla.qmarginal(c(0.025, 0.5, 0.975), .)
+  df_space <- spatial_effect %>% 
+    as.data.frame() %>% 
+    t() %>% 
+    as.data.frame() %>% 
+    rename("2.5%" = V1, "50%" = V2, "97.5%" = V3) %>% 
+    mutate(Feature_ID = feature) %>% 
+    mutate(effect = "spatial_in_double") %>% 
+    mutate(waic = output$waic$waic) %>% 
+    mutate(marginals.hyperpar.gaussian = output$marginals.hyperpar[1] ) %>% 
+    mutate(marginals.hyperpar.sp_id = output$marginals.hyperpar[3])
+
+  df_phylo <- phylo_effect %>% 
+    as.data.frame() %>% 
+    t() %>% 
+    as.data.frame() %>% 
+    rename("2.5%" = V1, "50%" = V2, "97.5%" = V3) %>% 
+    mutate(Feature_ID = feature) %>% 
+    mutate(effect = "phylo_in_double") %>% 
+    mutate(waic = output$waic$waic) %>% 
+    mutate(marginals.hyperpar.gaussian = output$marginals.hyperpar[1] ) %>% 
+    mutate(marginals.hyperpar.phy_id = output$marginals.hyperpar[2])
+  
+  df_spatial_phylo <- df_spatial_phylo  %>% 
+    full_join(df_space, by = c("2.5%", "50%", "97.5%", "Feature_ID", "effect", "waic")) %>% 
+    full_join(df_phylo, by = c("2.5%", "50%", "97.5%", "Feature_ID", "effect", "waic", "marginals.hyperpar.phy_id"))
+  
+}
+
+df_spatial_phylo %>% write_tsv("spatiospatialgenetic_modelling/results/df_spatial_phylo.tsv")
+df_spatial_phylo %>% saveRDS("spatiospatialgenetic_modelling/results/df_spatial_phylo.Rdata")
+
+beep(3)
 
 
-# inla.tmarginal(function(x) 1/sqrt(exp(x)),result$internal.marginals.hyperpar[[2]])
 
-# PC2
-spatiophylogenetic_speffect_varPC2 = inla.tmarginal(function(x) 1/sqrt(x), 
-                                                    spatiophylogenetic_PC2$marginals.hyperpar$`Precision for sp_id`, 
-                                                    method = "linear") %>%
-  inla.qmarginal(c(0.025, 0.5, 0.975), .)
 
-spatiophylogenetic_phyeffect_varPC2 = inla.tmarginal(function(x) 1/sqrt(x), 
-                                                     spatiophylogenetic_PC2$marginals.hyperpar$`Precision for phy_id`, 
-                                                     method = "linear") %>%
-  inla.qmarginal(c(0.025, 0.5, 0.975), .)
 
-# PC3
-spatiophylogenetic_speffect_varPC3 = inla.tmarginal(function(x) 1/sqrt(x), 
-                                                    spatiophylogenetic_PC3$marginals.hyperpar$`Precision for sp_id`, 
-                                                    method = "linear") %>%
-  inla.qmarginal(c(0.025, 0.5, 0.975), .)
 
-spatiophylogenetic_phyeffect_varPC3 = inla.tmarginal(function(x) 1/sqrt(x), 
-                                                     spatiophylogenetic_PC3$marginals.hyperpar$`Precision for phy_id`, 
-                                                     method = "linear") %>%
-  inla.qmarginal(c(0.025, 0.5, 0.975), .)
+
+
+
+
+#####OTHER THINGS
+
+
+
 
 spatiophylogenetic_models = rbind(
   c(spatiophylogenetic_phyeffect_varPC1, spatiophylogenetic_speffect_varPC1),
