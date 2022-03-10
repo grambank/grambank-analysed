@@ -227,8 +227,9 @@ for(feature in features){
     mutate(Feature_ID = feature) %>% 
     mutate(effect = "spatial_only") %>% 
     mutate(waic = output$waic$waic) %>% 
-    mutate(marginals.hyperpar <- output$marginals.hyperpar)
-  
+    mutate(marginals.hyperpar.gaussian = output$marginals.hyperpar[1] ) %>% 
+    mutate(marginals.hyperpar.sp_id = output$marginals.hyperpar[2] )
+
   df_spatial_only <- df_spatial_only  %>% 
     full_join(df)
   
