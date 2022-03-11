@@ -149,39 +149,39 @@ df_phylo_only$waic <- as.numeric(df_phylo_only$waic)
 index <- 0
 
 for(feature in features){
-
-#feature <- features[1]
-
-cat(paste0("# Running the phylo-only model on feature ", feature, ". That means I'm ", round(index/length(features) * 100, 2), "% done.\n"))
-index <- index + 1 
   
-output <- eval(substitute(inla(formula = this_feature ~
+  #feature <- features[1]
+  
+  cat(paste0("# Running the phylo-only model on feature ", feature, ". That means I'm ", round(index/length(features) * 100, 2), "% done.\n"))
+  index <- index + 1 
+  
+  output <- eval(substitute(inla(formula = this_feature ~
                                    f(phy_id, model = "generic0", Cmatrix = phylo_prec_mat,
                                      constr = TRUE, hyper = pcprior_phy),
-                               control.compute = list(waic=TRUE, dic = TRUE, mlik = FALSE, config = TRUE),
-                               control.predictor = list(compute = TRUE),
-                               data = grambank_df),
-                              list(this_feature=as.name(feature))))
-
-phylo_effect = inla.tmarginal(function(x) 1/sqrt(x),
-                              output$marginals.hyperpar$`Precision for phy_id`,
-                                     method = "linear") %>%
-  inla.qmarginal(c(0.025, 0.5, 0.975), .)
-
-df <- phylo_effect %>% 
-  as.data.frame() %>% 
-  t() %>% 
-  as.data.frame() %>% 
-  rename("2.5%" = V1, "50%" = V2, "97.5%" = V3) %>% 
-  mutate(Feature_ID = feature) %>% 
-  mutate(effect = "phylo_only") %>% 
-  mutate(waic = output$waic$waic)  %>% 
-  mutate(marginals.hyperpar.gaussian = output$marginals.hyperpar[1] ) %>% 
-  mutate(marginals.hyperpar.phy_id = output$marginals.hyperpar[2])
-
-df_phylo_only <- df_phylo_only  %>% 
-  full_join(df)
-
+                                 control.compute = list(waic=TRUE, dic = TRUE, mlik = FALSE, config = TRUE),
+                                 control.predictor = list(compute = TRUE),
+                                 data = grambank_df),family = "bernoulli",
+                            list(this_feature=as.name(feature))))
+  
+  phylo_effect = inla.tmarginal(function(x) 1/sqrt(x),
+                                output$marginals.hyperpar$`Precision for phy_id`,
+                                method = "linear") %>%
+    inla.qmarginal(c(0.025, 0.5, 0.975), .)
+  
+  df <- phylo_effect %>% 
+    as.data.frame() %>% 
+    t() %>% 
+    as.data.frame() %>% 
+    rename("2.5%" = V1, "50%" = V2, "97.5%" = V3) %>% 
+    mutate(Feature_ID = feature) %>% 
+    mutate(effect = "phylo_only") %>% 
+    mutate(waic = output$waic$waic)  %>% 
+    mutate(marginals.hyperpar.bernoulli = output$marginals.hyperpar[1] ) %>% 
+    mutate(marginals.hyperpar.phy_id = output$marginals.hyperpar[2])
+  
+  df_phylo_only <- df_phylo_only  %>% 
+    full_join(df)
+  
 }
 
 df_phylo_only %>% write_tsv("spatiophylogenetic_modelling/results/df_phylo_only.tsv")
@@ -216,7 +216,7 @@ for(feature in features){
                                    f(sp_id, model = "generic0", Cmatrix = spatial_prec_mat,
                                      constr = TRUE, hyper = pcprior_spa),
                                  control.compute = list(waic=TRUE, dic = TRUE),
-                                 data = grambank_df),
+                                 data = grambank_df),family = "bernoulli",
                             list(this_feature=as.name(feature))))
   
   spatial_effect = inla.tmarginal(function(x) 1/sqrt(x),
@@ -224,7 +224,7 @@ for(feature in features){
                                   method = "linear") %>%
     inla.qmarginal(c(0.025, 0.5, 0.975), .)
   
-
+  
   df <- spatial_effect %>% 
     as.data.frame() %>% 
     t() %>% 
@@ -233,9 +233,9 @@ for(feature in features){
     mutate(Feature_ID = feature) %>% 
     mutate(effect = "spatial_only") %>% 
     mutate(waic = output$waic$waic) %>% 
-    mutate(marginals.hyperpar.gaussian = output$marginals.hyperpar[1] ) %>% 
+    mutate(marginals.hyperpar.bernoulli = output$marginals.hyperpar[1] ) %>% 
     mutate(marginals.hyperpar.sp_id = output$marginals.hyperpar[2])
-
+  
   df_spatial_only <- df_spatial_only  %>% 
     full_join(df)
   
@@ -270,21 +270,21 @@ for(feature in features){
   
   output <- eval(substitute(inla(formula = this_feature ~
                                    f(phy_id, model = "generic0", Cmatrix = phylo_prec_mat, constr = TRUE, hyper = pcprior_phy) + 
-                                   f(sp_id, model = "generic0", Cmatrix = spatial_prec_mat, constr = TRUE, hyper = pcprior_spa), 
+                                   f(sp_id, model = "generic0", Cmatrix = spatial_prec_mat, constr = TRUE, hyper = pcprior_spa), family = "bernoulli",
                                  control.compute = list(waic=TRUE),
                                  data = grambank_df),
                             list(this_feature=as.name(feature))))
   
-spatial_effect = inla.tmarginal(function(x) 1/sqrt(x), 
+  spatial_effect = inla.tmarginal(function(x) 1/sqrt(x), 
                                   output$marginals.hyperpar$`Precision for sp_id`, 
                                   method = "linear") %>%
     inla.qmarginal(c(0.025, 0.5, 0.975), .)
   
-phylo_effect = inla.tmarginal(function(x) 1/sqrt(x), 
-                              output$marginals.hyperpar$`Precision for phy_id`, 
-                              method = "linear") %>%
-  inla.qmarginal(c(0.025, 0.5, 0.975), .)
-
+  phylo_effect = inla.tmarginal(function(x) 1/sqrt(x), 
+                                output$marginals.hyperpar$`Precision for phy_id`, 
+                                method = "linear") %>%
+    inla.qmarginal(c(0.025, 0.5, 0.975), .)
+  
   df_space <- spatial_effect %>% 
     as.data.frame() %>% 
     t() %>% 
@@ -293,9 +293,9 @@ phylo_effect = inla.tmarginal(function(x) 1/sqrt(x),
     mutate(Feature_ID = feature) %>% 
     mutate(effect = "spatial_in_double") %>% 
     mutate(waic = output$waic$waic) %>% 
-    mutate(marginals.hyperpar.gaussian = output$marginals.hyperpar[1] ) %>% 
+    mutate(marginals.hyperpar.bernoulli = output$marginals.hyperpar[1] ) %>% 
     mutate(marginals.hyperpar.sp_id = output$marginals.hyperpar[3])
-
+  
   df_phylo <- phylo_effect %>% 
     as.data.frame() %>% 
     t() %>% 
@@ -304,7 +304,7 @@ phylo_effect = inla.tmarginal(function(x) 1/sqrt(x),
     mutate(Feature_ID = feature) %>% 
     mutate(effect = "phylo_in_double") %>% 
     mutate(waic = output$waic$waic) %>% 
-    mutate(marginals.hyperpar.gaussian = output$marginals.hyperpar[1] ) %>% 
+    mutate(marginals.hyperpar.bernoulli = output$marginals.hyperpar[1] ) %>% 
     mutate(marginals.hyperpar.phy_id = output$marginals.hyperpar[2])
   
   df_spatial_phylo <- df_spatial_phylo  %>% 
