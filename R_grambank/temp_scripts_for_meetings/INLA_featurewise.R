@@ -160,7 +160,7 @@ for(feature in features){
                                      constr = TRUE, hyper = pcprior_phy),
                                  control.compute = list(waic=TRUE, dic = TRUE, mlik = FALSE, config = TRUE),
                                  control.predictor = list(compute = TRUE),
-                                 data = grambank_df),family = "bernoulli",
+                                 data = grambank_df),family = "binomial",
                             list(this_feature=as.name(feature))))
   
   phylo_effect = inla.tmarginal(function(x) 1/sqrt(x),
@@ -176,7 +176,7 @@ for(feature in features){
     mutate(Feature_ID = feature) %>% 
     mutate(effect = "phylo_only") %>% 
     mutate(waic = output$waic$waic)  %>% 
-    mutate(marginals.hyperpar.bernoulli = output$marginals.hyperpar[1] ) %>% 
+    mutate(marginals.hyperpar.binomial = output$marginals.hyperpar[1] ) %>% 
     mutate(marginals.hyperpar.phy_id = output$marginals.hyperpar[2])
   
   df_phylo_only <- df_phylo_only  %>% 
@@ -216,7 +216,7 @@ for(feature in features){
                                    f(sp_id, model = "generic0", Cmatrix = spatial_prec_mat,
                                      constr = TRUE, hyper = pcprior_spa),
                                  control.compute = list(waic=TRUE, dic = TRUE),
-                                 data = grambank_df),family = "bernoulli",
+                                 data = grambank_df),family = "binomial",
                             list(this_feature=as.name(feature))))
   
   spatial_effect = inla.tmarginal(function(x) 1/sqrt(x),
@@ -233,7 +233,7 @@ for(feature in features){
     mutate(Feature_ID = feature) %>% 
     mutate(effect = "spatial_only") %>% 
     mutate(waic = output$waic$waic) %>% 
-    mutate(marginals.hyperpar.bernoulli = output$marginals.hyperpar[1] ) %>% 
+    mutate(marginals.hyperpar.binomial = output$marginals.hyperpar[1] ) %>% 
     mutate(marginals.hyperpar.sp_id = output$marginals.hyperpar[2])
   
   df_spatial_only <- df_spatial_only  %>% 
@@ -270,7 +270,7 @@ for(feature in features){
   
   output <- eval(substitute(inla(formula = this_feature ~
                                    f(phy_id, model = "generic0", Cmatrix = phylo_prec_mat, constr = TRUE, hyper = pcprior_phy) + 
-                                   f(sp_id, model = "generic0", Cmatrix = spatial_prec_mat, constr = TRUE, hyper = pcprior_spa), family = "bernoulli",
+                                   f(sp_id, model = "generic0", Cmatrix = spatial_prec_mat, constr = TRUE, hyper = pcprior_spa), family = "binomial",
                                  control.compute = list(waic=TRUE),
                                  data = grambank_df),
                             list(this_feature=as.name(feature))))
@@ -293,7 +293,7 @@ for(feature in features){
     mutate(Feature_ID = feature) %>% 
     mutate(effect = "spatial_in_double") %>% 
     mutate(waic = output$waic$waic) %>% 
-    mutate(marginals.hyperpar.bernoulli = output$marginals.hyperpar[1] ) %>% 
+    mutate(marginals.hyperpar.binomial = output$marginals.hyperpar[1] ) %>% 
     mutate(marginals.hyperpar.sp_id = output$marginals.hyperpar[3])
   
   df_phylo <- phylo_effect %>% 
@@ -304,7 +304,7 @@ for(feature in features){
     mutate(Feature_ID = feature) %>% 
     mutate(effect = "phylo_in_double") %>% 
     mutate(waic = output$waic$waic) %>% 
-    mutate(marginals.hyperpar.bernoulli = output$marginals.hyperpar[1] ) %>% 
+    mutate(marginals.hyperpar.binomial = output$marginals.hyperpar[1] ) %>% 
     mutate(marginals.hyperpar.phy_id = output$marginals.hyperpar[2])
   
   df_spatial_phylo <- df_spatial_phylo  %>% 
@@ -320,100 +320,3 @@ beep(3)
 
 
 
-
-
-
-
-
-
-
-#####OTHER THINGS
-
-
-
-
-spatiophylogenetic_models = rbind(
-  c(spatiophylogenetic_phyeffect_varPC1, spatiophylogenetic_speffect_varPC1),
-  c(spatiophylogenetic_phyeffect_varPC2, spatiophylogenetic_speffect_varPC2),
-  c(spatiophylogenetic_phyeffect_varPC3, spatiophylogenetic_speffect_varPC3))
-
-## output table
-
-out_table = matrix(NA, ncol = 4, nrow = 3)
-out_table[,1] = apply(phylo_effect_var, 1, function(x) paste(round(x, 2), collapse = ", "))
-out_table[,2] = apply(spatial_effect_var, 1, function(x) paste(round(x, 2), collapse = ", "))
-out_table[,3] = apply(spatiophylogenetic_models[,1:3], 1, function(x) paste(round(x, 2), collapse = ", "))
-out_table[,4] = apply(spatiophylogenetic_models[,4:6], 1, function(x) paste(round(x, 2), collapse = ", "))
-
-out_table = apply(out_table, 1:2, function(x) paste0("(", x, ")"))
-dimnames(out_table) = list(c("PC1", "PC2", "PC3"),
-                           c("Phylogenetic_only", "Spatial_Only", "Phylogenetic_Joint", "Spatial_Joint"))
-
-write.csv(out_table, file.path("spatiophylogenetic_modelling", "results", "jaeger_table.csv"))
-
-#### Table 1 ####
-table1 = matrix(NA, ncol = 4, nrow = 3)
-dimnames(table1) = list(c("PC1", "PC2", "PC3"),
-                        c("Standarddeviation_Phy",
-                          "Percentage_Phy",
-                          "Standarddevation_Sp",
-                          "Percentage_SP"))
-
-table1[,"Standarddeviation_Phy"] = 
-  round(spatiophylogenetic_models[,2], 2)
-table1[,"Standarddevation_Sp"] = 
-  round(spatiophylogenetic_models[,5], 2)
-
-### Get percentage explained results
-get_percent = function(mean, sd){
-  pct = pnorm(mean + sd / 2, lower.tail=TRUE) - 
-    pnorm(mean - sd / 2, lower.tail=TRUE)
-  round(pct, 2)
-}
-
-phy_percent = get_percent(
-  colMeans(grambank_pca[,c("PC1", "PC2", "PC3")]),
-  spatiophylogenetic_models[,2])
-
-sp_percent = get_percent(
-  colMeans(grambank_pca[,c("PC1", "PC2", "PC3")]),
-  spatiophylogenetic_models[,5])
-
-table1[,"Percentage_Phy"] = phy_percent
-table1[,"Percentage_SP"]  = sp_percent
-
-write.csv(table1, 
-          "spatiophylogenetic_modelling/results/table_1.csv")
-
-#### WAIC output ####
-waic_output = matrix(NA, ncol = 3, nrow = 3)
-
-waic_output[1,] = c(phylogenetic_PC1$waic$waic, 
-                    spatial_PC1$waic$waic,
-                    spatiophylogenetic_PC1$waic$waic)
-
-waic_output[2,] = c(phylogenetic_PC2$waic$waic, 
-                    spatial_PC2$waic$waic,
-                    spatiophylogenetic_PC2$waic$waic)
-
-waic_output[3,] = c(phylogenetic_PC3$waic$waic, 
-                    spatial_PC3$waic$waic,
-                    spatiophylogenetic_PC3$waic$waic)
-
-dimnames(waic_output) = list(c("PC1", "PC2", "PC3"), c("Phylogeny", "Space", "Spatiophylogenetic"))
-write.csv(waic_output, "spatiophylogenetic_modelling/results/jaeger_waic.csv")
-
-#### Save models #### 
-model_list = list(phylogenetic_PC1, phylogenetic_PC2, phylogenetic_PC3,
-                  spatial_PC1, spatial_PC2, spatial_PC3, 
-                  spatiophylogenetic_PC1, spatiophylogenetic_PC2, spatiophylogenetic_PC3)
-
-
-marginals.hyperpar = lapply(model_list, function(x) x$marginals.hyperpar)
-
-names(marginals.hyperpar) = c("Phy_PC1", "Phy_PC2", "Phy_PC3", 
-                              "Space_PC1", "Space_PC2", "Space_PC3",
-                              "SP_PC1", "SP_PC2", "SP_PC3")
-
-save(marginals.hyperpar, 
-     file = "spatiophylogenetic_modelling/results/jaeger_models.RData")
