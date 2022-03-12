@@ -160,7 +160,7 @@ for(feature in features){
                                      constr = TRUE, hyper = pcprior_phy),
                                  control.compute = list(waic=TRUE, dic = TRUE, mlik = FALSE, config = TRUE),
                                  control.predictor = list(compute = TRUE),
-                                 data = grambank_df),family = "binomial",
+                                 data = grambank_df,family = "binomial"),
                             list(this_feature=as.name(feature))))
   
   phylo_effect = inla.tmarginal(function(x) 1/sqrt(x),
@@ -216,7 +216,7 @@ for(feature in features){
                                    f(sp_id, model = "generic0", Cmatrix = spatial_prec_mat,
                                      constr = TRUE, hyper = pcprior_spa),
                                  control.compute = list(waic=TRUE, dic = TRUE),
-                                 data = grambank_df),family = "binomial",
+                                 data = grambank_df,family = "binomial"),
                             list(this_feature=as.name(feature))))
   
   spatial_effect = inla.tmarginal(function(x) 1/sqrt(x),
@@ -269,8 +269,8 @@ for(feature in features){
   index <- index + 1 
   
   output <- eval(substitute(inla(formula = this_feature ~
-                                   f(phy_id, model = "generic0", Cmatrix = phylo_prec_mat, constr = TRUE, hyper = pcprior_phy) + 
-                                   f(sp_id, model = "generic0", Cmatrix = spatial_prec_mat, constr = TRUE, hyper = pcprior_spa), family = "binomial",
+                                   f(phy_id, model = "generic0", Cmatrix = phylo_prec_mat, constr = TRUE, hyper = pcprior_phy, family = "binomial") + 
+                                   f(sp_id, model = "generic0", Cmatrix = spatial_prec_mat, constr = TRUE, hyper = pcprior_spa, family = "binomial") ,
                                  control.compute = list(waic=TRUE),
                                  data = grambank_df),
                             list(this_feature=as.name(feature))))
