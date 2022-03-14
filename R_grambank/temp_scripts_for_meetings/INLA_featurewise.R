@@ -1,12 +1,13 @@
 source("requirements.R")
 p_load(beepr)
 
-source("spatiophylogenetic_modelling/processing/pruning_jagertree.R")
+#If the tree hasn't been prune yet - prune the tree :)
+if (!dir.exists("spatiophylogenetic_modelling/processed_data/jaeger_pruned.tree")) { source("spatiophylogenetic_modelling/processing/pruning_jagertree.R") }		
 
-# load variational covariance matrix taken from geoR::varcov_spatial
+# load variational covariance matrix function taken from geoR::varcov_spatial
 source('spatiophylogenetic_modelling/analysis/varcov_spatial.R')
 
-# Check INLA is installed
+# Check that INLA is installed
 if (!is_installed("INLA")) { cat("INLA wasn't installed, installing now.\n") 
   source(file.path("spatiophylogenetic_modelling", "install_inla.R")) } else {
     cat("Great, INLA was already installed, loading now.\n") }
