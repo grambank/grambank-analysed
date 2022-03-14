@@ -145,6 +145,7 @@ df_phylo_only$`50%` <- as.numeric(df_phylo_only$`50%`)
 df_phylo_only$Feature_ID <- as.character(df_phylo_only$Feature_ID)
 df_phylo_only$effect <- as.character(df_phylo_only$effect)
 df_phylo_only$waic <- as.numeric(df_phylo_only$waic)
+df_phylo_only$marginals.hyperpar.phy_id <- as.list(df_phylo_only$marginals.hyperpar.phy_id)
 
 index <- 0
 
@@ -162,7 +163,8 @@ for(feature in features){
                                  control.predictor = list(compute = TRUE),
                                  data = grambank_df,family = "binomial"),
                             list(this_feature=as.name(feature))))
-  
+beep()
+    
   phylo_effect = inla.tmarginal(function(x) 1/sqrt(x),
                                 output$marginals.hyperpar$`Precision for phy_id`,
                                 method = "linear") %>%
@@ -176,17 +178,15 @@ for(feature in features){
     mutate(Feature_ID = feature) %>% 
     mutate(effect = "phylo_only") %>% 
     mutate(waic = output$waic$waic)  %>% 
-    mutate(marginals.hyperpar.binomial = output$marginals.hyperpar[1] ) %>% 
-    mutate(marginals.hyperpar.phy_id = output$marginals.hyperpar[2])
-  
-  df_phylo_only <- df_phylo_only  %>% 
-    full_join(df)
+    mutate(marginals.hyperpar.phy_id = output$marginals.hyperpar[1])
+
+    df_phylo_only <- df_phylo_only  %>% 
+    full_join(df, by = c("2.5%", "50%", "97.5%", "Feature_ID", "effect", "waic", "marginals.hyperpar.phy_id"))
   
 }
 
 df_phylo_only %>% write_tsv("spatiophylogenetic_modelling/results/df_phylo_only.tsv")
 df_phylo_only %>% saveRDS("spatiophylogenetic_modelling/results/df_phylo_only.Rdata")
-beep(3)
 
 ###
 
@@ -195,12 +195,13 @@ cat("#### Spatial only Model ####\n")
 
 #make empty df to bind to
 df_spatial_only <- data.frame(matrix(ncol = 6, nrow = 0))
-colnames(df_spatial_only) <- c("2.5%","50%", "97.5%", "Feature_ID", "effect", "waic") 
+colnames(df_spatial_only) <- c("2.5%","50%", "97.5%", "Feature_ID", "effect", "waic", "marginals.hyperpar.sp_id") 
 df_spatial_only$`2.5%` <- as.numeric(df_spatial_only$`2.5%`)
 df_spatial_only$`50%` <- as.numeric(df_spatial_only$`50%`)
 df_spatial_only$Feature_ID <- as.character(df_spatial_only$Feature_ID)
 df_spatial_only$effect <- as.character(df_spatial_only$effect)
 df_spatial_only$waic <- as.numeric(df_spatial_only$waic)
+df_spatial_only$marginals.hyperpar.sp_id <- as.numeric(df_spatial_only$marginals.hyperpar.sp_id)
 
 index <- 0
 
@@ -233,19 +234,18 @@ for(feature in features){
     mutate(Feature_ID = feature) %>% 
     mutate(effect = "spatial_only") %>% 
     mutate(waic = output$waic$waic) %>% 
-    mutate(marginals.hyperpar.binomial = output$marginals.hyperpar[1] ) %>% 
-    mutate(marginals.hyperpar.sp_id = output$marginals.hyperpar[2])
+    mutate(marginals.hyperpar.sp_id = output$marginals.hyperpar[1])
   
   df_spatial_only <- df_spatial_only  %>% 
-    full_join(df)
+    full_join(df, by = c("2.5%", "50%", "97.5%", "Feature_ID", "effect", "waic", "marginals.hyperpar.sp_id"))
   
 }
 
-df_spatial_only %>% write_tsv("spatiospatialgenetic_modelling/results/df_spatial_only.tsv")
-df_spatial_only %>% saveRDS("spatiospatialgenetic_modelling/results/df_spatial_only.Rdata")
+df_spatial_only %>% write_tsv("spatiophylogenetic_modelling/results/df_spatial_only_2.tsv")
+df_spatial_only %>% saveRDS("spatiophylogenetic_modelling/results/df_spatial_only_2.Rdata")
 
 
-beep(3)
+beep(1)
 ###
 
 cat("#### Spatial & Phylo Model ####\n")
@@ -269,11 +269,13 @@ for(feature in features){
   index <- index + 1 
   
   output <- eval(substitute(inla(formula = this_feature ~
-                                   f(phy_id, model = "generic0", Cmatrix = phylo_prec_mat, constr = TRUE, hyper = pcprior_phy, family = "binomial") + 
+                                   f(phy_id, model = "generic0", Cmatrix = phylo_prec_mat, constr = TRUE, hyper = pcprior_phy, 
+                                     family = "binomial") + 
                                    f(sp_id, model = "generic0", Cmatrix = spatial_prec_mat, constr = TRUE, hyper = pcprior_spa, family = "binomial") ,
                                  control.compute = list(waic=TRUE),
                                  data = grambank_df),
                             list(this_feature=as.name(feature))))
+  beep()
   
   spatial_effect = inla.tmarginal(function(x) 1/sqrt(x), 
                                   output$marginals.hyperpar$`Precision for sp_id`, 
@@ -313,8 +315,8 @@ for(feature in features){
   
 }
 
-df_spatial_phylo %>% write_tsv("spatiospatialgenetic_modelling/results/df_spatial_phylo.tsv")
-df_spatial_phylo %>% saveRDS("spatiospatialgenetic_modelling/results/df_spatial_phylo.Rdata")
+df_spatial_phylo %>% write_tsv("spatiophylogenetic_modelling/results/df_spatial_phylo.tsv")
+df_spatial_phylo %>% saveRDS("spatiophylogenetic_modelling/results/df_spatial_phylo.Rdata")
 
 beep(3)
 
