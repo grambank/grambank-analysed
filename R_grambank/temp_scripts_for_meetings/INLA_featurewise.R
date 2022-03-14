@@ -140,9 +140,10 @@ cat("#### Phylogenetic only model ####\n")
 
 #make empty df to bind to
 df_phylo_only <- data.frame(matrix(ncol = 6, nrow = 0))
-colnames(df_phylo_only) <- c("2.5%","50%", "97.5%", "Feature_ID", "effect", "waic") 
+colnames(df_phylo_only) <- c("2.5%","50%", "97.5%", "Feature_ID", "effect", "waic", "marginals.hyperpar.phy_id") 
 df_phylo_only$`2.5%` <- as.numeric(df_phylo_only$`2.5%`)
 df_phylo_only$`50%` <- as.numeric(df_phylo_only$`50%`)
+df_phylo_only$`97.5%` <- as.numeric(df_phylo_only$`97.5%`)
 df_phylo_only$Feature_ID <- as.character(df_phylo_only$Feature_ID)
 df_phylo_only$effect <- as.character(df_phylo_only$effect)
 df_phylo_only$waic <- as.numeric(df_phylo_only$waic)
@@ -199,10 +200,11 @@ df_spatial_only <- data.frame(matrix(ncol = 6, nrow = 0))
 colnames(df_spatial_only) <- c("2.5%","50%", "97.5%", "Feature_ID", "effect", "waic", "marginals.hyperpar.sp_id") 
 df_spatial_only$`2.5%` <- as.numeric(df_spatial_only$`2.5%`)
 df_spatial_only$`50%` <- as.numeric(df_spatial_only$`50%`)
+df_spatial_only$`97.5%` <- as.numeric(df_spatial_only$`97.5%`)
 df_spatial_only$Feature_ID <- as.character(df_spatial_only$Feature_ID)
 df_spatial_only$effect <- as.character(df_spatial_only$effect)
 df_spatial_only$waic <- as.numeric(df_spatial_only$waic)
-df_spatial_only$marginals.hyperpar.sp_id <- as.numeric(df_spatial_only$marginals.hyperpar.sp_id)
+df_spatial_only$marginals.hyperpar.sp_id <- as.list(df_spatial_only$marginals.hyperpar.sp_id)
 
 index <- 0
 
@@ -237,7 +239,7 @@ for(feature in features){
     mutate(waic = output$waic$waic) %>% 
     mutate(marginals.hyperpar.sp_id = output$marginals.hyperpar[1])
   
-  df_spatial_only <- df_spatial_only  %>% 
+  df_spatial_only <- df_spatial_only  %>%
     full_join(df, by = c("2.5%", "50%", "97.5%", "Feature_ID", "effect", "waic", "marginals.hyperpar.sp_id"))
   
 }
