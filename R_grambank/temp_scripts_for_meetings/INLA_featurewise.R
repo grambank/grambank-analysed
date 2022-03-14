@@ -242,8 +242,8 @@ for(feature in features){
   
 }
 
-df_spatial_only %>% write_tsv("spatiophylogenetic_modelling/results/df_spatial_only_2.tsv")
-df_spatial_only %>% saveRDS("spatiophylogenetic_modelling/results/df_spatial_only_2.Rdata")
+df_spatial_only %>% write_tsv("spatiophylogenetic_modelling/results/df_spatial_only.tsv")
+df_spatial_only %>% saveRDS("spatiophylogenetic_modelling/results/df_spatial_only.Rdata")
 
 
 beep(1)
@@ -320,6 +320,3 @@ df_spatial_phylo %>% write_tsv("spatiophylogenetic_modelling/results/df_spatial_
 df_spatial_phylo %>% saveRDS("spatiophylogenetic_modelling/results/df_spatial_phylo.Rdata")
 
 beep(3)
-
-
-
