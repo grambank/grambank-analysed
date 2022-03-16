@@ -10,3 +10,6 @@
 [submodule "autotyp-data"]
 	path = autotyp-data
 	url = https://github.com/autotyp/autotyp-data
+[submodule "dplace-data"]
+	path = dplace-data
+	url = https://github.com/D-PLACE/dplace-data
