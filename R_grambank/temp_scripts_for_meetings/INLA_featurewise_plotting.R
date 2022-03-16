@@ -28,3 +28,15 @@ theme_classic() +
         axis.text.y = element_text(angle = 30),
         axis.ticks = element_blank(),
         axis.line = element_blank()) 
+
+df_spatial_only <- readRDS("spatiophylogenetic_modelling/results/df_spatial_only.Rdata") %>%   left_join(parameters)
+
+joined <- full_join(df_phylo_only, df_spatial_only)
+
+joined %>% 
+  group_by(Feature_ID) %>% 
+  slice(which.min(waic)) %>% View()
+
+#only ones where spatial_only wins
+#GB319
+#GB320
