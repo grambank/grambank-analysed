@@ -40,3 +40,18 @@ phist = haplotypes::pairPhiST(x = GB_dist,
 )
 
 phist_matrix = phist$PhiST
+
+phist_list <-phist_matrix %>% 
+  reshape2::melt() %>% 
+  filter(!is.na(value)) %>% 
+  unite(Var1, Var2, col = "Vars", sep = " - ") 
+
+phist_list$Vars <- fct_reorder(phist_list$Vars, phist_list$value)
+
+phist_list %>% 
+  ggplot() +
+  geom_point(aes(x = Vars, y = value))
+
+phist %>% 
+saveRDS("temp_scripts_for_meetings/PHiST.rdata")
+
