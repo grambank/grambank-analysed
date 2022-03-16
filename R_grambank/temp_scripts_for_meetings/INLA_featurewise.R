@@ -29,7 +29,9 @@ GB_imputed <- read_tsv(GB_imputed_filename, col_types= cols())
 languages <- read_csv(GRAMBANK_LANGUAGES, col_types=LANGUAGES_COLSPEC) %>%		
   dplyr::select(Language_ID = Language_level_ID, Family_name, Name, Longitude, Latitude, Macroarea) %>% 
   distinct(Language_ID, .keep_all = T) %>% 
-  inner_join(GB_imputed, by = "Language_ID")
+  inner_join(GB_imputed, by = "Language_ID") %>% 
+  mutate(Longitude = round(Longitde, 3)) # let's cut down the precision of the lat/long to make the process go quicker. See stack exchange thread where they say "The third decimal place is worth up to 110 m: it can identify a large agricultural field or institutional campus." https://gis.stackexchange.com/questions/8650/measuring-accuracy-of-latitude-and-longitude
+  mutate(Latitude = round(Latitude, 3))
 
 # trees
 tree_filename = 'spatiophylogenetic_modelling/processed_data/jaeger_pruned.tree'
@@ -44,10 +46,6 @@ taxa = GB_imputed$Language_ID
 phylogenetic_tree = keep.tip(phylogenetic_tree, tip = taxa)
 
 #### Parameters ####
-GB_basename = tools::file_path_sans_ext(GB_imputed_filename) %>% basename()
-tree_basename = tools::file_path_sans_ext(tree_filename) %>% basename()
-out_name = paste(GB_basename, tree_basename, sep = "_")
-
 #### Spatial Jittering ####
 ## There are some number of languages that have identical spatial coordinates, which we cannot allow for the spatial analysis.
 ## I have jittered the coordinates that are identical
@@ -87,6 +85,24 @@ cov2precision = function(spatial_covar_mat){
 }
 
 spatial_prec_mat = cov2precision(spatial_covar_mat)
+
+#inspecting the spatial prec_mat a bit
+spatial_covar_mat_for_plots <- spatial_prec_mat
+spatial_covar_mat_for_plots[upper.tri(spatial_covar_mat_for_plots, diag = T)] <- NA
+
+melted <- spatial_covar_mat_for_plots%>% 
+  as.data.frame() %>% 
+  rownames_to_column("Language_ID") %>% 
+  reshape2::melt() %>% 
+  filter(!is.na(value))
+
+hist(melted$value)
+
+
+melted %>% 
+  ggplot() +
+  geom_point(aes(x = Language_ID, y = value))
+
 
 # Do Phylo and Spatial rownames match?
 if(all(rownames(phylo_prec_mat) == rownames(spatial_covar_mat))){
@@ -186,6 +202,7 @@ beep()
     full_join(df, by = c("2.5%", "50%", "97.5%", "Feature_ID", "effect", "waic", "marginals.hyperpar.phy_id"))
   
 }
+cat("All done with the phylo only model, 100% done!")
 
 df_phylo_only %>% write_tsv("spatiophylogenetic_modelling/results/df_phylo_only.tsv")
 df_phylo_only %>% saveRDS("spatiophylogenetic_modelling/results/df_phylo_only.Rdata")
@@ -205,6 +222,7 @@ df_spatial_only$Feature_ID <- as.character(df_spatial_only$Feature_ID)
 df_spatial_only$effect <- as.character(df_spatial_only$effect)
 df_spatial_only$waic <- as.numeric(df_spatial_only$waic)
 df_spatial_only$marginals.hyperpar.sp_id <- as.list(df_spatial_only$marginals.hyperpar.sp_id)
+
 
 index <- 0
 
@@ -247,6 +265,7 @@ for(feature in features){
 df_spatial_only %>% write_tsv("spatiophylogenetic_modelling/results/df_spatial_only.tsv")
 df_spatial_only %>% saveRDS("spatiophylogenetic_modelling/results/df_spatial_only.Rdata")
 
+cat("All done with the spatial only model, 100% done!")
 
 beep(1)
 ###
@@ -298,8 +317,7 @@ for(feature in features){
     mutate(Feature_ID = feature) %>% 
     mutate(effect = "spatial_in_double") %>% 
     mutate(waic = output$waic$waic) %>% 
-    mutate(marginals.hyperpar.binomial = output$marginals.hyperpar[1] ) %>% 
-    mutate(marginals.hyperpar.sp_id = output$marginals.hyperpar[3])
+    mutate(marginals.hyperpar.sp_id = output$marginals.hyperpar[2])
   
   df_phylo <- phylo_effect %>% 
     as.data.frame() %>% 
@@ -309,8 +327,7 @@ for(feature in features){
     mutate(Feature_ID = feature) %>% 
     mutate(effect = "phylo_in_double") %>% 
     mutate(waic = output$waic$waic) %>% 
-    mutate(marginals.hyperpar.binomial = output$marginals.hyperpar[1] ) %>% 
-    mutate(marginals.hyperpar.phy_id = output$marginals.hyperpar[2])
+    mutate(marginals.hyperpar.phy_id = output$marginals.hyperpar[1])
   
   df_spatial_phylo <- df_spatial_phylo  %>% 
     full_join(df_space, by = c("2.5%", "50%", "97.5%", "Feature_ID", "effect", "waic")) %>% 
