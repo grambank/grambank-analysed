@@ -49,7 +49,8 @@ geo_dist[upper.tri(geo_dist, diag = T)] <- NA
 geo_dist_list <- geo_dist %>%   
   reshape2::melt() %>% 
   filter(!is.na(value)) %>% 
-  rename(geo_dist = value)
+  rename(geo_dist = value) %>% 
+  mutate(geo_dist = log10(geo_dist))
 
 #tree dist 
 if (!dir.exists("spatiophylogenetic_modelling/processed_data")) { 
@@ -69,7 +70,8 @@ tree_dist_list <- tree_dist %>%
   rownames_to_column("Language_ID") %>% 
   reshape2::melt(id.vars = "Language_ID") %>% 
   filter(!is.na(value)) %>% 
-  rename(tree_dist = value, Var1 = Language_ID, Var2 = variable)
+  rename(tree_dist = value, Var1 = Language_ID, Var2 = variable) %>% 
+  mutate(tree_dist = log10(tree_dist))
 
 #joined 
 
