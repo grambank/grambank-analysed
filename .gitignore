@@ -2,6 +2,7 @@
 .DS_Store
 R_grambank/.Rhistory
 *Rproj*
+*rdata*
 *Rhistory*
 .Rproj.user
 
