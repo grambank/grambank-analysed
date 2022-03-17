@@ -38,7 +38,7 @@ GB_dist <- GB_matrix %>%
 rownames(GB_dist) <- rownames(GB)
 colnames(GB_dist) <- rownames(GB)
 
-GB_dist_2 = GB_dist^2
+#GB_dist_2 = GB_dist^2
 
 #PHiST family
 
@@ -88,7 +88,7 @@ phist_macroarea_list %>%
   theme_classic() +
   theme(axis.text = element_text(angle = 70, hjust=1))
 
-ggsave("temp_scripts_for_meetings/phist_macroareas.png")
+ggsave("temp_scripts_for_meetings/phist_macroareas.png",  width = 7.87 , height =  8.26)
 
 phist_macroarea %>% 
   saveRDS("temp_scripts_for_meetings/phist_macroarea.rdata")
