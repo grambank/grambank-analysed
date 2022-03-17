@@ -2,6 +2,7 @@
 .DS_Store
 R_grambank/.Rhistory
 *Rproj*
+*rdata*
 *Rhistory*
 .Rproj.user
 
@@ -10,3 +11,9 @@ R_grambank/.Rhistory
 *non_GB_datasets*
 *coverage_plots*
 *processed_data*
+*R_grambank/MDS*
+*R_grambank/PCA*
+*R_grambank/UMAP*
+R_grambank/impute_missing_values.log
+*R_grambank/spatiophylogenetic_modelling/results/*
+R_grambank/temp_scripts_for_meetings/phist_macroareas.png
