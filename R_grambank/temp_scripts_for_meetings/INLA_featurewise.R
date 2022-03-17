@@ -141,7 +141,6 @@ grambank_df = GB_imputed %>%
                    phy_id = 1:nrow(phylo_prec_mat),
                    sp_id = 1:nrow(spatial_prec_mat)), by = "Language_ID")
 
-
 #################
 ###INLA LOOPS####
 #################
@@ -291,13 +290,15 @@ for(feature in features){
   index <- index + 1 
   
   output <- eval(substitute(inla(formula = this_feature ~
-                                   f(phy_id, model = "generic0", Cmatrix = phylo_prec_mat, constr = TRUE, hyper = pcprior_phy, 
-                                     family = "binomial") + 
-                                   f(sp_id, model = "generic0", Cmatrix = spatial_prec_mat, constr = TRUE, hyper = pcprior_spa, family = "binomial") ,
+                                   f(phy_id, model = "generic0", Cmatrix = phylo_prec_mat, constr = TRUE, hyper = pcprior_phy) + 
+                                   f(sp_id, model = "generic0", Cmatrix = spatial_prec_mat, constr = TRUE, hyper = pcprior_spa) ,
                                  control.compute = list(waic=TRUE),
-                                 data = grambank_df),
+                                 data = grambank_df, family = "binomial"),
                             list(this_feature=as.name(feature))))
-  beep()
+  
+  output %>% 
+    saveRDS(file = paste0("spatiophylogenetic_modelling/results/dual_process_rdata/spatial_phylo_", feature, ".rdata"))
+  
   
   spatial_effect = inla.tmarginal(function(x) 1/sqrt(x), 
                                   output$marginals.hyperpar$`Precision for sp_id`, 
@@ -330,8 +331,8 @@ for(feature in features){
     mutate(marginals.hyperpar.phy_id = output$marginals.hyperpar[1])
   
   df_spatial_phylo <- df_spatial_phylo  %>% 
-    full_join(df_space, by = c("2.5%", "50%", "97.5%", "Feature_ID", "effect", "waic")) %>% 
-    full_join(df_phylo, by = c("2.5%", "50%", "97.5%", "Feature_ID", "effect", "waic", "marginals.hyperpar.phy_id"))
+    suppressMessages(full_join(df_space)) %>% 
+    suppressMessages(full_join(df_phylo))
   
 }
 
