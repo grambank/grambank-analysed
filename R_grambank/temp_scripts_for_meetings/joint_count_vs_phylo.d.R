@@ -54,6 +54,7 @@ gb_spec <- GB[[feature]] %>% as.factor()
 names(gb_spec) <- GB$Language_ID
 join_count_object <- spdep::joincount.test(gb_spec, listw = nb2listw(GB_nb, style = "B"))
 
+
 df_spec <-  data.frame(
 Feature_ID = feature,
 join_count_statistic = join_count_object[[1]]$statistic[[1]],
@@ -67,6 +68,8 @@ df <- df %>%
   full_join(df_spec, by = c("Feature_ID", "join_count_statistic", "p.value", "estimate_same_color", "estimate_expectation", "estimate_variance", "alternative"))
 }
 
+cat("I'm a 100% done! Go me!")
+
 
 joined_df <- df %>% 
   full_join(phylo_d_table, by = "Feature_ID")
@@ -74,9 +77,10 @@ joined_df <- df %>%
 png("temp_scripts_for_meetings/phylo_d_vs_join_count.png")
 joined_df %>% 
   left_join(parameters, by = "Feature_ID") %>% 
-  ggplot() +
-  geom_point(aes(x = join_count_statistic, y = `D-estimate`, col = Main_domain)) +
-  theme_classic()
+  ggplot(aes(x = estimate_same_color, y = `D-estimate`)) +
+  geom_point(aes(col = Main_domain)) +
+  theme_classic() +
+  geom_smooth()
 
 x <- dev.off()
 
