@@ -81,7 +81,7 @@ joined <- full_join(GB_dist_list, geo_dist_list) %>%
   left_join(right) %>% 
   mutate(same_fam = ifelse(Family_name_var1 == Family_name_var2, "same", "diff"))
 
-png("geo_GB_dist.png", height = 10.6, width = 11.3)
+png("temp_scripts_for_meetings/geo_GB_dist.png", height = 10.6, width = 11.3)
 joined %>% 
   ggplot(aes(x = geo_dist, y = GB_dist)) +
   geom_point(aes(color = same_fam), alpha = 0.6) +
@@ -92,7 +92,7 @@ joined %>%
 x <- dev.off()
 
 
-png("tree_GB_dist.png", height = 10.6, width = 11.3)
+png("temp_scripts_for_meetings/tree_GB_dist.png", height = 10.6, width = 11.3)
 
 joined %>% 
   ggplot(aes(x = tree_dist, y = GB_dist)) +
