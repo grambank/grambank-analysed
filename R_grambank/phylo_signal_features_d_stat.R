@@ -1,6 +1,9 @@
 source("requirements.R")
 #This script was written by Hedvig Skirgård, with assistance from caper-maintainer David Orme and phytools-maintainer Liam Revell.
 
+OUTPUTDIR <- file.path("phylosig")
+if (!dir.exists(OUTPUTDIR)) { dir.create(OUTPUTDIR) }	
+
 #reading in global tree. This tree has been processed already by spatiophylogenetic_modelling/processing/pruning_jagertree.R
 tree <- read.tree("spatiophylogenetic_modelling/processed_data/jaeger_pruned.tree")
 
