@@ -13,7 +13,7 @@ This Git repository contains git submodules. That means that this repository is 
 
 If you want to run scripts in this repository on your machine, it is necessary not only to clone this repository but also after cloning to run:
 
-`git submodules update --init`
+`git submodule update --init`
 
 This command will initialise and update the git submodules appropriately. Note that this includes data from grambank-cldf, so no script will run without initalising the git submodules.
 
