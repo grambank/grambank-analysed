@@ -116,23 +116,24 @@ In these scripts, "na_prop" refers to the proportion of missing values. A high v
 `Makefile`: is a [GNU Make](https://www.gnu.org/software/make/) Makefile for compiling and building all the plots. To build everything, run this from your terminal/console in the directory R_grambank:
 
 1. `make requirements.log`: installs all the required R packages.
-2. `make data`: renders wide data tables based on the CLDF-data. This step also generates the cropped and imputed dataframe as well as the glottolog-cldf table and pruning of the global Jäger-tree. This step also generates the data coverage comparison plot for WALS vs GB, which necessitates fetching WALS data from the web.
+2. `make data`: renders wide data tables based on the CLDF-data. This step also generates the cropped and imputed dataframe as well as the glottolog-cldf table and pruning of the global Jäger-tree. This step also generates the data coverage comparison plot for WALS vs GB, which necessitates fetching WALS data from the git submodule.
 3. `make pca`: runs PCA and generate all PCA plots. Also compares PCA to theoretical scores
 4. `make get_unusualness`: calculates the unusualness scores per languages and generates plots.
 5. `make phylo_signal_per_feature`: calculates the D-value per feature (in the binarised, cropped and imputed dataset)
 6. `make endangerment_analysis`: calculates the dissimilarity scores per endangerment level
 
-If you want to run all steps 0:7, you can also use the Makefile rule `make almost_all_fast`. This will run all the steps which are reasonable to run on a personal computer (with internet access) and which do not take up a lot of time. The next steps are more computationally expensive, which is why you may want to elect to run them when there is more time or more computational resources (cluster).
+If you want to run all steps 1:6, you can also use the Makefile rule `make almost_all_fast`. This will run all the steps which are reasonable to run on a personal computer and which do not take up a lot of time. The next steps are more computationally expensive, which is why you may want to elect to run them when there is more time or more computational resources (cluster).
 
-6. `make INLA`: runs the spatiophylogenetic modelling using the INLA-approach. This is feasible to run on a personal computer, but may take a few hours.
-7. `make predict_unsualness`: runs a BRMS-analysis of the unusualness score calculated in step 3. This is preferable to run on a cluster instead of on a personal computer.
+7. `make INLA`: runs the spatiophylogenetic modelling using the INLA-approach. This is feasible to run on a personal computer, but may take a few hours.
+8. `make predict_unsualness`: runs a BRMS-analysis of the unusualness score calculated in step 3. This is preferable to run on a cluster instead of on a personal computer.
 
 If you wish to run all analysis in one sweep, including step 6:7 and tests: `make all` will accomplish this.
 
-8. `make clean`: deletes all new files and directories from previous steps, wiping the slate clean for running scripts anew.
+9. `make clean`: deletes all new files and directories from previous steps, wiping the slate clean for running scripts anew.
 
-Note that there are several scripts which requires internet access:
+### Git submodules
+All scrits require git submodules to be initialised. Git submodules are a principled way to linked to other git repositories. If you want to run scripts in this repository on your machine, it is necessary not only to clone this repository but also after cloning to run:
 
-* make_glottolog-cldf_table.R (step 1)
-* compare_coverage_WALS.R (step 1)
-* unusualness/processing/assigning_AUTOTYP_areas.R (step 3)
+`git submodules update --init`
+
+This command will initialise and update the git submodules appropraitely. This includes the data from grambank-cldf. You can read more about git submodules [here](https://git-scm.com/book/en/v2/Git-Tools-Submodules#_cloning_submodules).
