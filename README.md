@@ -13,6 +13,8 @@ This Git repository contains git submodules. That means that this repository is 
 
 `git submodules update --init`
 
-This command will initialise and update the git submodules appropraitely. You can read more about git submodules [here](https://git-scm.com/book/en/v2/Git-Tools-Submodules#_cloning_submodules).
+This command will initialise and update the git submodules appropriately. This includes data from grambank-cldf. 
+
+You can read more about git submodules [here](https://git-scm.com/book/en/v2/Git-Tools-Submodules#_cloning_submodules).
 
  
