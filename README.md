@@ -9,12 +9,12 @@ This repository also includes analysis and/or plots which requires data from glo
 You can run almost all the scripts in this repository on your personal computer, with the exception of the BRMS analysis and also possibly the INLA-analysis (depending on if it's possible to install INLA on your machine). You can read more about the possible Makefile rules you can run [here](https://github.com/grambank/grambank-analysed/blob/main/R_grambank/README.md#files).
 
 ## Git submodules
-This Git repository contains git submodules. That means that this repository is linked to other git repositories in a principled way. If you want to run scripts in this repository on your machine, it is necessary not only to clone this repository but also after cloning to run:
+This Git repository contains git submodules. That means that this repository is linked to other git repositories in a principled way. In this instance this repository has git submodules for the following repostiroeies: grambank-cldf, AUTOTYP-data, glottolog-cldf and WALS.
+
+If you want to run scripts in this repository on your machine, it is necessary not only to clone this repository but also after cloning to run:
 
 `git submodules update --init`
 
-This command will initialise and update the git submodules appropriately. This includes data from grambank-cldf. 
+This command will initialise and update the git submodules appropriately. Note that this includes data from grambank-cldf, so no script will run without initalising the git submodules.
 
 You can read more about git submodules [here](https://git-scm.com/book/en/v2/Git-Tools-Submodules#_cloning_submodules).
-
- 
