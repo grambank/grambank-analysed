@@ -132,8 +132,12 @@ If you wish to run all analysis in one sweep, including step 6:7 and tests: `mak
 9. `make clean`: deletes all new files and directories from previous steps, wiping the slate clean for running scripts anew.
 
 ### Git submodules
-All scrits require git submodules to be initialised. Git submodules are a principled way to linked to other git repositories. If you want to run scripts in this repository on your machine, it is necessary not only to clone this repository but also after cloning to run:
+This Git repository contains git submodules. That means that this repository is linked to other git repositories in a principled way. In this instance this repository has git submodules for the following repostiroeies: grambank-cldf, AUTOTYP-data, glottolog-cldf and WALS.
+
+If you want to run scripts in this repository on your machine, it is necessary not only to clone this repository but also after cloning to run:
 
 `git submodules update --init`
 
-This command will initialise and update the git submodules appropraitely. This includes the data from grambank-cldf. You can read more about git submodules [here](https://git-scm.com/book/en/v2/Git-Tools-Submodules#_cloning_submodules).
+This command will initialise and update the git submodules appropriately. Note that this includes data from grambank-cldf, so no script will run without initalising the git submodules.
+
+You can read more about git submodules [here](https://git-scm.com/book/en/v2/Git-Tools-Submodules#_cloning_submodules).
