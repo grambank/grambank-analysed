@@ -2,7 +2,18 @@ source("requirements.R")
 p_load(beepr)
 
 #If the tree hasn't been prune yet - prune the tree :)
-if (!dir.exists("spatiophylogenetic_modelling/processed_data/jaeger_pruned.tree")) { source("spatiophylogenetic_modelling/processing/pruning_jagertree.R") }		
+if (!file.exists("spatiophylogenetic_modelling/processed_data/jaeger_pruned.tree")) { source("spatiophylogenetic_modelling/processing/pruning_jagertree.R") }		
+
+#make output dirs
+
+if (!dir.exists("spatiophylogenetic_modelling/results/")) {
+dir.create("spatiophylogenetic_modelling/results/")
+  }
+if (!dir.exists("spatiophylogenetic_modelling/results/phylo_only/")) {
+dir.create("spatiophylogenetic_modelling/results/phylo_only/")
+dir.create("spatiophylogenetic_modelling/results/spatial_only/")
+dir.create("spatiophylogenetic_modelling/results/dual_process_rdata/")
+   }		
 
 # load variational covariance matrix function taken from geoR::varcov_spatial
 source('spatiophylogenetic_modelling/analysis/varcov_spatial.R')
@@ -180,6 +191,9 @@ for(feature in features){
                                  control.predictor = list(compute = TRUE),
                                  data = grambank_df,family = "binomial"),
                             list(this_feature=as.name(feature))))
+  
+  output %>% 
+    saveRDS(file = paste0("spatiophylogenetic_modelling/results/phylo_only/phylo_only_", feature, ".rdata"))
     
   phylo_effect = inla.tmarginal(function(x) 1/sqrt(x),
                                 output$marginals.hyperpar$`Precision for phy_id`,
@@ -238,6 +252,9 @@ for(feature in features){
                                  control.compute = list(waic=TRUE, dic = TRUE),
                                  data = grambank_df,family = "binomial"),
                             list(this_feature=as.name(feature))))
+  
+  output %>% 
+    saveRDS(file = paste0("spatiophylogenetic_modelling/results/spatial_only/spatial_only_", feature, ".rdata"))
   
   spatial_effect = inla.tmarginal(function(x) 1/sqrt(x),
                                   output$marginals.hyperpar$`Precision for sp_id`,
