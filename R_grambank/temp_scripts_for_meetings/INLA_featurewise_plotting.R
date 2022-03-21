@@ -45,6 +45,6 @@ joined %>%
   group_by(Feature_ID) %>% 
   slice(which.min(waic)) %>% View()
 
-#only ones where spatial_only wins
-#GB319
-#GB320
+
+
+
