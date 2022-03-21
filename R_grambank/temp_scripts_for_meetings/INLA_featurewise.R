@@ -325,6 +325,8 @@ df_spatial_phylo$`50%` <- as.numeric(df_spatial_phylo$`50%`)
 df_spatial_phylo$Feature_ID <- as.character(df_spatial_phylo$Feature_ID)
 df_spatial_phylo$effect <- as.character(df_spatial_phylo$effect)
 df_spatial_phylo$waic <- as.numeric(df_spatial_phylo$waic)
+df_spatial_phylo$marginals.hyperpar.sp_id <- as.list(df_spatial_phylo$marginals.hyperpar.sp_id)
+df_spatial_phylo$marginals.hyperpar.phy_id <- as.list(df_spatial_phylo$marginals.hyperpar.phy_id)
 
 for(fn in spatial_phylo_rdata_fns){
 
@@ -335,25 +337,15 @@ feature <- fn %>% str_extract("GB[0-9]*[a|b]?")
 
 cat(paste0("I'm processing the inla output for feature ", feature, ".\n" ))
     
-spatial_effect = inla.tmarginal(function(x) 1/sqrt(x), 
-                                output$marginals.hyperpar$`Precision for sp_id`, 
-                                method = "linear") %>%
-  inla.qmarginal(c(0.025, 0.5, 0.975), .)
-
 phylo_effect = inla.tmarginal(function(x) 1/sqrt(x), 
                               output$marginals.hyperpar$`Precision for phy_id`, 
                               method = "linear") %>%
   inla.qmarginal(c(0.025, 0.5, 0.975), .)
 
-df_space <- spatial_effect %>% 
-  as.data.frame() %>% 
-  t() %>% 
-  as.data.frame() %>% 
-  rename("2.5%" = V1, "50%" = V2, "97.5%" = V3) %>% 
-  mutate(Feature_ID = feature) %>% 
-  mutate(effect = "spatial_in_double") %>% 
-  mutate(waic = output$waic$waic) %>% 
-  mutate(marginals.hyperpar.sp_id = output$marginals.hyperpar[2])
+spatial_effect = inla.tmarginal(function(x) 1/sqrt(x), 
+                                output$marginals.hyperpar$`Precision for sp_id`, 
+                                method = "linear") %>%
+  inla.qmarginal(c(0.025, 0.5, 0.975), .)
 
 df_phylo <- phylo_effect %>% 
   as.data.frame() %>% 
@@ -365,9 +357,19 @@ df_phylo <- phylo_effect %>%
   mutate(waic = output$waic$waic) %>% 
   mutate(marginals.hyperpar.phy_id = output$marginals.hyperpar[1])
 
+df_space <- spatial_effect %>% 
+  as.data.frame() %>% 
+  t() %>% 
+  as.data.frame() %>% 
+  rename("2.5%" = V1, "50%" = V2, "97.5%" = V3) %>% 
+  mutate(Feature_ID = feature) %>% 
+  mutate(effect = "spatial_in_double") %>% 
+  mutate(waic = output$waic$waic) %>% 
+  mutate(marginals.hyperpar.sp_id = output$marginals.hyperpar[2])
+
 df_spatial_phylo <- df_spatial_phylo  %>% 
-  suppressMessages(full_join(df_space)) %>% 
-  suppressMessages(full_join(df_phylo))
+  full_join(df_space, by = c("2.5%", "50%", "97.5%", "Feature_ID", "effect", "waic", "marginals.hyperpar.sp_id")) %>% 
+  full_join(df_phylo, by = c("2.5%", "50%", "97.5%", "Feature_ID", "effect", "waic", "marginals.hyperpar.phy_id"))
 
 }
 
