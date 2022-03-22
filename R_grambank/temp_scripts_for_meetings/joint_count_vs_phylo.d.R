@@ -3,16 +3,15 @@ p_load("spdep")
 
 #get the phylo.d table   
 if (!file.exists("phylosig/pylosig_table.tsv")) { source("phylo_signal_features_d_stat.R") }		
-phylo_d_table <- read_tsv("phylosig/pylosig_table.tsv", col_types = cols()) %>% 
+phylo_d_table <- read.delim("phylosig/pylosig_table.tsv", sep = "\t") %>% 
   dplyr::rename(Feature_ID = Feature)
 
-GB <- read_tsv("GB_wide/GB_wide_imputed_binarized.tsv", col_types = cols())
+GB <- read.delim("GB_wide/GB_wide_imputed_binarized.tsv", sep = "\t")
+
+parameters <- read.delim("feature_grouping_for_analysis.csv", sep = ",")
 
 
-parameters <- read_csv("../../grambank_grambank/grambank/docs/feature_groupings/feature_grouping_for_analysis.csv", show_col_types = F, col_types = cols())
-
-
-Language_meta_data <-  read_csv(GRAMBANK_LANGUAGES, col_types=LANGUAGES_COLSPEC) %>%		
+Language_meta_data <-  read.delim(GRAMBANK_LANGUAGES, sep = ",") %>%		
   dplyr::select(Language_ID = Language_level_ID, Latitude, Longitude, Family_name) %>% 
   distinct(Language_ID, .keep_all = T) %>% 
   mutate(Family_name = ifelse(is.na(Family_name), "Isolate", Family_name))
@@ -32,15 +31,10 @@ features <- GB %>%
   colnames()
 
 #empty df to bind to
-df <- data.frame(matrix(ncol = 7, nrow = 0))
-colnames(df) <- c("Feature_ID","join_count_statistic", "p.value", "estimate_same_color","estimate_expectation", "estimate_variance", "alternative") 
+df <- data.frame(matrix(ncol = 2, nrow = 0))
+colnames(df) <- c("Feature_ID","jtot_z_value") 
 df$Feature_ID <- as.character(df$Feature_ID)
-df$join_count_statistic <- as.numeric(df$join_count_statistic)
-df$p.value <- as.numeric(df$p.value)
-df$estimate_same_color <- as.numeric(df$estimate_same_color)
-df$estimate_expectation <- as.numeric(df$estimate_expectation)
-df$estimate_variance <- as.numeric(df$estimate_variance)
-df$alternative <- as.character(df$alternative)
+df$jtot_z_value <- as.numeric(df$jtot_z_value)
 
 index <- 0
 for(feature in features){
@@ -52,32 +46,29 @@ for(feature in features){
   
 gb_spec <- GB[[feature]] %>% as.factor()
 names(gb_spec) <- GB$Language_ID
-join_count_object <- spdep::joincount.test(gb_spec, listw = nb2listw(GB_nb, style = "B"))
+join_count_object <- spdep::joincount.multi(fx = gb_spec, listw = nb2listw(GB_nb, style = "B"))
 
+jtot_z_value<- join_count_object["Jtot", "z-value"] 
 
 df_spec <-  data.frame(
 Feature_ID = feature,
-join_count_statistic = join_count_object[[1]]$statistic[[1]],
-p.value = join_count_object[[1]]$p.value[[1]],
-estimate_same_color =join_count_object[[1]]$estimate[[1]],
-estimate_expectation =join_count_object[[1]]$estimate[[2]],
-estimate_variance =join_count_object[[1]]$estimate[[3]],
-alternative = join_count_object[[1]]$alternative)
+jtot_z_value = jtot_z_value)
 
 df <- df %>% 
-  full_join(df_spec, by = c("Feature_ID", "join_count_statistic", "p.value", "estimate_same_color", "estimate_expectation", "estimate_variance", "alternative"))
+  full_join(df_spec, by = c("Feature_ID", "jtot_z_value"))
 }
 
 cat("I'm a 100% done! Go me!")
 
 
 joined_df <- df %>% 
-  full_join(phylo_d_table, by = "Feature_ID")
+  full_join(phylo_d_table, by = "Feature_ID") %>% 
+  mutate(jtot_z_value = scale(jtot_z_value))
 
 png("temp_scripts_for_meetings/phylo_d_vs_join_count.png")
 joined_df %>% 
   left_join(parameters, by = "Feature_ID") %>% 
-  ggplot(aes(x = estimate_same_color, y = `D-estimate`)) +
+  ggplot(aes(x = jtot_z_value, y = `D-estimate`)) +
   geom_point(aes(col = Main_domain)) +
   theme_classic() +
   geom_smooth()
