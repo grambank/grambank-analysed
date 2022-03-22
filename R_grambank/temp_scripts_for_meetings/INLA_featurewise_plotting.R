@@ -43,7 +43,11 @@ col_vector <- c("purple4", "turquoise3")
 
 
 plot_df_summ_hed_subset <- plot_df_summ_hed %>% 
-  filter(model == "dual")
+  filter(model == "dual") %>% 
+#  filter(Feature_ID == "GB430") %>% 
+  mutate(xmin = Mean - Trad.lower, 
+         xmax = Mean + Trad.upper) %>% 
+  mutate(too_low = ifelse(Mean < xmin, "yes", "no"))
 
 plot <- plot_df_summ_hed_subset %>% 
   ggplot(aes(y = Feature_ID, x = Mean, fill = effect, col = effect), stat = "identity") +
@@ -51,12 +55,13 @@ plot <- plot_df_summ_hed_subset %>%
   scale_colour_manual(values = col_vector) + 
   scale_fill_manual(values = col_vector) +
   geom_errorbar(width = 0.2, 
-                aes(xmin = Mean - Trad.lower, 
-                    xmax = Mean + Trad.upper),
+                aes(xmin = xmin, 
+                    xmax = xmax),
                 position = position_dodge(width = 0.4)) + 
   geom_point(shape=21, size=2, position = position_dodge(width = 0.4)) + 
   theme(legend.title = element_blank(), legend.position="bottom") +
-  theme(axis.text.y = element_text(size = 14))
+  theme(axis.text.y = element_text(size = 14)) +
+  xlim(c(0,7))
   
 
 png( "spatiophylogenetic_modelling/figures/featurewise_dual_process_effects.png", width = 10, height = 25, units = "in", res = 100)
