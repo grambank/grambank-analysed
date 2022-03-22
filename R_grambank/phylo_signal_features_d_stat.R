@@ -16,7 +16,7 @@ GB_wide <- tree_tips %>% #merging the GB dataset to the tree tip df to ensure sa
 
 #table with full names and abbreviations of features
 GB_id_desc <- read_tsv("GB_wide/parameters_binary.tsv", show_col_types = FALSE) %>% 
-  dplyr::select(Feature = ID, Grambank_ID_desc)
+  dplyr::select(Feature_ID = ID, Grambank_ID_desc)
 
 # Build the comparative dataset for the phylo.d function
 df_comp <- comparative.data(tree, GB_wide, names.col=Language_ID)
@@ -26,7 +26,7 @@ features <- colnames(df_comp$data)
 
 #make an empty tibble to populate in the for-loop
 nfeature <- length(features)
-result_df <- tibble(Feature = character(nfeature), 
+result_df <- tibble(Feature_ID = character(nfeature), 
                     `D-estimate` = numeric(length = nfeature), 
                     Pval1 = numeric(length = nfeature), 
                     Pval0 = numeric(length = nfeature))
@@ -53,7 +53,7 @@ for (idx in seq_along(features)) {
 close(pb)
 
 result_df_with_desc <- result_df %>%  
-  left_join(GB_id_desc, by = "Feature") 
+  left_join(GB_id_desc, by = "Feature_ID") 
 
 result_df_with_desc %>% 
   write_tsv("phylosig/pylosig_table.tsv")
@@ -112,7 +112,7 @@ most_signal_features <- result_df_with_desc%>%
   filter(Pval0 >= 0.05) %>% 
   arrange(`D-estimate`) %>% 
   top_n(n = 5, wt = -`D-estimate`) %>% 
-  dplyr::select(Feature) %>% 
+  dplyr::select(Feature_ID) %>% 
   as.matrix() %>% 
   as.vector()
 
@@ -132,7 +132,7 @@ feature_df <-GB_wide %>%
   mutate(tip.color = ifelse(.[,2] == 1, color_vector[1],  color_vector[2]))
 
 plot_title <- GB_id_desc %>% 
-  filter(Feature == feature) %>% 
+  filter(Feature_ID == feature) %>% 
   dplyr::select(Grambank_ID_desc) %>% 
   as.matrix() %>% 
   as.vector() 
