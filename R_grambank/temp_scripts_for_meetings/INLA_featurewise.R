@@ -304,16 +304,12 @@ for(feature in features){
                                  data = grambank_df, family = "binomial"),
                             list(this_feature=as.name(feature))))
   
-  
-  
   output %>% 
     saveRDS(file = paste0("spatiophylogenetic_modelling/results/dual_process_rdata/spatial_phylo_", feature, ".rdata"))
 }
 
 
-spatial_phylo_rdata_fns <- list.files("spatiophylogenetic_modelling/results/dual_process_rdata/", full.names = T)
-
-spatial_phylo_rdata_fns <- spatial_phylo_rdata_fns[-20]
+spatial_phylo_rdata_fns <- list.files("spatiophylogenetic_modelling/results/dual_process_rdata/", full.names = T, pattern = ".*rdata")
 
 #second for loop for the dual process model because of previously discussing debugging workflow the for loop is split in twain.
 
@@ -330,8 +326,10 @@ df_spatial_phylo$marginals.hyperpar.phy_id <- as.list(df_spatial_phylo$marginals
 
 for(fn in spatial_phylo_rdata_fns){
 
-#  fn <- spatial_phylo_rdata_fns[95]
-    output <- readRDS(fn)
+#  fn <- spatial_phylo_rdata_fns[1]
+# fn <- "spatiophylogenetic_modelling/results/dual_process_rdata/spatial_phylo_GB051.rdata"
+
+output <- readRDS(fn)
 
 feature <- fn %>% str_extract("GB[0-9]*[a|b]?")
 
