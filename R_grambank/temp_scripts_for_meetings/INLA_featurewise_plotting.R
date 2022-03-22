@@ -33,6 +33,7 @@ plot_df_hed <- joined %>%
   mutate(effect = ifelse(effect == "phylo_only", "phylo", effect)) %>% 
   mutate(effect = ifelse(effect == "spatial_only", "spatial", effect))
 
+write_tsv(plot_df_hed, "inla_effects_featurewise.tsv", na = "")
 
 plot_df_summ_hed = groupwiseMean(value ~ Feature_ID + effect + model,
                              data   = plot_df_hed,
