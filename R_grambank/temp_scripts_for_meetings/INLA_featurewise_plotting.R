@@ -35,6 +35,8 @@ plot_df_hed <- joined %>%
 
 write_tsv(plot_df_hed, "inla_effects_featurewise.tsv", na = "")
 
+plot_df_hed <- read_tsv("inla_effects_featurewise.tsv")
+
 plot_df_summ_hed = groupwiseMean(value ~ Feature_ID + effect + model,
                              data   = plot_df_hed,
                              conf   = 0.95,
@@ -45,10 +47,11 @@ col_vector <- c("purple4", "turquoise3")
 
 plot_df_summ_hed_subset <- plot_df_summ_hed %>% 
   filter(model == "dual") %>% 
+  left_join(plot_df_hed) %>%
+  reshape2::dcast(Feature_ID+ effect+ model+ n+Mean+Conf.level+Trad.lower+Trad.upper ~ variable, value.var =    "value" ) %>% 
 #  filter(Feature_ID == "GB430") %>% 
-  mutate(xmin = Mean - Trad.lower, 
-         xmax = Mean + Trad.upper) %>% 
-  mutate(too_low = ifelse(Mean < xmin, "yes", "no"))
+  mutate(xmin = `2.5%`, 
+         xmax = `97.5%`) 
 
 plot <- plot_df_summ_hed_subset %>% 
   ggplot(aes(y = Feature_ID, x = Mean, fill = effect, col = effect), stat = "identity") +
