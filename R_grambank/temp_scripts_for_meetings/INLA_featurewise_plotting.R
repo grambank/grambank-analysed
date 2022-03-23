@@ -79,7 +79,8 @@ simmo_plot_draft_1 <- plot_df_summ_hed_subset %>%
   geom_point(aes(x = phylo, y = spatial, col = Main_domain)) +
   ylim(c(0, 1)) +
   xlim(c(0, 2.7)) +
-  theme_classic()
+  theme_classic() +
+  theme_set(theme_gray(base_size = 18))
 
 png( "spatiophylogenetic_modelling/figures/featurewise_dual_process_effects_phylo_vs_spatial.png", width = 12, height = 12, units = "in", res = 100)
 plot(simmo_plot_draft_1)
