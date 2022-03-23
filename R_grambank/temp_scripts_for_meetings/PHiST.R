@@ -38,7 +38,7 @@ GB_dist <- GB_matrix %>%
 rownames(GB_dist) <- rownames(GB)
 colnames(GB_dist) <- rownames(GB)
 
-#GB_dist_2 = GB_dist^2
+GB_dist_2 = GB_dist^2
 
 #PHiST family
 
