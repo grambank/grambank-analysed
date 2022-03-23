@@ -124,7 +124,7 @@ inla.tmarginal(function(x) 1/sqrt(x),
 
 ## Spatial Model - should be bad at predicting our phylogenetic model
 spatial_covar_mat = 
-  geoR::varcov.spatial(model_data[,c("longitude", "latitude")], 
+  varcov.spatial(model_data[,c("longitude", "latitude")], 
                  cov.pars = c(1, 1.15), kappa = 2)$varcov
 dimnames(spatial_covar_mat) = list(model_data$spat_id, model_data$spat_id)
 
