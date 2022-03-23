@@ -20,6 +20,10 @@ suppressPackageStartupMessages(
   library(INLA, quietly = T, warn.conflicts = F, verbose = F)
 )
 
+OUTPUTDIR <- "spatiophylogenetic_modelling/results/binomial_test/"
+if (!dir.exists(OUTPUTDIR)){dir.create(OUTPUTDIR)}
+
+
 # Set seed to make sure random data is the reproduced
 set.seed(115588)
 
@@ -96,6 +100,9 @@ no_predictors = inla(y ~ 1,
 exp(no_predictors$summary.fixed$mean)
 sum(model_data$y == 1) / sum(model_data$y == 0)
 
+fn_out <- paste0(OUTPUTDIR, "no_predictors.rds")
+saveRDS(no_predictors, fn_out)
+
 ## Grouped model
 ## Adding groups does nothing because there is only 1 value per group
 ## But just checking that nothing changes
@@ -104,6 +111,9 @@ group_model = inla(formula = y ~ f(phy_id, model = "iid"),
                    data= model_data)
 exp(group_model$summary.fixed$mean)
 sum(model_data$y == 1) / sum(model_data$y == 0)
+
+fn_out <- paste0(OUTPUTDIR, "group_model.rds")
+saveRDS(group_model, fn_out)
 
 ## Adding a phylogentic effect
 lambda_only = inla(formula = y ~
@@ -115,6 +125,10 @@ lambda_only = inla(formula = y ~
 exp(lambda_only$summary.fixed$mean)
 sum(model_data$y == 1) / sum(model_data$y == 0)
 summary(lambda_only)
+
+fn_out <- paste0(OUTPUTDIR, "lambda_only.rds")
+saveRDS(lambda_only, fn_out)
+
 
 ## What does the 50% estimate look like from the posterior?
 inla.tmarginal(function(x) 1/sqrt(x),
@@ -138,6 +152,9 @@ spatial_only = inla(formula = y ~
                    data = model_data,
                    family = "binomial")
 
+fn_out <- paste0(OUTPUTDIR, "spatial_only.rds")
+saveRDS(spatial_only, fn_out)
+
 # Check 50% marginal for spatial effect
 inla.tmarginal(function(x) 1/sqrt(x),
                spatial_only$marginals.hyperpar$`Precision for as.integer(spat_id)`,
@@ -155,6 +172,9 @@ dual_model = inla(y ~
                       constr = TRUE, hyper = pcprior_phy), 
                   data = model_data,
                   family = "binomial")
+
+fn_out <- paste0(OUTPUTDIR, "dual.rds")
+saveRDS(dual_model, fn_out)
 
 ## Check 2.5% 50%, 97.5% range for phylogenetic and spatial effect
 
