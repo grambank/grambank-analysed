@@ -110,7 +110,7 @@ get_unusualness:
 ## Phylogenetic signal per feature.
 phylo_signal_per_feature:
 	@echo "## Running analysis of phylogenetic signal per feature. ##"
-	mkdir -p phylosig
+	mkdir -p output/phylosig
 	Rscript phylo_signal_features_d_stat.R
 
 #step 5

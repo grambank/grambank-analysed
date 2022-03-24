@@ -1,12 +1,16 @@
 #script written by Damián Blasi
 source("requirements.R")
 
+#output directory
+OUTPUTDIR <- file.path('.', "output", 'diversity_endangerment')
+if (!dir.exists(OUTPUTDIR)){dir.create(OUTPUTDIR)}
+
 #read in the endangerment status df
-status_df<-read_tsv("non_GB_datasets/glottolog-cldf_wide_df.tsv", col_types = cols()) %>% 
+status_df<-read_tsv("output/non_GB_datasets/glottolog-cldf_wide_df.tsv", col_types = cols()) %>% 
   dplyr::select(Language_ID, endangerment_status = aes)
 
 # Load the imputed and binarized dataset
-gb <-read_tsv("GB_wide/GB_wide_imputed_binarized.tsv", col_types = cols()) %>% 
+gb <-read_tsv("output/GB_wide/GB_wide_imputed_binarized.tsv", col_types = cols()) %>% 
     mutate_at(vars(-Language_ID), as.factor) #make all GB feature cols be factors to ensure that they are understood as binary instead of interval scaled by cluster::daisy()
 
 x <- assert_that(nrow(gb) == n_imputed, msg = "The number of languages has changed.")
@@ -149,7 +153,10 @@ uralic_pair_value <-   new_plot_df %>%
   dplyr::select(l) %>% 
   .[1,1]
 
-ggplot(data=new_plot_df,
+new_plot_df %>% 
+  write_tsv(file = file.path(OUTPUTDIR, "diversity_endangerment_table.tsv"))
+
+plot <- ggplot(data=new_plot_df,
        aes(y=l,x=x, color=factor(type),
            label=case)) +
   geom_vline(xintercept = 0,size=2,color="gray95")+
@@ -188,7 +195,12 @@ ggplot(data=new_plot_df,
     scale_colour_manual(values = c("control" = "#1a8cff", "empirical" = "tomato2","similar"="#2eb873","extreme"="maroon"))
 
 # Save this
-ggsave("gb_diversity_endangerment.png", height = 13, width = 10)
-ggsave("gb_diversity_endangerment.tiff", height = 13, width = 10)
+png(filename = file.path("OUTPUTDIR", "gb_diversity_endangerment.png"), height = 13, width = 10)
+plot(plot)
+x <- dev.off()
+
+tiff(ilename = file.path("OUTPUTDIR", "gb_diversity_endangerment.tiff"), height = 13, width = 10)
+plot(plot)
+x <- dev.off()
 
 cat("Done with the endangerment dissimilarity analysis.\n")
