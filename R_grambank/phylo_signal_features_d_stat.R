@@ -1,21 +1,21 @@
 source("requirements.R")
 #This script was written by Hedvig Skirgård, with assistance from caper-maintainer David Orme and phytools-maintainer Liam Revell.
 
-OUTPUTDIR <- file.path("phylosig")
+OUTPUTDIR <- file.path("output", "phylosig")
 if (!dir.exists(OUTPUTDIR)) { dir.create(OUTPUTDIR) }	
 
 #reading in global tree. This tree has been processed already by spatiophylogenetic_modelling/processing/pruning_jagertree.R
-tree <- read.tree("spatiophylogenetic_modelling/processed_data/jaeger_pruned.tree")
+tree <- read.tree("output/spatiophylogenetic_modelling/processed_data/jaeger_pruned.tree")
 
 tree_tips <- tree$tip.label %>% 
   as.data.frame() %>% 
   dplyr::rename(Language_ID = ".")
 
 GB_wide <- tree_tips %>% #merging the GB dataset to the tree tip df to ensure same ordering
-  inner_join(read_tsv("GB_wide/GB_wide_imputed_binarized.tsv", show_col_types = FALSE), by = "Language_ID")
+  inner_join(read_tsv("output/GB_wide/GB_wide_imputed_binarized.tsv", show_col_types = FALSE), by = "Language_ID")
 
 #table with full names and abbreviations of features
-GB_id_desc <- read_tsv("GB_wide/parameters_binary.tsv", show_col_types = FALSE) %>% 
+GB_id_desc <- read_tsv("output/GB_wide/parameters_binary.tsv", show_col_types = FALSE) %>% 
   dplyr::select(Feature_ID = ID, Grambank_ID_desc)
 
 # Build the comparative dataset for the phylo.d function
@@ -56,7 +56,7 @@ result_df_with_desc <- result_df %>%
   left_join(GB_id_desc, by = "Feature_ID") 
 
 result_df_with_desc %>% 
-  write_tsv("phylosig/pylosig_table.tsv")
+  write_tsv("output/phylosig/pylosig_table.tsv")
 #result_df_with_desc <- read_tsv("phylosig/pylosig_table.tsv")  
 
 #filtering to only features that are not statistically significantly different from 0
@@ -84,13 +84,13 @@ result_df_with_desc_for_plot %>%
         axis.title.x = element_text(size = 18),
         axis.text = element_text(size = 14)) 
 
-ggsave("phylosig/plot_phylo_signal_pre_feature.tiff", height =22, width = 10)
-ggsave("phylosig/plot_phylo_signal_pre_feature.png", height =22, width = 10)
+ggsave("output/phylosig/plot_phylo_signal_pre_feature.tiff", height =22, width = 10)
+ggsave("output/phylosig/plot_phylo_signal_pre_feature.png", height =22, width = 10)
 
 ###Tree plots of feature with most phylogenetic signal, and the one with least.
 
 #reading in table with language names for plotting
-glottolog_cldf_df <- read_tsv("non_GB_datasets/glottolog-cldf_wide_df.tsv",show_col_types = FALSE)
+glottolog_cldf_df <- read_tsv("output/non_GB_datasets/glottolog-cldf_wide_df.tsv",show_col_types = FALSE)
 
 #imputing branch lengths for the visualisation so that the tree is ultrametric
 tree_for_plots <- tree %>% 
@@ -137,8 +137,8 @@ plot_title <- GB_id_desc %>%
   as.matrix() %>% 
   as.vector() 
 
-filename <- paste("phylosig/most_signal_", as.character(index), "_" , str_replace(plot_title, " ", "_"), ".tiff", sep = "")
-filename_png <- paste("phylosig/most_signal_", as.character(index), "_" , str_replace(plot_title, " ", "_"), ".png", sep = "")
+filename <- paste("output/phylosig/most_signal_", as.character(index), "_" , str_replace(plot_title, " ", "_"), ".tiff", sep = "")
+filename_png <- paste("output/phylosig/most_signal_", as.character(index), "_" , str_replace(plot_title, " ", "_"), ".png", sep = "")
 
 x <- feature_df[,2]
 

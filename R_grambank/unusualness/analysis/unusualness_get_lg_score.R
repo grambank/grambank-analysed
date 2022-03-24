@@ -5,10 +5,17 @@ source("unusualness/analysis/unusualness_fun.R")
 
 cat("Calcualting the unusualness score per language and make a map plot.\n")
 
-OUTPUTDIR <- file.path("unusualness")
+OUTPUTDIR <- file.path("output/unusualness")
+if (!dir.exists(OUTPUTDIR)) { dir.create(OUTPUTDIR) }		
+
+OUTPUTDIR_tables <- file.path("output/unusualness/tables")
+if (!dir.exists(OUTPUTDIR_tables)) { dir.create(OUTPUTDIR_tables) }		
+
+OUTPUTDIR_plots <- file.path("output/unusualness/plots")
+if (!dir.exists(OUTPUTDIR_plots)) { dir.create(OUTPUTDIR_plots) }		
 
 # Add autotyp areas to language tibble
-autotyp_areas <- read_tsv(file.path("non_GB_datasets", "glottolog_AUTOTYP_areas.tsv"), col_types = cols()) %>%
+autotyp_areas <- read_tsv(file.path("output", "non_GB_datasets", "glottolog_AUTOTYP_areas.tsv"), col_types = cols()) %>%
     dplyr::select(ID = Language_ID, AUTOTYP_area) 
 
 languages <- read_csv(GRAMBANK_LANGUAGES, col_types=LANGUAGES_COLSPEC) %>%		
@@ -21,7 +28,7 @@ languages <- read_csv(GRAMBANK_LANGUAGES, col_types=LANGUAGES_COLSPEC) %>%
     mutate(Family_group = if_else(n == 1, "Singleton", Family_group)) %>%
     left_join(autotyp_areas, by = "ID")
 
-GB <- read_tsv(file.path("GB_wide", "GB_wide_imputed_binarized.tsv"), col_types=WIDE_COLSPEC) %>%
+GB <- read_tsv(file.path("output","GB_wide", "GB_wide_imputed_binarized.tsv"), col_types=WIDE_COLSPEC) %>%
     column_to_rownames("Language_ID")
 
 family_probs <- get_family_probs(GB, languages)
@@ -39,7 +46,7 @@ scores$ID <- rownames(scores)
 scores_joined <- left_join(scores, languages, by = "ID")
 
 scores_joined %>% 
-    write_tsv("unusualness/tables/scores.tsv")
+    write_tsv("output/unusualness/tables/scores.tsv")
 
 cor_lat_score <- cor.test(abs(scores_joined$Latitude), scores_joined$score, method = "pearson")
 
@@ -107,8 +114,8 @@ mh <- map + inset_element(h, right = 0.5, bottom = 0.0, left = 0.2, top = 0.4)
 
 plot(mh)
 
-ggsave(file.path(OUTPUTDIR, "plots", 'worldmap.tiff'), mh, height = 5, width = 8)
-ggsave(file.path(OUTPUTDIR, "plots", 'worldmap.png'), mh, height = 5, width = 8)
+ggsave(file.path(OUTPUTDIR_plots,'worldmap.tiff'), mh, height = 5, width = 8)
+ggsave(file.path(OUTPUTDIR_plots,'worldmap.png'), mh, height = 5, width = 8)
 
 fams <- scores_joined_for_plotting %>% 
     filter(!is.na(Family_name))
@@ -125,4 +132,4 @@ p <- ggplot(fams, aes(x=score, y=Family_name, label=Name, color=score)) +
 
 plot(p)
 
-ggsave(file.path(OUTPUTDIR, "plots", 'perfamily.tiff'), p, width=10, height=16)
+ggsave(file.path(OUTPUTDIR_plots, 'perfamily.tiff'), p, width=10, height=16)

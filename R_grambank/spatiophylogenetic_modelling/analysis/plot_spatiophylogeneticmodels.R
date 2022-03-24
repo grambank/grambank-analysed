@@ -7,8 +7,10 @@ if (!is_installed("INLA")) { source(file.path("spatiophylogenetic_modelling", "i
   cat("Great, INLA was already installed.\n") }
 suppressPackageStartupMessages(library(INLA, quietly = T, warn.conflicts = F, verbose = F))
 
+OUTPUTDIR <- "output/spatiophylogenetic_modelling/figures"
+if (!dir.exists(OUTPUTDIR)){dir.create(OUTPUTDIR)}
 
-load('spatiophylogenetic_modelling/results/jaeger_models.RData')
+load('output/spatiophylogenetic_modelling/results/jaeger_models.RData')
 
 cat("Plotting results of sp-models.\n")
 
@@ -69,9 +71,9 @@ plot_1 = ggplot(plot_df_summ, aes(y = model, x = Mean, fill = effect, col = effe
 
 plot_1
 
-ggsave(filename = 'spatiophylogenetic_modelling/figures/spatiophylo_plot.tiff',
+ggsave(filename = 'output/spatiophylogenetic_modelling/figures/spatiophylo_plot.tiff',
        plot_1, height = 4, width = 7)
-ggsave(filename = 'spatiophylogenetic_modelling/figures/spatiophylo_plot.png',
+ggsave(filename = 'output/spatiophylogenetic_modelling/figures/spatiophylo_plot.png',
        plot_1, height = 4, width = 7)
 
 plot_df$PC = paste0("PC", plot_df$PC)
@@ -87,5 +89,5 @@ plot_2 = ggplot(plot_df, aes(y = model, x = values, fill = effect, col = effect)
 
 plot_2
 
-ggsave(filename = 'spatiophylogenetic_modelling/figures/spatiophylo_ridgeplot.tiff',
+ggsave(filename = 'output/spatiophylogenetic_modelling/figures/spatiophylo_ridgeplot.tiff',
        plot_2, height = 4, width = 7)

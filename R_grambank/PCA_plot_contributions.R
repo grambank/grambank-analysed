@@ -3,18 +3,15 @@ source("requirements.R")
 
 #script written by Hedvig Skirgård and Simon Greenhill
 
-OUTPUTDIR <- file.path('.', 'PCA')
+OUTPUTDIR <- file.path('.', "output", 'PCA')
 
 # Part of this script is taken from Julia Silge's PCA visualisations of
 # stack overflow data especially the tided contributions graphs:
 #    https://juliasilge.com/blog/stack-overflow-pca/
-tidied_PCA_descs<- suppressMessages(
-  read_tsv(file.path('PCA', 'PCA_rotations.tsv'))
-)
+tidied_PCA_descs <- read.delim(file.path("output", 'PCA', 'PCA_rotations.tsv'), sep = "\t")
 
-PCA_prop_variance_df<- tidied_PCA_descs %>% 
-  distinct(PC, `Proportion of Variance`)
-
+PCA_prop_variance_df<- tidied_PCA_descs %>%
+  dplyr::distinct(PC, `Proportion.of.Variance`)
 
 # set up our plotting theme - starts with theme_classic and then modify some parts
 theme_grambank_pca <- function(base_size = 12, base_family = "") {

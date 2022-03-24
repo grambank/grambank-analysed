@@ -4,18 +4,18 @@ source("requirements.R")
 
 cat("Creating plots comparing the loadings of components to theoretical scores.\n")
 
-GB_morph_counts <- read_tsv(file.path("Bound_morph", "Bound_morph_score.tsv"), col_types = cols()) %>% 
+GB_morph_counts <- read_tsv(file.path("output", "Bound_morph", "Bound_morph_score.tsv"), col_types = cols()) %>% 
   dplyr::select(Language_ID, "Boundness" = mean_morph)
 
 #comparison to PC1
-PCA_df <- read_tsv(file.path("PCA", 'PCA_language_values.tsv'), col_types = cols()) %>% 
+PCA_df <- read_tsv(file.path("output", "PCA", 'PCA_language_values.tsv'), col_types = cols()) %>% 
   dplyr::select(Language_ID, PC1, PC2, PC3)
 
 df_morph_count_PCA <- GB_morph_counts %>% 
   dplyr::select(Language_ID, "Boundness") %>% 
   full_join(PCA_df, by = "Language_ID")
 
-df_morph_count_PCA %>% 
+df_morph_count_PCA__plot <- df_morph_count_PCA %>% 
   ggplot(aes(Boundness, PC1)) +
   geom_point(color = "turquoise3") +
   ggpubr::stat_cor(method = "pearson", p.digits = 2, geom = "label", color = "blue",
@@ -26,15 +26,20 @@ df_morph_count_PCA %>%
        x ="Boundness score", y = "PC1") + 		
   xlim(c(0,0.75))
 
-ggsave(file.path("PCA", "PC1_bound_morph_cor_plot.tiff"), width = 5, height = 4)
-ggsave(file.path("PCA", "PC1_bound_morph_cor_plot.png"), width = 5, height = 4)
+tiff(file.path("output", "PCA", "PC1_bound_morph_cor_plot.tiff"), width = 5, height = 4)
+plot(df_morph_count_PCA__plot)
+x <- dev.off()
+
+png(file.path("output", "PCA", "PC1_bound_morph_cor_plot.png"), width = 5, height = 4)
+plot(df_morph_count_PCA__plot)
+x <- dev.off()
 
 ##Calculating the other scores per language
 
-GB_wide <- read_tsv(file.path("GB_wide", "GB_wide_binarized.tsv"), col_types=WIDE_COLSPEC) %>%
+GB_wide <- read_tsv(file.path("output", "GB_wide", "GB_wide_binarized.tsv"), col_types=WIDE_COLSPEC) %>%
   filter(na_prop <= 0.25 )
 
-feature_scores <- data.table::fread(file.path("GB_wide", "parameters_binary.tsv") ,
+feature_scores <- data.table::fread(file.path("output", "GB_wide", "parameters_binary.tsv") ,
                                     encoding = 'UTF-8', 
                                     quote = "\"", header = TRUE, 
                                     sep = "\t") %>% 
@@ -108,7 +113,7 @@ lg_df_all_scores <- lg_df_for_OV_VO_count %>%
   full_join(PCA_df, by = "Language_ID")  
     
 ##SPLOM for overview
-tiff("PCA/splom_all_scores.tiff", height =30, width = 30, units = "cm", res = 400)
+tiff("output/PCA/splom_all_scores.tiff", height =30, width = 30, units = "cm", res = 400)
 
 pairs.panels(lg_df_all_scores[,2:10], 
              method = "pearson", # correlation method
@@ -124,7 +129,7 @@ pairs.panels(lg_df_all_scores[,2:10],
 x <- dev.off()
 
 
-png("PCA/splom_all_scores.png", height =30, width = 30, units = "cm", res = 400)
+png("output/PCA/splom_all_scores.png", height =30, width = 30, units = "cm", res = 400)
 
 pairs.panels(lg_df_all_scores[,2:10], 
              method = "pearson", # correlation method
@@ -144,7 +149,7 @@ cat("Scatterplot of PC and theoretical scores made.\n")
 
 #specific scatterplots for MS
 
-lg_df_all_scores  %>% 
+PCA2_vs_gender_plot <- lg_df_all_scores  %>% 
   ggplot(aes(`Gender/\nnoun class` , PC2)) +
   geom_point(color = "turquoise3") +
   ggpubr::stat_cor(method = "pearson", p.digits = 2, geom = "label", color = "blue",
@@ -156,5 +161,10 @@ lg_df_all_scores  %>%
   xlim(c(0,max(lg_df_all_scores$`Gender/
 noun class`)))
 
-ggsave(file.path("PCA", "PC2_gender_cor_plot.tiff"), width = 5, height = 4)
-ggsave(file.path("PCA", "PC2_gender_cor_plot.png"), width = 5, height = 4)
+tiff(file.path("output", "PCA", "PC2_gender_cor_plot.tiff"), width = 5, height = 4)
+plot(PCA2_vs_gender_plot)
+x <- dev.off()
+
+png(file.path("output", "PCA", "PC2_gender_cor_plot.png"), width = 5, height = 4)
+plot(PCA2_vs_gender_plot)
+x <- dev.off()

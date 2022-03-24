@@ -48,7 +48,7 @@ languages <- read_csv(GRAMBANK_LANGUAGES, col_types=LANGUAGES_COLSPEC) %>%
 
 suppressWarnings(rownames(languages) <- languages$Language_ID)
 
-phylogeny = read.tree("spatiophylogenetic_modelling/processed_data/jaeger_pruned.tree")
+phylogeny = read.tree("output/spatiophylogenetic_modelling/processed_data/jaeger_pruned.tree")
 
 #jitter points that are at exactly the same coordinates
 duplicate_coords = languages[duplicated(languages[,c("Longitude", "Latitude")]) | duplicated(languages[,c("Longitude", "Latitude")], fromLast = TRUE),"Language_ID"]
@@ -129,7 +129,7 @@ legend_text = c("1 - Haversine",
                 paste0("Spatial: k = ", parameters[4,1],"; s = ", parameters[4,2]))
 
 
-tiff("spatiophylogenetic_modelling/figures/spatial_varyingparameters.tiff", width = 8, height = 8, res = 400, units = "in")
+tiff("output/spatiophylogenetic_modelling/figures/spatial_varyingparameters.tiff", width = 8, height = 8, res = 400, units = "in")
 plot(x = plot_ss$haversine_dist, y = plot_ss$haversine_dist, 
      type = "l", main = "Distance between all languages", 
      ylim = c(0, 1),
@@ -148,7 +148,7 @@ legend(0.05, 1.0,
        col=cols, lty=1, cex=0.8, lwd = 3)
 x <- dev.off()
 
-png("spatiophylogenetic_modelling/figures/spatial_varyingparameters.png", width = 8, height = 8, res = 400, units = "in")
+png("output/spatiophylogenetic_modelling/figures/spatial_varyingparameters.png", width = 8, height = 8, res = 400, units = "in")
 plot(x = plot_ss$haversine_dist, y = plot_ss$haversine_dist, 
      type = "l", main = "Distance between all languages", 
      ylim = c(0, 1),
@@ -166,6 +166,3 @@ legend(0.05, 1.0,
        legend=legend_text,
        col=cols, lty=1, cex=0.8, lwd = 3)
 x <- dev.off()
-
-
-

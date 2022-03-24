@@ -4,7 +4,7 @@ p_load("BayesLCA")
 # Grambank unusualness
 
 # Load imputed binarized data
-gb<-read.delim("GB_wide/GB_wide_imputed_binarized.tsv", sep = "\t")
+gb<-read.delim("output/GB_wide/GB_wide_imputed_binarized.tsv", sep = "\t")
 
 # Analyze clusters given a fixed k (number of clusters)
 k_range<-c(2:8)
@@ -40,12 +40,19 @@ estimate_prob_LCA<-function(obs,p){
 # Apply
 rarity_df<-estimate_rarity_LCA(LCA_clusters[[1]],gb[,-1])
 
+write_tsv(rarity_df, "output/unusualness/DB_rarity.tsv", na = "")
+
 # Plot
-ggplot(rarity_df,aes(x=surprisal,y=..density..))+
+
+db_rarity_plot <- ggplot(rarity_df,aes(x=surprisal,y=..density..))+
   geom_density(color="dodgerblue3")+
   geom_histogram(bins = 50,alpha=0.7,fill="dodgerblue1")+
   labs(x="Surprisal",y="Density")+
   theme_minimal()
+
+png("output/unusualness/plots/DB_rarity_plot.png")
+plot(db_rarity_plot)
+x <- dev.off()
 
 # Randomization test
 

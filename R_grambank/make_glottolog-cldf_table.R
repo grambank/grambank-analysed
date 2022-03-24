@@ -2,6 +2,9 @@ source("requirements.R")
 
 #This script takes the values and languages tables from the glottolog cldf-release and combines then and transforms them to a wide data format from a long. It does not take into account the parameter or code tables.
 
+OUTPUTDIR <- "output/non_GB_datasets/"
+if (!dir.exists(OUTPUTDIR)){dir.create(OUTPUTDIR)}
+
 #script written by Hedvig Skirgård
 
 #finding the filenames for the two tables we are interested in, the language and value tables. The specific filenames can vary, so instead of identifying them via the filename we should check which of the tables conform to particular CLDF-standards and then take the filenames for the tables that conform to those standards from the meta-data json.
@@ -66,6 +69,6 @@ if(str_detect(cldf_github_folder, "glottolog")) {
 
 cldf_wide_df <- dplyr::full_join(values,languages, by = "Language_ID") 
 
-write_tsv(cldf_wide_df, "non_GB_datasets/glottolog-cldf_wide_df.tsv")
+write_tsv(cldf_wide_df, file = paste0(OUTPUTDIR ,"glottolog-cldf_wide_df.tsv"))
 
-cat("Wrote non_GB_datasets/glottolog-cldf_wide_df.tsv\n", sep = "")
+cat("Wrote output/non_GB_datasets/glottolog-cldf_wide_df.tsv\n", sep = "")

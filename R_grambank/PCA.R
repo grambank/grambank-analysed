@@ -3,17 +3,17 @@ source("requirements.R")
 
 #script written by Hedvig Skirgård
 
-OUTPUTDIR <- file.path("PCA")
+OUTPUTDIR <- file.path("output/PCA")
 if (!dir.exists(OUTPUTDIR)) { dir.create(OUTPUTDIR) }		
 
 cat("Running Principal Component Analysis on the cropped, dialect-merged, binarised and imputed dataset.\n")
 
-GB_imputed <- read_tsv(file.path("GB_wide", "GB_wide_imputed_binarized.tsv"), col_types= cols()) %>%
+GB_imputed <- read_tsv(file.path("output", "GB_wide", "GB_wide_imputed_binarized.tsv"), col_types= cols()) %>%
   column_to_rownames("Language_ID") %>%
   as.matrix()
 
   #Shorter names for the Grambank parameters that can be used in graphs
-Grambank_id_abbrev <- data.table::fread(file.path("GB_wide", "parameters_binary.tsv") ,
+Grambank_id_abbrev <- data.table::fread(file.path("output", "GB_wide", "parameters_binary.tsv") ,
                                         encoding = 'UTF-8', 
                                         quote = "\"", header = TRUE, 
                                         sep = "\t") %>% 
@@ -68,6 +68,10 @@ optimal_components <- nS$Components$nparallel
 
 plotnScree(nS)
 
+png(filename = file.path(OUTPUTDIR, "PCA_nscree_plot"))
+plotnScree(nS)
+x <- dev.off()
+
 df <- tidied_pca %>% 
   distinct(PC, `Proportion of Variance`) %>% 
   .[1:optimal_components,] 
@@ -76,4 +80,9 @@ prop_explained_by_optimal_components <- sum(df$`Proportion of Variance`)
 
 cat("PCA tables written to dir PCA.\n")
 
-cat("The optimal number of components is", optimal_components, "and they explain", prop_explained_by_optimal_components *100, "% of the variation.\n")
+nScree_summary_string <- paste("The optimal number of components is", optimal_components, "and they explain", prop_explained_by_optimal_components *100, "% of the variation.\n")
+
+writeLines(nScree_summary_string, con = file.path(OUTPUTDIR, "PCA_nScree_summary.txt") )
+
+
+cat(nScree_summary_string )

@@ -1,9 +1,7 @@
 source("requirements.R")
 #GB contains a small set of multistate features. They can be binarised, but they need to be done so in a particular way. This code renders a appropriately binarised version of the dataset.
 
-GB_wide_strict <- suppressMessages(
-    read_tsv(file.path("GB_wide", "GB_wide_strict.tsv"), col_types = cols())
-)
+GB_wide_strict <- read.delim(file.path("output", "GB_wide", "GB_wide_strict.tsv"), sep = "\t")
 
 multistate_features <- read_csv(GRAMBANK_CODES, col_types=CODES_COLSPEC)  %>% 
   unite(possible_values_split, Name,  Description, sep = ": ") %>% 
@@ -66,10 +64,11 @@ GB_wide_strict_multi_only_binarized <- GB_wide_strict_multi %>%
 
 stopifnot(all(!multistate_features %in% colnames(GB_wide_strict_multi_only_binarized)))
 
-output_path <- file.path("GB_wide", "GB_wide_binarized.tsv")
+output_path <- file.path("output", "GB_wide", "GB_wide_binarized.tsv")
 
+cat("Wrote", output_path, "\n")
 
-
+#making parameters table_binary 
 GB_wide_strict %>% 
   dplyr::select(-all_of(multistate_features)) %>% 
   full_join(GB_wide_strict_multi_only_binarized,by = "Language_ID") %>% 
@@ -140,6 +139,5 @@ Parameter_desc_binary %>%
   mutate(Binary_Multistate= ifelse(ID %in% multistate_features, "Multi", Binary_Multistate)) %>% 
   mutate(Binary_Multistate = ifelse(is.na(Binary_Multistate), "Binary", Binary_Multistate)) %>% 
   dplyr::select(-Description) %>% 
-  write_tsv(file.path("GB_wide/parameters_binary.tsv"))
+  write_tsv(file.path("output/GB_wide/parameters_binary.tsv"))
 
-cat("Wrote", output_path, "\n")

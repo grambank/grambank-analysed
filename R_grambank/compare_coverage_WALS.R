@@ -6,12 +6,15 @@ source("requirements.R")
 
 cat("Make plot to compare WALS and GB coverage.\n")
 
+OUTPUTDIR <- "output/coverage_plots"
+if (!dir.exists(OUTPUTDIR)){dir.create(OUTPUTDIR)}
+
 #getting table from Glottolog which contains information on the Language-level parent of dialects
-glottolog_cldf_df <- read_tsv("non_GB_datasets/glottolog-cldf_wide_df.tsv",col_types = cols()) %>% 
+glottolog_cldf_df <- read.delim("output/non_GB_datasets/glottolog-cldf_wide_df.tsv",sep = "\t") %>% 
   mutate(Language_level_ID = ifelse(is.na(Language_level_ID), Language_ID, Language_level_ID)) #making language-level entities their own parent, so that we can use this column for aggregation easier.
 
 ##grambank import and aggregation to language-level (i.e. merge dialects)
-GB_wide <-read_tsv(file.path("GB_wide", "GB_wide_strict.tsv"), col_types = cols()) %>% 
+GB_wide <-read.delim(file.path("output", "GB_wide", "GB_wide_strict.tsv"), sep = "\t") %>% 
   dplyr::select(Language_ID, GB_na_prop = na_prop) %>% 
   mutate(GB_na_prop_reverse = 1 - GB_na_prop) 
 
@@ -31,7 +34,7 @@ WALS_data <- read_csv(file.path(wals_fn, "values.csv"),col_types = cols()) %>%
 
 WALS_lgs_codes <- read_csv(file.path(wals_fn, "languages.csv"), col_types = cols()) 
 
-#Important: languoids which do not have a glottocode in the WALS dataset are ignored since we can't confidently matche them to dialect parents or tell them apart from duplicates.
+#Important: languoids which do not have a glottocode in the WALS dataset are ignored since we can't confidently match them to dialect parents or tell them apart from duplicates.
 
 #counting how many languoids in WALS don't have glottocodes
 wals_lgs_without_glottocodes <- WALS_data %>% 
@@ -91,11 +94,11 @@ WALS_GB_coverage_overlay <- ggplot() +
   annotation_custom(grid.text("WALS", x=0.17,  y=0.17, gp=gpar(col = "white", fontsize=50, fontface="bold")))  +
   annotation_custom(grid.text("Grambank", x=0.40,  y=0.40, gp=gpar(col = "white", fontsize=50, fontface="bold")))  
 
-tiff(file.path("coverage_plots", "WALS_GB_coverage_overlay.tiff"), height = 1100, width = 1600,    units = "px",  bg = "white")
+tiff(file.path(OUTPUTDIR, "WALS_GB_coverage_overlay.tiff"), height = 1100, width = 1600,    units = "px",  bg = "white")
 plot(WALS_GB_coverage_overlay)
 x <- dev.off()
 
-png(file.path("coverage_plots", "WALS_GB_coverage_overlay.png"), height = 1100, width = 1600,    units = "px",  bg = "white")
+png(file.path(OUTPUTDIR, "WALS_GB_coverage_overlay.png"), height = 1100, width = 1600,    units = "px",  bg = "white")
 plot(WALS_GB_coverage_overlay)
 x <- dev.off()
 

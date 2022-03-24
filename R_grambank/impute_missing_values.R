@@ -4,7 +4,7 @@
 
 source('requirements.R')
 
-OUTPUTFILE <- file.path("GB_wide", "GB_wide_imputed_binarized.tsv")
+OUTPUTFILE <- file.path("output", "GB_wide", "GB_wide_imputed_binarized.tsv")
 
 #CUTOFFS
 
@@ -20,7 +20,7 @@ FEAT_NA_PROP_CUTOFF = 0.25
 # into numeric (sometimes functions coerce into numeric by default).
 
 #using the biniarised version
-GB_wide_binarised <- suppressMessages(read_tsv(file.path("GB_wide", "GB_wide_binarized.tsv")))
+GB_wide_binarised <- read.delim(file.path("output" , "GB_wide", "GB_wide_binarized.tsv"), sep = "\t")
 
 Binary_feat_n <- GB_wide_binarised %>% 
   dplyr::select(-na_prop, -Language_ID) %>% 
@@ -98,7 +98,7 @@ GB_wide_cropped_for_imputation %>%
   mutate(value =  str_replace_all(value,  "1 - present", "1")) %>%
   dplyr::select(Language_ID, Parameter_ID = variable, value) %>%
   spread(key = Parameter_ID, value = value, drop = FALSE) %>% 
-  write_tsv(file = file.path("GB_wide", "GB_cropped_for_missing.tsv"))
+  write_tsv(file = file.path("output", "GB_wide", "GB_cropped_for_missing.tsv"))
 
 #actual imputation
 imputed_data <- GB_wide_cropped_for_imputation %>%

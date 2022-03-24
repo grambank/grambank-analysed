@@ -18,7 +18,7 @@ languages <- read_csv(GRAMBANK_LANGUAGES, col_types=LANGUAGES_COLSPEC) %>%
   distinct(Language_ID, .keep_all = T)
 
 # pca
-pca_filename = 'PCA/PCA_language_values.tsv'
+pca_filename = 'output/PCA/PCA_language_values.tsv'
 pca_components = read_tsv(pca_filename, col_types = cols()) %>% 
   mutate(PC1 =scale(PC1)) %>% 
   mutate(PC2 =scale(PC2)) %>% 
@@ -29,7 +29,7 @@ pca_components = read_tsv(pca_filename, col_types = cols()) %>%
 x <- assert_that(nrow(pca_components) == n_imputed, msg = "The total number of languages has changed. This might mean the data doesn't align with the phylogeny")
 
 # trees
-tree_filename = 'spatiophylogenetic_modelling/processed_data/jaeger_pruned.tree'
+tree_filename = 'output/spatiophylogenetic_modelling/processed_data/jaeger_pruned.tree'
 phylogenetic_tree = read.tree(tree_filename)
 
 # Subset PCA and languages to Jaeger set

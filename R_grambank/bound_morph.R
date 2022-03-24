@@ -2,12 +2,11 @@ source("requirements.R")
 
 #script written by Hedvig Skirgård
 
-
-OUTPUTDIR <- file.path('.', "Bound_morph")		
+OUTPUTDIR <- file.path('.', "output", "Bound_morph")		
 # create output dir if it does not exist.		
 if (!dir.exists(OUTPUTDIR)) { dir.create(OUTPUTDIR) }		
 
-GB_wide <- read_tsv(file.path("GB_wide", "GB_wide_strict.tsv"), col_types=WIDE_COLSPEC)	
+GB_wide <- read_tsv(file.path("output", "GB_wide", "GB_wide_strict.tsv"), col_types=WIDE_COLSPEC)	
 
 Language_meta_data <-read_csv(GRAMBANK_LANGUAGES, col_types=LANGUAGES_COLSPEC) %>%		
   dplyr::select(Language_ID = Language_level_ID, Family_name, Name, Longitude, Latitude, Macroarea) %>% 
