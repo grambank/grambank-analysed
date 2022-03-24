@@ -14,7 +14,7 @@ almost_all_fast: requirements.log data pca get_unusualness phylo_signal_per_feat
 ## clean 
 clean:
 	rm -r output/*
-#need to make excetion for output/README.md
+#to do need to make excetion for output/README.md
 	
 #step 0
 ## Check and install dependencies if needed.
@@ -35,33 +35,33 @@ data:
 	@$(MAKE) -f $(THIS_MAKEFILE) output/GB_wide/GB_wide_imputed_binarized.tsv
 	@$(MAKE) -f $(THIS_MAKEFILE) output/coverage_plots/WALS_GB_coverage_overlay.png
 	@$(MAKE) -f $(THIS_MAKEFILE) output/coverage_plots/coverage_macroarea.png
-	@$(MAKE) -f $(THIS_MAKEFILE) pruning_jagertree
+	@$(MAKE) -f $(THIS_MAKEFILE) output/pruning_jagertree
 
-non_GB_datasets/glottolog-cldf_wide_df.tsv:
+output/non_GB_datasets/glottolog-cldf_wide_df.tsv:
 	@echo Fetching Glottolog language table. Note: this script requires the git submodule glottolog-cldf.
 	Rscript make_glottolog-cldf_table.R
 
-GB_wide/GB_wide_strict.tsv:
+output/GB_wide/GB_wide_strict.tsv:
 	@echo Making the GB data wide and merging dialects
 	Rscript make_wide.R
 
-GB_wide/GB_wide_binarized.tsv:
+output/GB_wide/GB_wide_binarized.tsv:
 	@echo Binarising the GB data.
 	Rscript make_wide_binarized.R
 
-GB_wide/GB_wide_imputed_binarized.tsv:
+output/GB_wide/GB_wide_imputed_binarized.tsv:
 	@echo Imputing missing values. This will most likely take a few minutes.
 	Rscript impute_missing_values.R | tee impute_missing_values.log
 	
-coverage_plots/WALS_GB_coverage_overlay.png:
+output/coverage_plots/WALS_GB_coverage_overlay.png:
 	@echo Making plot for comparing GB and WALS. Note: this script requires the git submodule wals
 	Rscript compare_coverage_WALS.R
 
-coverage_plots/coverage_macroarea.png:
+output/coverage_plots/coverage_macroarea.png:
 	@echo Making plots for coverage per macroarea.
 	Rscript coverage_bar_plots.R
 
-pruning_jagertree:
+output/pruning_jagertree:
 	mkdir -p output/spatiophylogenetic_modelling/processed_data
 	RScript spatiophylogenetic_modelling/processing/pruning_jagertree.R
 
