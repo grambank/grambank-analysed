@@ -17,3 +17,8 @@ R_grambank/.Rhistory
 R_grambank/impute_missing_values.log
 *R_grambank/spatiophylogenetic_modelling/results/*
 R_grambank/temp_scripts_for_meetings/phist_macroareas.png
+R_grambank/phylosig/**
+
+#images
+**/*.png
+**/*.tiff

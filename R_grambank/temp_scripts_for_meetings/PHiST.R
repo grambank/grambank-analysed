@@ -13,8 +13,8 @@ GB_matrix <- GB %>%
 
 #reading in lg meta data
 #areas
-if (!dir.exists("non_GB_datasets/glottolog_AUTOTYP_areas.tsv")) { source("unusualness/processing/assigning_AUTOTYP_areas.R") }		
-autotyp_area <- read_tsv("non_GB_datasets/glottolog_AUTOTYP_areas.tsv") %>%
+if (!file.exists("non_GB_datasets/glottolog_AUTOTYP_areas.tsv")) { source("unusualness/processing/assigning_AUTOTYP_areas.R") }		
+autotyp_area <- read_tsv("non_GB_datasets/glottolog_AUTOTYP_areas.tsv", col_types = cols()) %>%
   dplyr::select(Language_ID, AUTOTYP_area)
 
 #glottolog-cldf
@@ -38,7 +38,7 @@ GB_dist <- GB_matrix %>%
 rownames(GB_dist) <- rownames(GB)
 colnames(GB_dist) <- rownames(GB)
 
-#GB_dist_2 = GB_dist^2
+GB_dist_2 = GB_dist^2
 
 #PHiST family
 

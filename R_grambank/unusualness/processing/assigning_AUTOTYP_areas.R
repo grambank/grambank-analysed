@@ -6,6 +6,9 @@ cat("Matching all languages in Grambank to an AUTOTYP-area.\n")
 
 #combining the tables languages and values from glottolog_df-cldf into one wide dataframe.
 #this can be replaced with any list of Language_IDs, long and lat
+
+if (!file.exists("non_GB_datasets/glottolog-cldf_wide_df.tsv")) { source("make_glottolog-cldf_table.R") }		
+
 glottolog_df <- read_tsv("non_GB_datasets/glottolog-cldf_wide_df.tsv",col_types = cols()) %>% 
 dplyr::select(Language_ID, Longitude, Latitude)
 
