@@ -37,6 +37,12 @@ GB_imputed <- read_tsv(GB_imputed_filename, col_types= cols())
 
 #### Inputs ####
 # language metadata
+if (!file.exists("non_GB_datasets/glottolog_AUTOTYP_areas.tsv")) { source("unusualness/processing/assigning_AUTOTYP_areas.R") }		
+autotyp_area <- read_tsv("non_GB_datasets/glottolog_AUTOTYP_areas.tsv", col_types = cols()) %>%
+  dplyr::select(Language_ID, AUTOTYP_area)
+
+
+
 languages <- read_csv(GRAMBANK_LANGUAGES, col_types=LANGUAGES_COLSPEC) %>%		
   dplyr::select(Language_ID = Language_level_ID, Family_name, Name, Longitude, Latitude, Macroarea) %>% 
   distinct(Language_ID, .keep_all = T) %>% 
