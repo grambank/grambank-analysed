@@ -149,7 +149,7 @@ cat("Scatterplot of PC and theoretical scores made.\n")
 
 #specific scatterplots for MS
 
-lg_df_all_scores  %>% 
+PCA2_vs_gender_plot <- lg_df_all_scores  %>% 
   ggplot(aes(`Gender/\nnoun class` , PC2)) +
   geom_point(color = "turquoise3") +
   ggpubr::stat_cor(method = "pearson", p.digits = 2, geom = "label", color = "blue",
@@ -161,5 +161,10 @@ lg_df_all_scores  %>%
   xlim(c(0,max(lg_df_all_scores$`Gender/
 noun class`)))
 
-ggsave(file.path("output", "PCA", "PC2_gender_cor_plot.tiff"), width = 5, height = 4)
-ggsave(file.path("output", "PCA", "PC2_gender_cor_plot.png"), width = 5, height = 4)
+tiff(file.path("output", "PCA", "PC2_gender_cor_plot.tiff"), width = 5, height = 4)
+plot(PCA2_vs_gender_plot)
+x <- dev.off()
+
+png(file.path("output", "PCA", "PC2_gender_cor_plot.png"), width = 5, height = 4)
+plot(PCA2_vs_gender_plot)
+x <- dev.off()
