@@ -20,21 +20,21 @@ clean:
 ## Check and install dependencies if needed.
 requirements.log:
 	@echo "# Installing and loading all the necessary R-packages. #"
-	Rscript requirements.R | tee $@
+	Rscript requirements.R | tee output/requirements.log
  
 #step 1
 ## Fetch data from grambank-cldf into required formats for plotting.
 data:
 	@echo "# Preparing the dataset (including imputation and pruning of global tree. #"
-	@mkdir non_GB_datasets
-	@mkdir coverage_plots
-	@mkdir GB_wide
-	@$(MAKE) -f $(THIS_MAKEFILE) non_GB_datasets/glottolog-cldf_wide_df.tsv
-	@$(MAKE) -f $(THIS_MAKEFILE) GB_wide/GB_wide_strict.tsv
-	@$(MAKE) -f $(THIS_MAKEFILE) GB_wide/GB_wide_binarized.tsv
-	@$(MAKE) -f $(THIS_MAKEFILE) GB_wide/GB_wide_imputed_binarized.tsv
-	@$(MAKE) -f $(THIS_MAKEFILE) coverage_plots/WALS_GB_coverage_overlay.png
-	@$(MAKE) -f $(THIS_MAKEFILE) coverage_plots/coverage_macroarea.png
+	@mkdir output/non_GB_datasets
+	@mkdir output/coverage_plots
+	@mkdir output/GB_wide
+	@$(MAKE) -f $(THIS_MAKEFILE) output/non_GB_datasets/glottolog-cldf_wide_df.tsv
+	@$(MAKE) -f $(THIS_MAKEFILE) output/GB_wide/GB_wide_strict.tsv
+	@$(MAKE) -f $(THIS_MAKEFILE) output/GB_wide/GB_wide_binarized.tsv
+	@$(MAKE) -f $(THIS_MAKEFILE) output/GB_wide/GB_wide_imputed_binarized.tsv
+	@$(MAKE) -f $(THIS_MAKEFILE) output/coverage_plots/WALS_GB_coverage_overlay.png
+	@$(MAKE) -f $(THIS_MAKEFILE) output/coverage_plots/coverage_macroarea.png
 	@$(MAKE) -f $(THIS_MAKEFILE) pruning_jagertree
 
 non_GB_datasets/glottolog-cldf_wide_df.tsv:
@@ -62,7 +62,7 @@ coverage_plots/coverage_macroarea.png:
 	Rscript coverage_bar_plots.R
 
 pruning_jagertree:
-	mkdir -p spatiophylogenetic_modelling/processed_data
+	mkdir -p output/spatiophylogenetic_modelling/processed_data
 	RScript spatiophylogenetic_modelling/processing/pruning_jagertree.R
 
 #step 2
