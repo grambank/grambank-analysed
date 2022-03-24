@@ -4,6 +4,11 @@ source("requirements.R")
 
 cat("Pruning the global tree from Jäger to the Grambank dataset.\n")
 
+OUTPUT_DIR <- "spatiophylogenetic_modelling/processed_data/"
+if (!dir.exists(OUTPUT_DIR)) {
+  dir.create(OUTPUT_DIR)
+}
+
 #### Inputs ####
 #Glottolog-cldf table to have a match for all dialects to their language parent. Note that the particular dialects may differ from the dialects in GB which is why we cann't use the language table from the grambank-cldf relase
 glottolog_df <- read_tsv("non_GB_datasets/glottolog-cldf_wide_df.tsv",col_types = cols()) %>% 
