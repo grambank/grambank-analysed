@@ -15,7 +15,7 @@ df_morph_count_PCA <- GB_morph_counts %>%
   dplyr::select(Language_ID, "Boundness") %>% 
   full_join(PCA_df, by = "Language_ID")
 
-df_morph_count_PCA %>% 
+df_morph_count_PCA__plot <- df_morph_count_PCA %>% 
   ggplot(aes(Boundness, PC1)) +
   geom_point(color = "turquoise3") +
   ggpubr::stat_cor(method = "pearson", p.digits = 2, geom = "label", color = "blue",
@@ -26,8 +26,13 @@ df_morph_count_PCA %>%
        x ="Boundness score", y = "PC1") + 		
   xlim(c(0,0.75))
 
-ggsave(file.path("output", "PCA", "PC1_bound_morph_cor_plot.tiff"), width = 5, height = 4)
-ggsave(file.path("output", "PCA", "PC1_bound_morph_cor_plot.png"), width = 5, height = 4)
+tiff(file.path("output", "PCA", "PC1_bound_morph_cor_plot.tiff"), width = 5, height = 4)
+plot(df_morph_count_PCA__plot)
+x <- dev.off()
+
+png(file.path("output", "PCA", "PC1_bound_morph_cor_plot.png"), width = 5, height = 4)
+plot(df_morph_count_PCA__plot)
+x <- dev.off()
 
 ##Calculating the other scores per language
 
