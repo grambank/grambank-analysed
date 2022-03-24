@@ -7,9 +7,9 @@ cat("Matching all languages in Grambank to an AUTOTYP-area.\n")
 #combining the tables languages and values from glottolog_df-cldf into one wide dataframe.
 #this can be replaced with any list of Language_IDs, long and lat
 
-if (!file.exists("non_GB_datasets/glottolog-cldf_wide_df.tsv")) { source("make_glottolog-cldf_table.R") }		
+if (!file.exists("output/non_GB_datasets/glottolog-cldf_wide_df.tsv")) { source("make_glottolog-cldf_table.R") }		
 
-glottolog_df <- read_tsv("non_GB_datasets/glottolog-cldf_wide_df.tsv",col_types = cols()) %>% 
+glottolog_df <- read_tsv("output/non_GB_datasets/glottolog-cldf_wide_df.tsv",col_types = cols()) %>% 
 dplyr::select(Language_ID, Longitude, Latitude)
 
 ##Adding in areas of linguistic contact from AUTOTYP
@@ -24,7 +24,7 @@ AUTOTYP <- read_csv(AUTOTYP_FN  ,col_types = cols()) %>%
   sample_n(1) #when a language is assigned to more than one area, pick randomly.
 
 #This next bit where we find the autotyp areas of languages was written by Seán Roberts
-# We know the autotyp-area of langauges in autotyp and their long lat. We don't know the autotyp area of languages in Glottolog. We also can't be sure that the long lat of languoids with the same glottoids in autotyp and glottolog_df have the exact identical long lat. First let's make two datasets, one for autotyp languages (hence lgs where we know the area) and those that we wish to know about, the Glottolog ones.
+# We know the autotyp-area of languages in autotyp and their long lat. We don't know the autotyp area of languages in grambank. We also can't be sure that the long lat of languoids with the same glottoids in autotyp and grambank_df have the exact identical long lat. First let's make two datasets, one for autotyp languages (hence lgs where we know the area) and those that we wish to know about, the grambank ones.
 
 lgs_with_known_area <- as.matrix(AUTOTYP[!is.na(AUTOTYP$Area),c("Longitude","Latitude")])
 rownames(lgs_with_known_area) <- AUTOTYP[!is.na(AUTOTYP$Area),]$Language_ID
@@ -60,4 +60,4 @@ glottolog_df_with_AUTOTYP <- df_matched_up %>%
   dplyr::rename(AUTOTYP_area = Area) 
 
 glottolog_df_with_AUTOTYP %>% 
-  write_tsv("non_GB_datasets/glottolog_AUTOTYP_areas.tsv")
+  write_tsv("output/non_GB_datasets/glottolog_AUTOTYP_areas.tsv")

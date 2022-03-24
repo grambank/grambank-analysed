@@ -99,8 +99,9 @@ theoretical:
 ## Unusualness language analysis and generate plots.
 get_unusualness:
 	@echo "# Calculating unsualness scores and making plots. Note: these scripts requires internet access.#"
-	mkdir -p unusualness/plots
-	mkdir -p unusualness/tables
+	mkdir -p output/unusualness
+	mkdir -p output/unusualness/plots
+	mkdir -p output/unusualness/tables
 	@echo Assining each langauge to an AUTOTYP-area. Note this script requires the git submodule autotyp-data.
 	Rscript unusualness/processing/assigning_AUTOTYP_areas.R
 	Rscript unusualness/analysis/unusualness_get_lg_score.R
