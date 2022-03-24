@@ -12,9 +12,9 @@ dir.create("output/spatiophylogenetic_modelling/results/")
 if (!dir.exists("output/spatiophylogenetic_modelling/results/phylo_only/")) {
 dir.create("output/spatiophylogenetic_modelling/results/phylo_only/")
 dir.create("output/spatiophylogenetic_modelling/results/spatial_only/")
-dir.create("output/spatiophylogenetic_modelling/results/autotyp_area_only/")
-dir.create("output/spatiophylogenetic_modelling/results/dual_process_rdata/")
-dir.create("output/spatiophylogenetic_modelling/results/trial_process_rdata/")
+dir.create("output/spatiophylogenetic_modelling/results/autotyp_area_only")
+dir.create("output/spatiophylogenetic_modelling/results/dual_process_rdata")
+dir.create("output/spatiophylogenetic_modelling/results/trial_process_rdata")
    }		
 
 # load variational covariance matrix function taken from geoR::varcov_spatial
@@ -184,7 +184,7 @@ for(feature in features){
                             list(this_feature=as.name(feature))))
   
   output %>% 
-    saveRDS(file = paste0("spatiophylogenetic_modelling/results/phylo_only/phylo_only_", feature, ".rdata"))
+    saveRDS(file = paste0("output/spatiophylogenetic_modelling/results/phylo_only/phylo_only_", feature, ".rdata"))
     
   phylo_effect = inla.tmarginal(function(x) 1/sqrt(x),
                                 output$marginals.hyperpar$`Precision for phy_id`,
@@ -207,8 +207,8 @@ for(feature in features){
 }
 cat("All done with the phylo only model, 100% done!")
 
-df_phylo_only %>% write_tsv("spatiophylogenetic_modelling/results/df_phylo_only.tsv")
-df_phylo_only %>% saveRDS("spatiophylogenetic_modelling/results/df_phylo_only.Rdata")
+df_phylo_only %>% write_tsv("output/spatiophylogenetic_modelling/results/df_phylo_only.tsv")
+df_phylo_only %>% saveRDS("output/spatiophylogenetic_modelling/results/df_phylo_only.Rdata")
 
 ###
 
@@ -243,7 +243,7 @@ for(feature in features){
                             list(this_feature=as.name(feature))))
   
   output %>% 
-    saveRDS(file = paste0("spatiophylogenetic_modelling/results/spatial_only/spatial_only_", feature, ".rdata"))
+    saveRDS(file = paste0("output/spatiophylogenetic_modelling/results/spatial_only/spatial_only_", feature, ".rdata"))
   
   spatial_effect = inla.tmarginal(function(x) 1/sqrt(x),
                                   output$marginals.hyperpar$`Precision for sp_id`,
@@ -266,8 +266,8 @@ for(feature in features){
   
 }
 
-df_spatial_only %>% write_tsv("spatiophylogenetic_modelling/results/df_spatial_only.tsv")
-df_spatial_only %>% saveRDS("spatiophylogenetic_modelling/results/df_spatial_only.Rdata")
+df_spatial_only %>% write_tsv("output/spatiophylogenetic_modelling/results/df_spatial_only.tsv")
+df_spatial_only %>% saveRDS("output/spatiophylogenetic_modelling/results/df_spatial_only.Rdata")
 
 cat("All done with the spatial only model, 100% done!")
 
@@ -301,7 +301,7 @@ for(feature in features){
                             list(this_feature=as.name(feature))))
   
   output %>% 
-    saveRDS(file = paste0("spatiophylogenetic_modelling/results/autotyp_area_only/autotyp_area_only_", feature, ".rdata"))
+    saveRDS(file = paste0("output/spatiophylogenetic_modelling/results/autotyp_area_only/autotyp_area_only_", feature, ".rdata"))
   
   
 
@@ -327,8 +327,8 @@ for(feature in features){
 }
 cat("All done with the autotyp_area only model, 100% done!")
 
-df_autotyp_area_only %>% write_tsv("spatiophylogenetic_modelling/results/df_autotyp_area_only.tsv")
-df_autotyp_area_only %>% saveRDS("spatiophylogenetic_modelling/results/df_autotyp_area_only.Rdata")
+df_autotyp_area_only %>% write_tsv("output/spatiophylogenetic_modelling/results/df_autotyp_area_only.tsv")
+df_autotyp_area_only %>% saveRDS("output/spatiophylogenetic_modelling/results/df_autotyp_area_only.Rdata")
 
 
 cat("#### Spatial & Phylo Model ####\n")
@@ -352,10 +352,10 @@ for(feature in features){
                             list(this_feature=as.name(feature))))
   
   output %>% 
-    saveRDS(file = paste0("spatiophylogenetic_modelling/results/dual_process_rdata/spatial_phylo_", feature, ".rdata"))
+    saveRDS(file = paste0("output/spatiophylogenetic_modelling/results/dual_process_rdata/spatial_phylo_", feature, ".rdata"))
 }
 
-spatial_phylo_rdata_fns <- list.files("spatiophylogenetic_modelling/results/dual_process_rdata/", full.names = T, pattern = ".*rdata")
+spatial_phylo_rdata_fns <- list.files("output/spatiophylogenetic_modelling/results/dual_process_rdata/", full.names = T, pattern = ".*rdata")
 
 #second for loop for the dual process model because of previously discussing debugging workflow the for loop is split in twain.
 
@@ -373,7 +373,7 @@ df_spatial_phylo$marginals.hyperpar.phy_id <- as.list(df_spatial_phylo$marginals
 for(fn in spatial_phylo_rdata_fns){
 
 #  fn <- spatial_phylo_rdata_fns[1]
-# fn <- "spatiophylogenetic_modelling/results/dual_process_rdata/spatial_phylo_GB051.rdata"
+# fn <- "output/spatiophylogenetic_modelling/results/dual_process_rdata/spatial_phylo_GB051.rdata"
 
 output <- readRDS(fn)
 
@@ -417,8 +417,8 @@ df_spatial_phylo <- df_spatial_phylo  %>%
 
 }
 
-df_spatial_phylo %>% write_tsv("spatiophylogenetic_modelling/results/df_spatial_phylo.tsv")
-df_spatial_phylo %>% saveRDS("spatiophylogenetic_modelling/results/df_spatial_phylo.Rdata")
+df_spatial_phylo %>% write_tsv("output/spatiophylogenetic_modelling/results/df_spatial_phylo.tsv")
+df_spatial_phylo %>% saveRDS("output/spatiophylogenetic_modelling/results/df_spatial_phylo.Rdata")
 
 #TRIAL PROCESS
 
@@ -442,11 +442,10 @@ for(feature in features){
                             list(this_feature=as.name(feature))))
   
   output %>% 
-    saveRDS(file = paste0("spatiophylogenetic_modelling/results/trial_process_rdata/spatial_phylo_area_", feature, ".rdata"))
+    saveRDS(file = paste0("output/spatiophylogenetic_modelling/results/trial_process_rdata/spatial_phylo_area_", feature, ".rdata"))
 }
 
-
-spatial_phylo_area_rdata_fns <- list.files("spatiophylogenetic_modelling/results/trial_process_rdata/", full.names = T, pattern = ".*rdata")
+spatial_phylo_area_rdata_fns <- list.files("output/spatiophylogenetic_modelling/results/trial_process_rdata/", full.names = T, pattern = ".*rdata")
 
 #second for loop for the dual process model because of previously discussing debugging workflow the for loop is split in twain.
 
@@ -455,24 +454,25 @@ df_spatial_phylo_area <- data.frame(matrix(ncol = 9, nrow = 0))
 colnames(df_spatial_phylo_area) <- c("2.5%","50%", "97.5%", "Feature_ID", "effect", "waic", "marginals.hyperpar.sp_id", "marginals.hyperpar.phy_id", "marginals.hyperpar.autotyp_area") 
 df_spatial_phylo_area $`2.5%` <- as.numeric(df_spatial_phylo_area $`2.5%`)
 df_spatial_phylo_area $`50%` <- as.numeric(df_spatial_phylo_area $`50%`)
+df_spatial_phylo_area $`50%` <- as.numeric(df_spatial_phylo_area $`97.5%`)
 df_spatial_phylo_area $Feature_ID <- as.character(df_spatial_phylo_area $Feature_ID)
 df_spatial_phylo_area $effect <- as.character(df_spatial_phylo_area $effect)
-df_spatial_phylo_area $waic <- as.numeric(df_spatial_phylo_area $waic)
+df_spatial_phylo_area $waic <- as.numeric(df_spatial_phylo_area$waic)
 df_spatial_phylo_area $marginals.hyperpar.sp_id <- as.list(df_spatial_phylo_area $marginals.hyperpar.sp_id)
 df_spatial_phylo_area $marginals.hyperpar.phy_id <- as.list(df_spatial_phylo_area $marginals.hyperpar.phy_id)
-df_spatial_phylo_area $marginals.hyperpar.autotyp_area <- as.list(df_spatial_phylo_area $marginals.hyperpar.autotyp_area)
+df_spatial_phylo_area $marginals.hyperpar.autotyp_area <- as.list(df_spatial_phylo_area$marginals.hyperpar.autotyp_area)
 
 for(fn in spatial_phylo_area_rdata_fns){
   
   #  fn <- spatial_phylo_area_rdata_fns[1]
-  # fn <- "spatiophylogenetic_modelling/results/dual_process_rdata/spatial_phylo_area_GB051.rdata"
+  # fn <- "output/spatiophylogenetic_modelling/results/dual_process_rdata/spatial_phylo_area_GB051.rdata"
   
   output <- readRDS(fn)
   
   feature <- fn %>% str_extract("GB[0-9]*[a|b]?")
   
   cat(paste0("I'm processing the inla output for feature ", feature, ".\n" ))
-  
+
   phylo_effect = inla.tmarginal(function(x) 1/sqrt(x), 
                                 output$marginals.hyperpar$`Precision for phy_id`, 
                                 method = "linear") %>%
@@ -509,7 +509,7 @@ for(fn in spatial_phylo_area_rdata_fns){
     mutate(waic = output$waic$waic) %>% 
     mutate(marginals.hyperpar.sp_id = output$marginals.hyperpar[2])
 
-  df_area <- spatial_effect %>% 
+  df_area <-  area_effect  %>% 
     as.data.frame() %>% 
     t() %>% 
     as.data.frame() %>% 
@@ -517,16 +517,14 @@ for(fn in spatial_phylo_area_rdata_fns){
     mutate(Feature_ID = feature) %>% 
     mutate(effect = "area_in_trial") %>% 
     mutate(waic = output$waic$waic) %>% 
-    mutate(arginals.hyperpar.autotyp_area = output$marginals.hyperpar[3])
+    mutate(marginals.hyperpar.autotyp_area = output$marginals.hyperpar[3])
   
   df_spatial_phylo_area <- df_spatial_phylo_area  %>% 
     full_join(df_space, by = c("2.5%", "50%", "97.5%", "Feature_ID", "effect", "waic", "marginals.hyperpar.sp_id")) %>% 
     full_join(df_phylo, by = c("2.5%", "50%", "97.5%", "Feature_ID", "effect", "waic", "marginals.hyperpar.phy_id")) %>% 
-    full_join(df_area, by = c("2.5%", "50%", "97.5%", "Feature_ID", "effect", "waic", "marginals.hyperpar.autotyp_area")) %>% 
+    full_join(df_area, by = c("2.5%", "50%", "97.5%", "Feature_ID", "effect", "waic", "marginals.hyperpar.autotyp_area")) 
     
 }
 
-df_spatial_phylo_area %>% write_tsv("spatiophylogenetic_modelling/results/df_spatial_phylo.tsv")
-df_spatial_phylo_area %>% saveRDS("spatiophylogenetic_modelling/results/df_spatial_phylo.Rdata")
-
-
+df_spatial_phylo_area %>% write_tsv("output/spatiophylogenetic_modelling/results/df_spatial_phylo_area.tsv")
+df_spatial_phylo_area %>% saveRDS("output/spatiophylogenetic_modelling/results/df_spatial_phylo_area.Rdata")
