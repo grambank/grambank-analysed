@@ -69,7 +69,7 @@ output/pruning_jagertree:
 ## PCA analysis and plots.
 pca:
 	@echo "## Running PCA analysis and generating plots. ##"
-	mkdir -p PCA
+	mkdir -p output/PCA
 	@$(MAKE) -f $(THIS_MAKEFILE) output/PCA/PCA_df.tsv
 	@$(MAKE) -f $(THIS_MAKEFILE) output/PCA/PCA_contributions_PCA1_PCA2.png
 	@$(MAKE) -f $(THIS_MAKEFILE) output/PCA/PCA_RGB_worldmap.png

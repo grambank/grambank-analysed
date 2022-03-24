@@ -3,7 +3,7 @@ source("requirements.R")
 
 #script written by Hedvig Skirgård and Simon Greenhill
 
-OUTPUTDIR <- file.path('.', 'PCA')
+OUTPUTDIR <- file.path('.',"output", 'PCA')
 
 Language_meta_data <-  read_csv(GRAMBANK_LANGUAGES, col_types=LANGUAGES_COLSPEC) %>%		
   dplyr::select(Language_ID = Language_level_ID, Family_name, Name, Longitude, Latitude, Macroarea) %>% 
