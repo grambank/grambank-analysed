@@ -4,14 +4,19 @@ source("requirements.R")
 
 cat("Pruning the global tree from Jäger to the Grambank dataset.\n")
 
-OUTPUT_DIR <- "spatiophylogenetic_modelling/processed_data/"
+OUTPUT_DIR_top <- "output/spatiophylogenetic_modelling/"
+if (!dir.exists(OUTPUT_DIR_top)) {
+  dir.create(OUTPUT_DIR_top)
+}
+
+OUTPUT_DIR <- "output/spatiophylogenetic_modelling/processed_data/"
 if (!dir.exists(OUTPUT_DIR)) {
   dir.create(OUTPUT_DIR)
 }
 
 #### Inputs ####
 #Glottolog-cldf table to have a match for all dialects to their language parent. Note that the particular dialects may differ from the dialects in GB which is why we cann't use the language table from the grambank-cldf relase
-glottolog_df <- read_tsv("non_GB_datasets/glottolog-cldf_wide_df.tsv",col_types = cols()) %>% 
+glottolog_df <- read_tsv("output/non_GB_datasets/glottolog-cldf_wide_df.tsv",col_types = cols()) %>% 
   dplyr::select(Language_ID, Language_level_ID, level) %>% 
   mutate(Language_level_ID = ifelse(is.na(Language_level_ID), Language_ID, Language_level_ID)) #making language-level entities their own parent, so that we can use this column for aggregation easier.
 
@@ -21,7 +26,7 @@ taxa_pairing <- read.csv('spatiophylogenetic_modelling/phylogenies/taxa.csv') %>
 
 jaeger_tree <- read.tree('spatiophylogenetic_modelling/phylogenies/world.tre')
 
-GB_languages <- read_tsv("GB_wide/GB_wide_imputed_binarized.tsv",col_types = cols()) %>% 
+GB_languages <- read_tsv("output/GB_wide/GB_wide_imputed_binarized.tsv",col_types = cols()) %>% 
   dplyr::select(Language_ID) #this column is already aggregated for dialects in make_wide.R
 
 #### Tree - Data pairs ####
@@ -56,13 +61,13 @@ jaeger_pruned$tip.label <- jaeger_pruned$tip.label %>%
 scale = 1
 jaeger_pruned$edge.length = jaeger_pruned$edge.length/max(nodeHeights(jaeger_pruned)[,2])*scale
 
-write.tree(jaeger_pruned, "spatiophylogenetic_modelling/processed_data/jaeger_pruned.tree")
+write.tree(jaeger_pruned, "output/spatiophylogenetic_modelling/processed_data/jaeger_pruned.tree")
 
 removed <- GB_languages %>% 
   anti_join(taxa_pairing %>% dplyr::select(Language_ID = Language_level_ID), by = "Language_ID")
 
-write.csv(removed, 'spatiophylogenetic_modelling/processed_data/jaeger_removed.csv')
+write.csv(removed, 'output/spatiophylogenetic_modelling/processed_data/jaeger_removed.csv')
 
 cat("Jager tree created with", length(jaeger_pruned$tip.label), "tips.\n")
 cat(nrow(removed), "languages were not paired.\n")
-cat("Languages that are in Grambank, but not in the Jaeger tree can be found in the file spatiophylogenetic_modelling/processed_data/jaeger_removed.csv.\n")
+cat("Languages that are in Grambank, but not in the Jaeger tree can be found in the file output/spatiophylogenetic_modelling/processed_data/jaeger_removed.csv.\n")
