@@ -12,7 +12,8 @@ languages_df <- read_csv(GRAMBANK_LANGUAGES, col_types = LANGUAGES_COLSPEC) %>%
   dplyr::select(Language_ID =ID, Language_level_ID, level) 
 
 #output directory
-OUTPUTDIR <- file.path('.', 'GB_wide')
+OUTPUTDIR <- file.path('.', "output", 'GB_wide')
+if (!dir.exists(OUTPUTDIR)){dir.create(OUTPUTDIR)}
 
 #reading in cldf-formatted long data for grambank
 GB <- read_csv(GRAMBANK_VALUES, col_types=VALUES_COLSPEC)
