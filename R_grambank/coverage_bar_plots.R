@@ -5,7 +5,7 @@ source("requirements.R")
 cat("Making bar plots of the coverage of Grambank per macroarea and largest families.\n")
 
 #getting table from Glottolog which contains information on the med level of the languoids
-glottolog_cldf_df <- read_tsv("non_GB_datasets/glottolog-cldf_wide_df.tsv",col_types = cols()) %>% 
+glottolog_cldf_df <- read_tsv("output/non_GB_datasets/glottolog-cldf_wide_df.tsv",col_types = cols()) %>% 
   mutate(Language_level_ID = ifelse(is.na(Language_level_ID), Language_ID, Language_level_ID)) %>%  #making language-level entities their own parent, so that we can use this column for aggregation easier.
   mutate(Family_ID = if_else(is.na(Family_ID) & level != "family", "Isolates", Family_ID)) %>%  #Lump isolates for easier viz %>% 
   mutate(med_summarised = if_else(str_detect(med, "grammar"), "grammar exists", "no grammar exists/unknown")) %>% 
@@ -17,7 +17,7 @@ family_names_df <- glottolog_cldf_df %>%
   full_join(tibble( Family_ID = c("Isolates"), Family_name = c("Isolates")), by = c("Family_ID", "Family_name"))
 
 ##grambank import and aggregation to language-level (i.e. merge dialects)
-GB_wide <-read_tsv(file.path("GB_wide", "GB_wide_strict.tsv"), col_types = cols()) %>% 
+GB_wide <-read_tsv(file.path("output", "GB_wide", "GB_wide_strict.tsv"), col_types = cols()) %>% 
   dplyr::select(Language_ID, na_prop) 
 
 #per family
@@ -50,7 +50,7 @@ families_sum$Family_name <- fct_reorder(families_sum $Family_name, families_sum 
 
 col_vector <- c("orange", "purple4", "turquoise3")
 
-families_sum %>% 
+family_bar_plot <- families_sum %>% 
 ggplot(aes(x = Family_name, fill = plot_value, y = n)) +
   geom_bar(position= position_fill(), stat = "identity") + 
   theme_classic() +
@@ -63,8 +63,13 @@ ggplot(aes(x = Family_name, fill = plot_value, y = n)) +
   scale_y_continuous(labels = scales::percent) +
   geom_text(aes(x = `Family_name`, y = n, label = `n`, hjust = 0.5), size=6.5, colour = "white", position= position_fill(0.5)) 
 
-ggsave("coverage_plots/coverage_top_fifteen_families.tiff", width= 15, height =  8.46)
-ggsave("coverage_plots/coverage_top_fifteen_families.png", width= 15, height =  8.46)
+tiff("output/coverage_plots/coverage_top_fifteen_families.tiff", width= 15, height =  8.46)
+plot(family_bar_plot )
+x <- dev.off()
+
+png("output/coverage_plots/coverage_top_fifteen_families.png", width= 15, height =  8.46)
+plot(family_bar_plot )
+x <- dev.off()
 
 #making table
 df_for_family_plot %>% 
@@ -75,11 +80,11 @@ df_for_family_plot %>%
   complete(Family_name, plot_value, fill = list(n = 0)) %>% 
   reshape2::dcast(Family_name~plot_value, value.var = "n" ) %>% 
   arrange(desc(`in Grambank`)) %>% 
-  write_tsv("coverage_plots/coverage_table.tsv")
+  write_tsv("output/coverage_plots/coverage_table.tsv")
   
 #per continent
 
-df_for_macroera_plot <-  glottolog_cldf_df %>% 
+df_for_macroarea_plot <-  glottolog_cldf_df %>% 
   filter(level == "language") %>% 
   filter(Family_ID != 'book1242') %>% #removing bookkeeping languages
   filter(Family_ID != 'unat1236') %>% #removing unattested
@@ -96,7 +101,7 @@ df_for_macroera_plot <-  glottolog_cldf_df %>%
   distinct(Macroarea, plot_value, n, sum) %>% 
   arrange(desc(sum))
 
-df_for_macroera_plot%>% 
+macroarea_plot <- df_for_macroarea_plot%>% 
   ggplot(aes(x = Macroarea, fill = plot_value, y = n)) +
   geom_bar(position= position_fill(), stat = "identity") + 
   theme_classic() +
@@ -109,7 +114,13 @@ df_for_macroera_plot%>%
   scale_y_continuous(labels = scales::percent) +
   geom_text(aes(x = `Macroarea`, y = n, label = `n`, hjust = 0.5), size=8, colour = "white", position= position_fill(0.5)) 
 
-ggsave("coverage_plots/coverage_macroarea.tiff", width= 10, height =  8.46)
-ggsave("coverage_plots/coverage_macroarea.png", width= 10, height =  8.46)
+
+tiff("output/coverage_plots/coverage_macroarea.tiff", width= 10, height =  8.46)
+plot(macroarea_plot)
+x <- dev.off()
+
+png("output/coverage_plots/coverage_macroarea.png", width= 10, height =  8.46)
+plot(macroarea_plot)
+x <- dev.off()
 
 cat("Coverage bar plots made.\n")
