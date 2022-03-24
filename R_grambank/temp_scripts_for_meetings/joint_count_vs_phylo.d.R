@@ -2,11 +2,11 @@ source("requirements.R")
 p_load("spdep")
 
 #get the phylo.d table   
-if (!file.exists("phylosig/pylosig_table.tsv")) { source("phylo_signal_features_d_stat.R") }		
-phylo_d_table <- read.delim("phylosig/pylosig_table.tsv", sep = "\t") %>% 
+if (!file.exists("output/phylosig/pylosig_table.tsv")) { source("phylo_signal_features_d_stat.R") }		
+phylo_d_table <- read.delim("output/phylosig/pylosig_table.tsv", sep = "\t") %>% 
   dplyr::rename(Feature_ID = Feature)
 
-GB <- read.delim("GB_wide/GB_wide_imputed_binarized.tsv", sep = "\t")
+GB <- read.delim("output/GB_wide/GB_wide_imputed_binarized.tsv", sep = "\t")
 
 parameters <- read.delim("feature_grouping_for_analysis.csv", sep = ",")
 
@@ -76,7 +76,7 @@ joined_df <- df %>%
 
 joined_df$k <- fct_reorder(as.character(joined_df$k), joined_df$k) 
 
-png("temp_scripts_for_meetings/phylo_d_vs_join_count.png")
+png("output/phylosig/phylo_d_vs_join_count.png")
 joined_df %>% 
   left_join(parameters, by = "Feature_ID") %>% 
   ggplot(aes(x = jtot_z_value, y = `D-estimate`, col = k)) +
@@ -88,9 +88,3 @@ joined_df %>%
   annotate("segment",col="black", alpha = 0.6, y = 0, yend = 0, x = -3, xend = 2, size = 0.5, linetype = "dashed") 
 
 x <- dev.off()
-
-
-
-  
-
-
