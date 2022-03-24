@@ -156,7 +156,7 @@ features <- GB_imputed %>%
 cat("#### Phylogenetic only model ####\n")
 
 #make empty df to bind to
-df_phylo_only <- data.frame(matrix(ncol = 6, nrow = 0))
+df_phylo_only <- data.frame(matrix(ncol = 7, nrow = 0))
 colnames(df_phylo_only) <- c("2.5%","50%", "97.5%", "Feature_ID", "effect", "waic", "marginals.hyperpar.phy_id") 
 df_phylo_only$`2.5%` <- as.numeric(df_phylo_only$`2.5%`)
 df_phylo_only$`50%` <- as.numeric(df_phylo_only$`50%`)
@@ -216,7 +216,7 @@ cat("#### Spatial only Model ####\n")
 
 
 #make empty df to bind to
-df_spatial_only <- data.frame(matrix(ncol = 6, nrow = 0))
+df_spatial_only <- data.frame(matrix(ncol = 7, nrow = 0))
 colnames(df_spatial_only) <- c("2.5%","50%", "97.5%", "Feature_ID", "effect", "waic", "marginals.hyperpar.sp_id") 
 df_spatial_only$`2.5%` <- as.numeric(df_spatial_only$`2.5%`)
 df_spatial_only$`50%` <- as.numeric(df_spatial_only$`50%`)
@@ -277,15 +277,15 @@ cat("All done with the spatial only model, 100% done!")
 cat("#### autotyp_area only model ####\n")
 
 #make empty df to bind to
-df_autotyp_area_only <- data.frame(matrix(ncol = 6, nrow = 0))
-colnames(df_autotyp_area_only) <- c("2.5%","50%", "97.5%", "Feature_ID", "effect", "waic", "marginals.hyperpar.phy_id") 
+df_autotyp_area_only <- data.frame(matrix(ncol = 7, nrow = 0))
+colnames(df_autotyp_area_only) <- c("2.5%","50%", "97.5%", "Feature_ID", "effect", "waic", "marginals.hyperpar.autotyp_area") 
 df_autotyp_area_only$`2.5%` <- as.numeric(df_autotyp_area_only$`2.5%`)
 df_autotyp_area_only$`50%` <- as.numeric(df_autotyp_area_only$`50%`)
 df_autotyp_area_only$`97.5%` <- as.numeric(df_autotyp_area_only$`97.5%`)
 df_autotyp_area_only$Feature_ID <- as.character(df_autotyp_area_only$Feature_ID)
 df_autotyp_area_only$effect <- as.character(df_autotyp_area_only$effect)
 df_autotyp_area_only$waic <- as.numeric(df_autotyp_area_only$waic)
-df_autotyp_area_only$marginals.hyperpar.phy_id <- as.list(df_autotyp_area_only$marginals.hyperpar.autotyp_area_id)
+df_autotyp_area_only$marginals.hyperpar.autotyp_area <- as.list(df_autotyp_area_only$marginals.hyperpar.autotyp_area)
 
 index <- 0
 
@@ -321,10 +321,10 @@ for(feature in features){
     mutate(Feature_ID = feature) %>% 
     mutate(effect = "autotyp_area_only") %>% 
     mutate(waic = output$waic$waic)  %>% 
-    mutate(marginals.hyperpar.phy_id = output$marginals.hyperpar[1])
+    mutate(marginals.hyperpar.autotyp_area = output$marginals.hyperpar[1])
   
   df_autotyp_area_only <- df_autotyp_area_only  %>% 
-    full_join(df, by = c("2.5%", "50%", "97.5%", "Feature_ID", "effect", "waic", "marginals.hyperpar.phy_id"))
+    full_join(df, by = c("2.5%", "50%", "97.5%", "Feature_ID", "effect", "waic", "marginals.hyperpar.autotyp_area"))
   
 }
 cat("All done with the autotyp_area only model, 100% done!")
@@ -333,8 +333,7 @@ df_autotyp_area_only %>% write_tsv("spatiophylogenetic_modelling/results/df_auto
 df_autotyp_area_only %>% saveRDS("spatiophylogenetic_modelling/results/df_autotyp_area_only.Rdata")
 
 
-
-
+df_autotyp_area_only %>% View()
 
 cat("#### Spatial & Phylo Model ####\n")
 
