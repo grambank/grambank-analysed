@@ -62,6 +62,7 @@ output/coverage_plots/coverage_macroarea.png:
 	Rscript coverage_bar_plots.R
 
 output/pruning_jagertree:
+	mkdir -p output/spatiophylogenetic_modelling
 	mkdir -p output/spatiophylogenetic_modelling/processed_data
 	RScript spatiophylogenetic_modelling/processing/pruning_jagertree.R
 
@@ -76,16 +77,16 @@ pca:
 	@$(MAKE) -f $(THIS_MAKEFILE) output/PCA/PCA_macroarea.png
 	@$(MAKE) -f $(THIS_MAKEFILE) theoretical
 
-PCA/PCA_df.tsv:
+output/PCA/PCA_df.tsv:
 	Rscript PCA.R
 
-PCA/PCA_contributions_PCA1_PCA2.png: 
+output/PCA/PCA_contributions_PCA1_PCA2.png: 
 	Rscript PCA_plot_contributions.R
 
-PCA/PCA_RGB_worldmap.png: 
+output/PCA/PCA_RGB_worldmap.png: 
 	Rscript PCA_plot_worldmaps.R
 
-PCA/PCA_macroarea.png: 
+output/PCA/PCA_macroarea.png: 
 	Rscript PCA_plot_scatter_plots.R
 
 ## Comparing PCA to theoretical scores
@@ -124,12 +125,12 @@ endangerment_analysis:
 INLA: data pca sp_models sensitivity_testing
 
 ## Phylo-spatial modelling
-sp_models: PCA/PCA_language_values.tsv
+sp_models: output/PCA/PCA_language_values.tsv
 	@echo "## Running spatiophylogenetic modelling with INLA on the first three components. ##"
-	@echo "If INLA isn't installed it will be installed."
+	@echo "If INLA isn't installed it will be installed. This may require input from you regarding compilation of binary files."
 	@echo Strap-in, these models take a while!
-	mkdir -p spatiophylogenetic_modelling/results
-	mkdir -p spatiophylogenetic_modelling/figures
+	mkdir -p output/spatiophylogenetic_modelling/results
+	mkdir -p output/spatiophylogenetic_modelling/figures
 	Rscript spatiophylogenetic_modelling/analysis/spatiophylogenetic_jaegermodel.R
 	Rscript spatiophylogenetic_modelling/analysis/plot_spatiophylogeneticmodels.R
 

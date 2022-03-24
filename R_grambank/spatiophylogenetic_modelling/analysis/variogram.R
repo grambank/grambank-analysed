@@ -2,7 +2,7 @@ source('requirements.R')
 
 #### Read Data ####
 
-pca_filename = 'PCA/PCA_language_values.tsv'
+pca_filename = 'output/PCA/PCA_language_values.tsv'
 pca_components = read_tsv(pca_filename, col_types = cols()) %>% 
   mutate(PC1 = scale(PC1), PC2 = scale(PC2), PC3 = scale(PC3)) 
 
@@ -29,7 +29,7 @@ vario.pc3 = vario(n.bins = 15,
 
 #### phylogenetic variogram ####
 # Organise Tree & Data
-tree_filename = 'spatiophylogenetic_modelling/processed_data/jaeger_pruned.tree'
+tree_filename = 'output/spatiophylogenetic_modelling/processed_data/jaeger_pruned.tree'
 phylogenetic_tree = read.tree(tree_filename)
 
 # Subset PCA and languages to Jaeger set
@@ -41,7 +41,7 @@ taxa = pca_components$Language_ID
 phylogenetic_tree = keep.tip(phylogenetic_tree, tip = taxa)
 
 # Get Language levels
-glottolog = read_tsv("non_GB_datasets/glottolog-cldf_wide_df.tsv", col_types = cols())
+glottolog = read_tsv("output/non_GB_datasets/glottolog-cldf_wide_df.tsv", col_types = cols())
 
 classification = str_split(glottolog$classification, "/")
 classification = lapply(classification, function(x) x[c(1:3, length(x))]) %>%
@@ -148,4 +148,4 @@ sidebyside = phylo_vario + spatial_vario +
   theme(legend.position = 'bottom', legend.title = element_blank()) 
 
 ggsave(sidebyside, 
-       filename = 'spatiophylogenetic_modelling/figures/variogram_sidebyside.png')
+       filename = 'output/spatiophylogenetic_modelling/figures/variogram_sidebyside.png')

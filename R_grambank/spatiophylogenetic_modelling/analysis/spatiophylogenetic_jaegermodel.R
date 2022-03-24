@@ -13,12 +13,18 @@ suppressPackageStartupMessages(
   library(INLA, quietly = T, warn.conflicts = F, verbose = F)
 )
 
+OUTPUTDIR_figures <- "output/spatiophylogenetic_modelling/figures"
+if (!dir.exists(OUTPUTDIR_figures)){dir.create(OUTPUTDIR_figures)}
+
+OUTPUTDIR_results <- "output/spatiophylogenetic_modelling/results"
+if (!dir.exists(OUTPUTDIR_results)){dir.create(OUTPUTDIR_results)}
+
 cat("#### Building Jaeger tree models ####\n")
 
 #### Inputs ####
 # language metadata
 # pca
-pca_filename = 'PCA/PCA_language_values.tsv'
+pca_filename = 'output/PCA/PCA_language_values.tsv'
 pca_components = read_tsv(pca_filename, col_types = cols()) %>% 
   mutate(PC1 = scale(PC1), PC2 = scale(PC2), PC3 = scale(PC3)) 
 
@@ -31,7 +37,7 @@ languages <- read_csv(GRAMBANK_LANGUAGES, col_types=LANGUAGES_COLSPEC) %>%
 x <- assert_that(nrow(pca_components) == n_imputed, msg = "The total number of languages has changed. This might mean the data doesn't align with the phylogeny")
 
 # trees
-tree_filename = 'spatiophylogenetic_modelling/processed_data/jaeger_pruned.tree'
+tree_filename = 'output/spatiophylogenetic_modelling/processed_data/jaeger_pruned.tree'
 phylogenetic_tree = read.tree(tree_filename)
 
 # Subset PCA and languages to Jaeger set
@@ -67,7 +73,7 @@ languages$Latitude[duplicate_rowid] = jitter(languages$Latitude[duplicate_rowid]
 languages$Longitude[duplicate_rowid] = jitter(languages$Longitude[duplicate_rowid], factor = 1)
 
 #### Visualise repsonse ####
-pdf('spatiophylogenetic_modelling/figures/PCA_normalitychecks.pdf', width =8.3, height = 11.7)
+pdf('output/spatiophylogenetic_modelling/figures/PCA_normalitychecks.pdf', width =8.3, height = 11.7)
 p1 = ggplot(data=pca_components) +
   geom_histogram(aes(x=PC1, color=I("black"),fill=I("orchid")), bins = 30) + 
   ggtitle("Histogram")
@@ -219,7 +225,7 @@ phylo_effect_varPC3 = inla.tmarginal(function(x) 1/sqrt(x),
 phylo_effect_var = rbind(phylo_effect_varPC1, phylo_effect_varPC2, phylo_effect_varPC3)
 dimnames(phylo_effect_var) = list(c("PC1", "PC2", "PC3"), c("2.5%", "50%", "97.5%"))
 
-write.csv(phylo_effect_var, file.path("spatiophylogenetic_modelling", "results",
+write.csv(phylo_effect_var, file.path("output", "spatiophylogenetic_modelling", "results",
                                       paste0(out_name, "_phylogenyOnly.csv")))
 
 cat("#### Spatial only Model ####\n")
@@ -269,7 +275,7 @@ spatial_effect_varPC3 = inla.tmarginal(function(x) 1/sqrt(x),
 spatial_effect_var = rbind(spatial_effect_varPC1, spatial_effect_varPC2, spatial_effect_varPC3)
 dimnames(spatial_effect_var) = list(c("PC1", "PC2", "PC3"), c("2.5%", "50%", "97.5%"))
 
-write.csv(spatial_effect_var, file.path("spatiophylogenetic_modelling", "results",
+write.csv(spatial_effect_var, file.path("output", "spatiophylogenetic_modelling", "results",
                                       paste0(out_name, "_spaceOnly.csv")))
 
 cat("#### Spatial & Phylo Model ####\n")
@@ -358,7 +364,7 @@ out_table = apply(out_table, 1:2, function(x) paste0("(", x, ")"))
 dimnames(out_table) = list(c("PC1", "PC2", "PC3"),
                            c("Phylogenetic_only", "Spatial_Only", "Phylogenetic_Joint", "Spatial_Joint"))
 
-write.csv(out_table, file.path("spatiophylogenetic_modelling", "results", "jaeger_table.csv"))
+write.csv(out_table, file.path("output", "spatiophylogenetic_modelling", "results", "jaeger_table.csv"))
 
 #### Table 1 ####
 table1 = matrix(NA, ncol = 4, nrow = 3)
@@ -392,7 +398,7 @@ table1[,"Percentage_Phy"] = phy_percent
 table1[,"Percentage_SP"]  = sp_percent
 
 write.csv(table1, 
-          "spatiophylogenetic_modelling/results/table_1.csv")
+          "output/spatiophylogenetic_modelling/results/table_1.csv")
 
 #### WAIC output ####
 waic_output = matrix(NA, ncol = 3, nrow = 3)
@@ -410,7 +416,7 @@ waic_output[3,] = c(phylogenetic_PC3$waic$waic,
                     spatiophylogenetic_PC3$waic$waic)
 
 dimnames(waic_output) = list(c("PC1", "PC2", "PC3"), c("Phylogeny", "Space", "Spatiophylogenetic"))
-write.csv(waic_output, "spatiophylogenetic_modelling/results/jaeger_waic.csv")
+write.csv(waic_output, "output/spatiophylogenetic_modelling/results/jaeger_waic.csv")
 
 #### Save models #### 
 model_list = list(phylogenetic_PC1, phylogenetic_PC2, phylogenetic_PC3,
@@ -425,4 +431,4 @@ names(marginals.hyperpar) = c("Phy_PC1", "Phy_PC2", "Phy_PC3",
                       "SP_PC1", "SP_PC2", "SP_PC3")
 
 save(marginals.hyperpar, 
-     file = "spatiophylogenetic_modelling/results/jaeger_models.RData")
+     file = "output/spatiophylogenetic_modelling/results/jaeger_models.RData")

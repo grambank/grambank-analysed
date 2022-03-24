@@ -1,7 +1,7 @@
 source("requirements.R")
 
 #Glottolog df for language level merging and codes
-glottolog_df<- read_tsv("non_GB_datasets/glottolog-cldf_wide_df.tsv", col_types = cols()) %>% 
+glottolog_df<- read_tsv("output/non_GB_datasets/glottolog-cldf_wide_df.tsv", col_types = cols()) %>% 
   mutate(Language_level_ID = ifelse(is.na(Language_level_ID), Language_ID, Language_level_ID)) %>% 
     mutate(Family_ID = ifelse(is.na(Family_ID), Language_level_ID, Family_ID)) %>% 
   dplyr::select(Glottocode, "ISO_639"= ISO639P3code, Language_level_ID, level, Family_ID,Longitude, Latitude) 
@@ -12,7 +12,7 @@ e24 <- read_tsv("ethnologue_data/Table_of_Languages.tab", show_col_types = F) %>
   
 #reading in unusualness scores.
 # a low number (-86 compared to -40) makes you RARER
-unusualness_score <- read_tsv("unusualness/tables/scores.tsv") %>% 
+unusualness_score <- read_tsv("output/unusualness/tables/scores.tsv") %>% 
   dplyr::select(Glottocode = ID, unusualness_score=score)
 
 data <- e24 %>% 
@@ -47,7 +47,7 @@ pairs.panels(data[, 2:12],
              ci = T, cex.cor = 0.9,stars = T)
 
 # trees
-tree_filename = 'spatiophylogenetic_modelling/processed_data/jaeger_pruned.tree'
+tree_filename = 'output/spatiophylogenetic_modelling/processed_data/jaeger_pruned.tree'
 phylogenetic_tree = read.tree(tree_filename) 
 
 #pruning data to only obs also in the tree
@@ -78,7 +78,7 @@ full_model <- brms::brm(formula = formula_for_brms,
                     cores = 4,
                     control = list(adapt_delta =0.99, max_treedepth=15)
 ) %>% add_criterion("waic")
-full_model %>% broom.mixed::tidy() %>% write_csv("unusualness/analysis/full_model.csv")
+full_model %>% broom.mixed::tidy() %>% write_csv("output/unusualness/analysis/full_model.csv")
 
 simplified_model <- brms::brm(unusualness_score ~ 1 + (1 | gr(Glottocode, cov = vcv_tree)),
                     data = filter(inner_joined_df, !is.na(L1), !is.na(L2)),
@@ -87,6 +87,6 @@ simplified_model <- brms::brm(unusualness_score ~ 1 + (1 | gr(Glottocode, cov = 
                     iter = 25000,
                     control = list(adapt_delta =0.99, max_treedepth=15)
 ) %>% add_criterion("waic")
-simplified_model %>% broom.mixed::tidy() %>% write_csv("unusualness/analysis/simplified_model.csv")
+simplified_model %>% broom.mixed::tidy() %>% write_csv("output/unusualness/analysis/simplified_model.csv")
 
-loo_compare(full_model, simplified_model, criterion="waic") %>% as.tibble() %>% write_csv("unusualness/analysis/model_comparison.csv")
+loo_compare(full_model, simplified_model, criterion="waic") %>% as.tibble() %>% write_csv("output/unusualness/analysis/model_comparison.csv")
