@@ -203,12 +203,12 @@ suppressWarnings(  saveRDS(output, file = paste0("output/spatiophylogenetic_mode
 #Don't be alaramed by the supress warnings. saveRDS() is being kind and reminding us that the package stats may not be available when loading. However, this is not a necessary warning for us so we've wrapped saveRDS in suppressWarnings.
     
 
-  phylo_effect_generic = inla.tmarginal(function(x) 1/sqrt(x),
+phylo_effect_generic = inla.tmarginal(function(x) 1/sqrt(x),
                                 output$marginals.hyperpar$`Precision for phy_id_generic`,
                                 method = "linear") %>%
     inla.qmarginal(c(0.025, 0.5, 0.975), .)
 
-  phylo_effect_iid_model = inla.tmarginal(function(x) 1/sqrt(x),
+phylo_effect_iid_model = inla.tmarginal(function(x) 1/sqrt(x),
                                         output$marginals.hyperpar$`Precision for phy_id_iid_model`,
                                         method = "linear") %>%
     inla.qmarginal(c(0.025, 0.5, 0.975), .)
@@ -220,6 +220,7 @@ df_phylo_only_generic  <- phylo_effect_generic %>%
     rename("2.5%" = V1, "50%" = V2, "97.5%" = V3) %>% 
     mutate(Feature_ID = feature) %>% 
     mutate(effect = "phylo_only_generic") %>% 
+    mutate(model = "phylo_only") %>% 
     mutate(waic = output$waic$waic)  %>% 
     mutate(marginals.hyperpar.phy_id_generic = output$marginals.hyperpar[1])
 
@@ -230,6 +231,7 @@ df_phylo_only_iid_model <-   phylo_effect_iid_model %>%
   rename("2.5%" = V1, "50%" = V2, "97.5%" = V3) %>% 
   mutate(Feature_ID = feature) %>% 
   mutate(effect = "phylo_only_iid_model") %>% 
+  mutate(model = "phylo_only") %>% 
   mutate(waic = output$waic$waic)  %>% 
   mutate(marginals.hyperpar.phy_id_iid_model = output$marginals.hyperpar[2])
 
