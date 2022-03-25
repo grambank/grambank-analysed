@@ -1,1 +1,0 @@
-# This is the output dir for all data, plots etc created by the scripts in this repos. All content herein is ignored by .gitignore. 
