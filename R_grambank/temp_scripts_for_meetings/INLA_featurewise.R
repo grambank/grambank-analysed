@@ -7,7 +7,7 @@ if (!file.exists("output/spatiophylogenetic_modelling/processed_data/jaeger_prun
 #make output dirs
 
 if (!dir.exists("output/spatiophylogenetic_modelling/results/")) {
-dir.create("output/spatiophylogenetic_modelling/results/")
+  dir.create("output/spatiophylogenetic_modelling/results/")
   }
 if (!dir.exists("output/spatiophylogenetic_modelling/results/phylo_only/")) {
 dir.create("output/spatiophylogenetic_modelling/results/phylo_only/")
@@ -34,10 +34,10 @@ cat("#### Building Jaeger tree models ####\n")
 
 #reading in GB
 GB_imputed_filename <- file.path("output", "GB_wide", "GB_wide_imputed_binarized.tsv")
-GB_imputed <- read_tsv(GB_imputed_filename, col_types= cols()) 
+GB_imputed <- read.delim(GB_imputed_filename, sep = "\t")
 
 #subset GB to test code swiftly
-#GB_imputed <- GB_imputed[1:10,]
+#GB_imputed <- GB_imputed[1:20,]
 
 #### Inputs ####
 # language metadata
@@ -143,10 +143,10 @@ grambank_df = GB_imputed %>%
   left_join(tibble(Language_ID = rownames(phylo_prec_mat),
                    phy_id_generic = 1:nrow(phylo_prec_mat),
                    phy_id_iid_model = 1:nrow(phylo_prec_mat),
-                   sp_id_int = 1:nrow(spatial_prec_mat),
-                  sp_id2_int = 1:nrow(spatial_prec_mat)), by = "Language_ID") %>% 
+                   spatial_id_generic = 1:nrow(spatial_prec_mat),
+                  spatial_id_iid_model = 1:nrow(spatial_prec_mat)), by = "Language_ID") %>% 
   left_join(languages,  by = "Language_ID") %>% 
-  mutate(AUTOTYP_area2 = AUTOTYP_area)
+  rename(AUTOTYP_area_id_iid_model = AUTOTYP_area)
 
 #################
 ###INLA LOOPS####
@@ -158,22 +158,22 @@ features <- GB_imputed %>%
   colnames() 
 
 #subsetting for debugging code
-#features <- features[1:10]
+#features <- features[1:3]
 
 cat("#### Phylogenetic only model ####\n")
 
 #make empty df to bind to
-df_phylo_only <- data.frame(matrix(ncol = 8, nrow = 0))
-colnames(df_phylo_only) <- c("2.5%","50%", "97.5%", "Feature_ID", "effect", "waic", "marginals.hyperpar.phy_id_iid_model", "marginals.hyperpar.phy_id_generic") 
+df_phylo_only <- data.frame(matrix(ncol = 9, nrow = 0))
+colnames(df_phylo_only) <- c("2.5%","50%", "97.5%", "Feature_ID", "effect", "model", "waic", "marginals.hyperpar.phy_id_iid_model", "marginals.hyperpar.phy_id_generic") 
 df_phylo_only$`2.5%` <- as.numeric(df_phylo_only$`2.5%`)
 df_phylo_only$`50%` <- as.numeric(df_phylo_only$`50%`)
 df_phylo_only$`97.5%` <- as.numeric(df_phylo_only$`97.5%`)
 df_phylo_only$Feature_ID <- as.character(df_phylo_only$Feature_ID)
+df_phylo_only$model <- as.character(df_phylo_only$model)
 df_phylo_only$effect <- as.character(df_phylo_only$effect)
 df_phylo_only$waic <- as.numeric(df_phylo_only$waic)
 df_phylo_only$marginals.hyperpar.phy_id_iid_model <- as.list(df_phylo_only$marginals.hyperpar.phy_id_iid_model)
 df_phylo_only$marginals.hyperpar.phy_id_generic <- as.list(df_phylo_only$marginals.hyperpar.phy_id_generic)
-
 
 index <- 0
 
@@ -200,9 +200,8 @@ for(feature in features){
                             list(this_feature=as.name(feature))))
 
 suppressWarnings(  saveRDS(output, file = paste0("output/spatiophylogenetic_modelling/results/phylo_only/phylo_only_", feature, ".rdata")) )
-#Don't be alaramed by the supress warnings. saveRDS() is being kind and reminding us that the package stats may not be available when loading. However, this is not a necessary warning for us so we've wrapped saveRDS in suppressWarnings.
+#Don't be alarmed by the suppress warnings. saveRDS() is being kind and reminding us that the package stats may not be available when loading. However, this is not a necessary warning for us so we've wrapped saveRDS in suppressWarnings.
     
-
 phylo_effect_generic = inla.tmarginal(function(x) 1/sqrt(x),
                                 output$marginals.hyperpar$`Precision for phy_id_generic`,
                                 method = "linear") %>%
@@ -236,8 +235,8 @@ df_phylo_only_iid_model <-   phylo_effect_iid_model %>%
   mutate(marginals.hyperpar.phy_id_iid_model = output$marginals.hyperpar[2])
 
 df_phylo_only <- df_phylo_only  %>% 
-  full_join(df_phylo_only_iid_model, by = c("2.5%", "50%", "97.5%", "Feature_ID", "effect", "waic", "marginals.hyperpar.phy_id_iid_model")) %>% 
-  full_join(df_phylo_only_generic, by = c("2.5%", "50%", "97.5%", "Feature_ID", "effect", "waic", "marginals.hyperpar.phy_id_generic"))
+  full_join(df_phylo_only_iid_model, by = c("2.5%", "50%", "97.5%", "Feature_ID", "effect", "waic", "marginals.hyperpar.phy_id_iid_model", "model")) %>% 
+  full_join(df_phylo_only_generic, by = c("2.5%", "50%", "97.5%", "Feature_ID", "effect", "waic", "marginals.hyperpar.phy_id_generic", "model"))
   
 }
 cat("All done with the phylo only model, 100% done!")
@@ -250,15 +249,17 @@ df_phylo_only %>% saveRDS("output/spatiophylogenetic_modelling/results/df_phylo_
 cat("#### Spatial only Model ####\n")
 
 #make empty df to bind to
-df_spatial_only <- data.frame(matrix(ncol = 7, nrow = 0))
-colnames(df_spatial_only) <- c("2.5%","50%", "97.5%", "Feature_ID", "effect", "waic", "marginals.hyperpar.sp_id") 
+df_spatial_only <- data.frame(matrix(ncol = 9, nrow = 0))
+colnames(df_spatial_only) <- c("2.5%","50%", "97.5%", "Feature_ID", "effect", "model", "waic", "marginals.hyperpar.spatial_id_iid_model", "marginals.hyperpar.spatial_id_generic") 
 df_spatial_only$`2.5%` <- as.numeric(df_spatial_only$`2.5%`)
 df_spatial_only$`50%` <- as.numeric(df_spatial_only$`50%`)
 df_spatial_only$`97.5%` <- as.numeric(df_spatial_only$`97.5%`)
 df_spatial_only$Feature_ID <- as.character(df_spatial_only$Feature_ID)
+df_spatial_only$model <- as.character(df_spatial_only$model)
 df_spatial_only$effect <- as.character(df_spatial_only$effect)
 df_spatial_only$waic <- as.numeric(df_spatial_only$waic)
-df_spatial_only$marginals.hyperpar.sp_id <- as.list(df_spatial_only$marginals.hyperpar.sp_id)
+df_spatial_only$marginals.hyperpar.spatial_id_iid_model <- as.list(df_spatial_only$marginals.hyperpar.spatial_id_iid_model)
+df_spatial_only$marginals.hyperpar.spatial_id_generic <- as.list(df_spatial_only$marginals.hyperpar.spatial_id_generic)
 
 index <- 0
 
@@ -269,35 +270,59 @@ for(feature in features){
   
   cat(paste0("# Running the spatial-only model on feature ", feature, ". That means I'm ", round(index/length(features) * 100, 2), "% done.\n"))
   index <- index + 1 
-  
+
   output <- eval(substitute(inla(formula = this_feature ~
-                                   f(sp_id, model = "generic0", Cmatrix = spatial_prec_mat,
-                                     constr = TRUE, hyper = prior_spatial),
-                                 control.compute = list(waic=TRUE, dic = TRUE),
+                                   f((spatial_id_generic), 
+                                     model = "generic0",
+                                     Cmatrix = spatial_prec_mat,
+                                     constr = FALSE, 
+                                     hyper = pcprior) + 
+                                   f(spatial_id_iid_model,
+                                     model = "iid", 
+                                     hyper = pcprior),
+                                 control.compute = list(waic=TRUE, dic = TRUE, mlik = FALSE, config = TRUE),
+                                 control.predictor = list(compute = TRUE),
                                  data = grambank_df,family = "binomial"),
                             list(this_feature=as.name(feature))))
   
-  output %>% 
-    saveRDS(file = paste0("output/spatiophylogenetic_modelling/results/spatial_only/spatial_only_", feature, ".rdata"))
-  
-  spatial_effect = inla.tmarginal(function(x) 1/sqrt(x),
-                                  output$marginals.hyperpar$`Precision for sp_id`,
-                                  method = "linear") %>%
+  suppressWarnings(  saveRDS(output, file = paste0("output/spatiophylogenetic_modelling/results/spatial_only/spatial_only_", feature, ".rdata")) )
+  #Don't be alarmed by the suppress warnings. saveRDS() is being kind and reminding us that the package stats may not be available when loading. However, this is not a necessary warning for us so we've wrapped saveRDS in suppressWarnings.
+    spatial_effect_generic = inla.tmarginal(function(x) 1/sqrt(x),
+                                        output$marginals.hyperpar$`Precision for spatial_id_generic`,
+                                        method = "linear") %>%
     inla.qmarginal(c(0.025, 0.5, 0.975), .)
   
+  spatial_effect_iid_model = inla.tmarginal(function(x) 1/sqrt(x),
+                                          output$marginals.hyperpar$`Precision for spatial_id_iid_model`,
+                                          method = "linear") %>%
+    inla.qmarginal(c(0.025, 0.5, 0.975), .)
   
-  df <- spatial_effect %>% 
+  df_spatial_only_generic  <- spatial_effect_generic %>% 
     as.data.frame() %>% 
     t() %>% 
     as.data.frame() %>% 
     rename("2.5%" = V1, "50%" = V2, "97.5%" = V3) %>% 
     mutate(Feature_ID = feature) %>% 
-    mutate(effect = "spatial_only") %>% 
-    mutate(waic = output$waic$waic) %>% 
-    mutate(marginals.hyperpar.sp_id = output$marginals.hyperpar[1])
+    mutate(effect = "spatial_only_generic") %>% 
+    mutate(model = "spatial_only") %>% 
+    mutate(waic = output$waic$waic)  %>% 
+    mutate(marginals.hyperpar.spatial_id_generic = output$marginals.hyperpar[1])
+
+  df_spatial_only_iid_model <-   spatial_effect_iid_model %>% 
+    as.data.frame() %>% 
+    t() %>% 
+    as.data.frame() %>% 
+    rename("2.5%" = V1, "50%" = V2, "97.5%" = V3) %>% 
+    mutate(Feature_ID = feature) %>% 
+    mutate(effect = "spatial_only_iid_model") %>% 
+    mutate(model = "spatial_only") %>% 
+    mutate(waic = output$waic$waic)  %>% 
+    mutate(marginals.hyperpar.spatial_id_iid_model = output$marginals.hyperpar[2])
   
-  df_spatial_only <- df_spatial_only  %>%
-    full_join(df, by = c("2.5%", "50%", "97.5%", "Feature_ID", "effect", "waic", "marginals.hyperpar.sp_id"))
+  df_spatial_only <- df_spatial_only  %>% 
+    full_join(df_spatial_only_iid_model, by = c("2.5%", "50%", "97.5%", "Feature_ID", "effect", "waic", "marginals.hyperpar.spatial_id_iid_model", "model")) %>% 
+    full_join(df_spatial_only_generic, by = c("2.5%", "50%", "97.5%", "Feature_ID", "effect", "waic", "marginals.hyperpar.spatial_id_generic", "model"))
+  
   
 }
 
@@ -307,18 +332,19 @@ df_spatial_only %>% saveRDS("output/spatiophylogenetic_modelling/results/df_spat
 cat("All done with the spatial only model, 100% done!")
 
 ###
-cat("#### autotyp_area only model ####\n")
+cat("#### AUTOTYP_area only model ####\n")
 
 #make empty df to bind to
-df_autotyp_area_only <- data.frame(matrix(ncol = 7, nrow = 0))
-colnames(df_autotyp_area_only) <- c("2.5%","50%", "97.5%", "Feature_ID", "effect", "waic", "marginals.hyperpar.autotyp_area") 
+df_autotyp_area_only <- data.frame(matrix(ncol = 8, nrow = 0))
+colnames(df_autotyp_area_only) <- c("2.5%","50%", "97.5%", "Feature_ID", "effect", "model", "waic", "marginals.hyperpar.AUTOTYP_area_id_iid_model") 
 df_autotyp_area_only$`2.5%` <- as.numeric(df_autotyp_area_only$`2.5%`)
 df_autotyp_area_only$`50%` <- as.numeric(df_autotyp_area_only$`50%`)
 df_autotyp_area_only$`97.5%` <- as.numeric(df_autotyp_area_only$`97.5%`)
 df_autotyp_area_only$Feature_ID <- as.character(df_autotyp_area_only$Feature_ID)
+df_autotyp_area_only$model <- as.character(df_autotyp_area_only$model)
 df_autotyp_area_only$effect <- as.character(df_autotyp_area_only$effect)
 df_autotyp_area_only$waic <- as.numeric(df_autotyp_area_only$waic)
-df_autotyp_area_only$marginals.hyperpar.autotyp_area <- as.list(df_autotyp_area_only$marginals.hyperpar.autotyp_area)
+df_autotyp_area_only$marginals.hyperpar.AUTOTYP_area_id_iid_model <- as.list(df_autotyp_area_only$marginals.hyperpar.AUTOTYP_area_id_iid_model)
 
 index <- 0
 
@@ -329,20 +355,21 @@ for(feature in features){
   cat(paste0("# Running the autotyp_area-only model on feature ", feature, ". That means I'm ", round(index/length(features) * 100, 2), "% done.\n"))
   index <- index + 1 
   
-  output <- eval(substitute(inla(formula = this_feature ~ f(AUTOTYP_area, hyper = prior_autotyp_area),
+  output <- eval(substitute(inla(formula = this_feature ~ 
+                                   f(AUTOTYP_area_id_iid_model, 
+                                     hyper = pcprior,
+                                     model = "iid"),
                                  control.compute = list(waic=TRUE, dic = TRUE, mlik = FALSE, config = TRUE),
                                  control.predictor = list(compute = TRUE),
                                  data = grambank_df,family = "binomial"),
                             list(this_feature=as.name(feature))))
-  
-  output %>% 
-    saveRDS(file = paste0("output/spatiophylogenetic_modelling/results/autotyp_area_only/autotyp_area_only_", feature, ".rdata"))
-  
-  
 
 
-      autotyp_area_effect = inla.tmarginal(function(x) 1/sqrt(x),
-                                output$marginals.hyperpar$`Precision for AUTOTYP_area`,
+suppressWarnings(    saveRDS(output, file = paste0("output/spatiophylogenetic_modelling/results/autotyp_area_only/autotyp_area_only_", feature, ".rdata")))
+#Don't be alarmed by the suppress warnings. saveRDS() is being kind and reminding us that the package stats may not be available when loading. However, this is not a necessary warning for us so we've wrapped saveRDS in suppressWarnings
+
+  autotyp_area_effect = inla.tmarginal(function(x) 1/sqrt(x),
+                                output$marginals.hyperpar$`Precision for AUTOTYP_area_id_iid_model`,
                                 method = "linear") %>%
     inla.qmarginal(c(0.025, 0.5, 0.975), .)
   
@@ -352,12 +379,13 @@ for(feature in features){
     as.data.frame() %>% 
     rename("2.5%" = V1, "50%" = V2, "97.5%" = V3) %>% 
     mutate(Feature_ID = feature) %>% 
-    mutate(effect = "autotyp_area_only") %>% 
+    mutate(effect = "autotyp_area_iid_model") %>% 
+    mutate(model = "autotyp_area_only") %>% 
     mutate(waic = output$waic$waic)  %>% 
-    mutate(marginals.hyperpar.autotyp_area = output$marginals.hyperpar[1])
+    mutate(marginals.hyperpar.AUTOTYP_area_id_iid_model = output$marginals.hyperpar[1])
   
   df_autotyp_area_only <- df_autotyp_area_only  %>% 
-    full_join(df, by = c("2.5%", "50%", "97.5%", "Feature_ID", "effect", "waic", "marginals.hyperpar.autotyp_area"))
+    full_join(df, by = c("2.5%", "50%", "97.5%", "Feature_ID", "effect", "model", "waic", "marginals.hyperpar.AUTOTYP_area_id_iid_model"))
   
 }
 cat("All done with the autotyp_area only model, 100% done!")
@@ -374,20 +402,34 @@ index <- 0
 
 for(feature in features){
   
-  #feature <- features[16]
+  #feature <- features[2]
   
   cat(paste0("# Running the spatial-phylo (double-process) model on feature ", feature, ". That means I'm ", round(index/length(features) * 100, 2), "% done.\n"))
   index <- index + 1 
   
   output <- eval(substitute(inla(formula = this_feature ~
-                                   f(phy_id, model = "generic0", Cmatrix = phylo_prec_mat, constr = TRUE, hyper = prior_phylo) + 
-                                   f(sp_id, model = "generic0", Cmatrix = spatial_prec_mat, constr = TRUE, hyper = prior_spatial) ,
+                                   f((phy_id_generic), 
+                                     model = "generic0",
+                                     Cmatrix = phylo_prec_mat,
+                                     constr = FALSE, 
+                                     hyper = pcprior) + 
+                                   f(phy_id_iid_model,
+                                     model = "iid", 
+                                     hyper = pcprior) +
+                                   f((spatial_id_generic), 
+                                     model = "generic0",
+                                     Cmatrix = spatial_prec_mat,
+                                     constr = FALSE, 
+                                     hyper = pcprior) + 
+                                   f(spatial_id_iid_model,
+                                     model = "iid", 
+                                     hyper = pcprior),
                                  control.compute = list(waic=TRUE),
                                  data = grambank_df, family = "binomial"),
                             list(this_feature=as.name(feature))))
   
-  output %>% 
-    saveRDS(file = paste0("output/spatiophylogenetic_modelling/results/dual_process_rdata/spatial_phylo_", feature, ".rdata"))
+suppressWarnings(    saveRDS(output, file = paste0("output/spatiophylogenetic_modelling/results/dual_process_rdata/spatial_phylo_", feature, ".rdata")))
+ #Don't be alarmed by the suppress warnings. saveRDS() is being kind and reminding us that the package stats may not be available when loading. However, this is not a necessary warning for us so we've wrapped saveRDS in suppressWarnings
 }
 
 spatial_phylo_rdata_fns <- list.files("output/spatiophylogenetic_modelling/results/dual_process_rdata/", full.names = T, pattern = ".*rdata")
@@ -395,20 +437,23 @@ spatial_phylo_rdata_fns <- list.files("output/spatiophylogenetic_modelling/resul
 #second for loop for the dual process model because of previously discussing debugging workflow the for loop is split in twain.
 
 #make empty df to bind to
-df_spatial_phylo <- data.frame(matrix(ncol = 8, nrow = 0))
-colnames(df_spatial_phylo) <- c("2.5%","50%", "97.5%", "Feature_ID", "effect", "waic", "marginals.hyperpar.sp_id", "marginals.hyperpar.phy_id") 
-df_spatial_phylo$`2.5%` <- as.numeric(df_spatial_phylo$`2.5%`)
-df_spatial_phylo$`50%` <- as.numeric(df_spatial_phylo$`50%`)
-df_spatial_phylo$Feature_ID <- as.character(df_spatial_phylo$Feature_ID)
-df_spatial_phylo$effect <- as.character(df_spatial_phylo$effect)
-df_spatial_phylo$waic <- as.numeric(df_spatial_phylo$waic)
-df_spatial_phylo$marginals.hyperpar.sp_id <- as.list(df_spatial_phylo$marginals.hyperpar.sp_id)
-df_spatial_phylo$marginals.hyperpar.phy_id <- as.list(df_spatial_phylo$marginals.hyperpar.phy_id)
+df_dual_spatial_phylo <- data.frame(matrix(ncol = 11, nrow = 0))
+colnames(df_dual_spatial_phylo) <- c("2.5%","50%", "97.5%", "Feature_ID", "effect", "waic", "model", "marginals.hyperpar.phy_id_iid_model", "marginals.hyperpar.phy_id_generic", "marginals.hyperpar.spatial_id_iid_model", "marginals.hyperpar.spatial_id_generic") 
+df_dual_spatial_phylo$`2.5%` <- as.numeric(df_dual_spatial_phylo$`2.5%`)
+df_dual_spatial_phylo$`50%` <- as.numeric(df_dual_spatial_phylo$`50%`)
+df_dual_spatial_phylo$Feature_ID <- as.character(df_dual_spatial_phylo$Feature_ID)
+df_dual_spatial_phylo$effect <- as.character(df_dual_spatial_phylo$effect)
+df_dual_spatial_phylo$model <- as.character(df_dual_spatial_phylo$model)
+df_dual_spatial_phylo$waic <- as.numeric(df_dual_spatial_phylo$waic)
+df_dual_spatial_phylo$marginals.hyperpar.phy_id_iid_model <- as.list(df_dual_spatial_phylo$marginals.hyperpar.phy_id_iid_model)
+df_dual_spatial_phylo$marginals.hyperpar.phy_id_generic <- as.list(df_dual_spatial_phylo$marginals.hyperpar.phy_id_generic)
+df_dual_spatial_phylo$marginals.hyperpar.spatial_id_iid_model <- as.list(df_dual_spatial_phylo$marginals.hyperpar.spatial_id_iid_model)
+df_dual_spatial_phylo$marginals.hyperpar.spatial_id_generic <- as.list(df_dual_spatial_phylo$marginals.hyperpar.spatial_id_generic)
+
 
 for(fn in spatial_phylo_rdata_fns){
 
 #  fn <- spatial_phylo_rdata_fns[1]
-# fn <- "output/spatiophylogenetic_modelling/results/dual_process_rdata/spatial_phylo_GB051.rdata"
 
 output <- readRDS(fn)
 
@@ -416,44 +461,81 @@ feature <- fn %>% str_extract("GB[0-9]*[a|b]?")
 
 cat(paste0("I'm processing the inla output for feature ", feature, ".\n" ))
     
-phylo_effect = inla.tmarginal(function(x) 1/sqrt(x), 
-                              output$marginals.hyperpar$`Precision for phy_id`, 
-                              method = "linear") %>%
+phylo_effect_generic = inla.tmarginal(function(x) 1/sqrt(x),
+                                      output$marginals.hyperpar$`Precision for phy_id_generic`,
+                                      method = "linear") %>%
   inla.qmarginal(c(0.025, 0.5, 0.975), .)
 
-spatial_effect = inla.tmarginal(function(x) 1/sqrt(x), 
-                                output$marginals.hyperpar$`Precision for sp_id`, 
-                                method = "linear") %>%
+phylo_effect_iid_model = inla.tmarginal(function(x) 1/sqrt(x),
+                                        output$marginals.hyperpar$`Precision for phy_id_iid_model`,
+                                        method = "linear") %>%
   inla.qmarginal(c(0.025, 0.5, 0.975), .)
 
-df_phylo <- phylo_effect %>% 
+
+spatial_effect_generic = inla.tmarginal(function(x) 1/sqrt(x),
+                                        output$marginals.hyperpar$`Precision for spatial_id_generic`,
+                                        method = "linear") %>%
+  inla.qmarginal(c(0.025, 0.5, 0.975), .)
+
+spatial_effect_iid_model = inla.tmarginal(function(x) 1/sqrt(x),
+                                          output$marginals.hyperpar$`Precision for spatial_id_iid_model`,
+                                          method = "linear") %>%
+  inla.qmarginal(c(0.025, 0.5, 0.975), .)
+
+df_phylo_generic  <- phylo_effect_generic %>% 
   as.data.frame() %>% 
   t() %>% 
   as.data.frame() %>% 
   rename("2.5%" = V1, "50%" = V2, "97.5%" = V3) %>% 
   mutate(Feature_ID = feature) %>% 
-  mutate(effect = "phylo_in_double") %>% 
-  mutate(waic = output$waic$waic) %>% 
-  mutate(marginals.hyperpar.phy_id = output$marginals.hyperpar[1])
+  mutate(effect = "phylo_generic_in_dual") %>% 
+  mutate(model = "dual") %>% 
+  mutate(waic = output$waic$waic)  %>% 
+  mutate(marginals.hyperpar.phy_id_generic = output$marginals.hyperpar[1])
 
-df_space <- spatial_effect %>% 
+df_phylo_iid_model <-   phylo_effect_iid_model %>% 
   as.data.frame() %>% 
   t() %>% 
   as.data.frame() %>% 
   rename("2.5%" = V1, "50%" = V2, "97.5%" = V3) %>% 
   mutate(Feature_ID = feature) %>% 
-  mutate(effect = "spatial_in_double") %>% 
-  mutate(waic = output$waic$waic) %>% 
-  mutate(marginals.hyperpar.sp_id = output$marginals.hyperpar[2])
+  mutate(effect = "phylo_iid_model_in_dual") %>% 
+  mutate(model = "dual") %>% 
+  mutate(waic = output$waic$waic)  %>% 
+  mutate(marginals.hyperpar.phy_id_iid_model = output$marginals.hyperpar[2])
 
-df_spatial_phylo <- df_spatial_phylo  %>% 
-  full_join(df_space, by = c("2.5%", "50%", "97.5%", "Feature_ID", "effect", "waic", "marginals.hyperpar.sp_id")) %>% 
-  full_join(df_phylo, by = c("2.5%", "50%", "97.5%", "Feature_ID", "effect", "waic", "marginals.hyperpar.phy_id"))
+df_spatial_generic  <- spatial_effect_generic %>% 
+  as.data.frame() %>% 
+  t() %>% 
+  as.data.frame() %>% 
+  rename("2.5%" = V1, "50%" = V2, "97.5%" = V3) %>% 
+  mutate(Feature_ID = feature) %>% 
+  mutate(effect = "spatia_generic_in_dual") %>% 
+  mutate(model = "dual") %>% 
+  mutate(waic = output$waic$waic)  %>% 
+  mutate(marginals.hyperpar.spatial_id_generic = output$marginals.hyperpar[3])
+
+df_spatial_iid_model <-   spatial_effect_iid_model %>% 
+  as.data.frame() %>% 
+  t() %>% 
+  as.data.frame() %>% 
+  rename("2.5%" = V1, "50%" = V2, "97.5%" = V3) %>% 
+  mutate(Feature_ID = feature) %>% 
+  mutate(effect = "spatial_iid_model_in_dual") %>% 
+  mutate(model = "dual") %>% 
+  mutate(waic = output$waic$waic)  %>% 
+  mutate(marginals.hyperpar.spatial_id_iid_model = output$marginals.hyperpar[4])
+
+df_dual_spatial_phylo <- df_dual_spatial_phylo %>%
+  full_join(df_phylo_generic, by = c("2.5%", "50%", "97.5%", "Feature_ID", "effect", "waic", "model","marginals.hyperpar.phy_id_generic")) %>% 
+  full_join(df_phylo_iid_model, by = c("2.5%", "50%", "97.5%", "Feature_ID", "effect", "waic", "model","marginals.hyperpar.phy_id_iid_model")) %>% 
+  full_join(df_spatial_generic, by = c("2.5%", "50%", "97.5%", "Feature_ID", "effect", "waic", "model", "marginals.hyperpar.spatial_id_generic")) %>% 
+  full_join(df_spatial_iid_model, by = c("2.5%", "50%", "97.5%", "Feature_ID", "effect", "waic", "model","marginals.hyperpar.spatial_id_iid_model"))
 
 }
 
-df_spatial_phylo %>% write_tsv("output/spatiophylogenetic_modelling/results/df_spatial_phylo.tsv")
-df_spatial_phylo %>% saveRDS("output/spatiophylogenetic_modelling/results/df_spatial_phylo.Rdata")
+df_dual_spatial_phylo %>% write_tsv("output/spatiophylogenetic_modelling/results/df_spatial_phylo.tsv")
+df_dual_spatial_phylo %>% saveRDS("output/spatiophylogenetic_modelling/results/df_spatial_phylo.Rdata")
 
 #TRIAL PROCESS
 
@@ -463,21 +545,37 @@ index <- 0
 
 for(feature in features){
   
-  #feature <- features[16]
+  #feature <- features[2]
   
   cat(paste0("# Running the spatial-phylo-area (trial-process) model on feature ", feature, ". That means I'm ", round(index/length(features) * 100, 2), "% done.\n"))
   index <- index + 1 
   
   output <- eval(substitute(inla(formula = this_feature ~
-                                   f(phy_id, model = "generic0", Cmatrix = phylo_prec_mat, constr = TRUE, hyper = prior_phylo) + 
-                                   f(sp_id, model = "generic0", Cmatrix = spatial_prec_mat, constr = TRUE, hyper = prior_spatial)+  
-                                 f(AUTOTYP_area, hyper = prior_autotyp_area),
+                                   f((phy_id_generic), 
+                                     model = "generic0",
+                                     Cmatrix = phylo_prec_mat,
+                                     constr = FALSE, 
+                                     hyper = pcprior) + 
+                                   f(phy_id_iid_model,
+                                     model = "iid", 
+                                     hyper = pcprior) +
+                                   f((spatial_id_generic), 
+                                     model = "generic0",
+                                     Cmatrix = spatial_prec_mat,
+                                     constr = FALSE, 
+                                     hyper = pcprior) + 
+                                   f(spatial_id_iid_model,
+                                     model = "iid", 
+                                     hyper = pcprior) +  
+                                 f(AUTOTYP_area_id_iid_model,
+                                   model = "iid",
+                                   hyper = pcprior),
                                  control.compute = list(waic=TRUE),
                                  data = grambank_df, family = "binomial"),
                             list(this_feature=as.name(feature))))
   
-  output %>% 
-    saveRDS(file = paste0("output/spatiophylogenetic_modelling/results/trial_process_rdata/spatial_phylo_area_", feature, ".rdata"))
+suppressWarnings(saveRDS(output, file = paste0("output/spatiophylogenetic_modelling/results/trial_process_rdata/spatial_phylo_area_", feature, ".rdata")))
+#Don't be alarmed by the suppress warnings. saveRDS() is being kind and reminding us that the package stats may not be available when loading. However, this is not a necessary warning for us so we've wrapped saveRDS in suppressWarnings
 }
 
 spatial_phylo_area_rdata_fns <- list.files("output/spatiophylogenetic_modelling/results/trial_process_rdata/", full.names = T, pattern = ".*rdata")
@@ -485,17 +583,20 @@ spatial_phylo_area_rdata_fns <- list.files("output/spatiophylogenetic_modelling/
 #second for loop for the dual process model because of previously discussing debugging workflow the for loop is split in twain.
 
 #make empty df to bind to
-df_spatial_phylo_area <- data.frame(matrix(ncol = 9, nrow = 0))
-colnames(df_spatial_phylo_area) <- c("2.5%","50%", "97.5%", "Feature_ID", "effect", "waic", "marginals.hyperpar.sp_id", "marginals.hyperpar.phy_id", "marginals.hyperpar.autotyp_area") 
-df_spatial_phylo_area $`2.5%` <- as.numeric(df_spatial_phylo_area $`2.5%`)
-df_spatial_phylo_area $`50%` <- as.numeric(df_spatial_phylo_area $`50%`)
-df_spatial_phylo_area $`50%` <- as.numeric(df_spatial_phylo_area $`97.5%`)
-df_spatial_phylo_area $Feature_ID <- as.character(df_spatial_phylo_area $Feature_ID)
-df_spatial_phylo_area $effect <- as.character(df_spatial_phylo_area $effect)
-df_spatial_phylo_area $waic <- as.numeric(df_spatial_phylo_area$waic)
-df_spatial_phylo_area $marginals.hyperpar.sp_id <- as.list(df_spatial_phylo_area $marginals.hyperpar.sp_id)
-df_spatial_phylo_area $marginals.hyperpar.phy_id <- as.list(df_spatial_phylo_area $marginals.hyperpar.phy_id)
-df_spatial_phylo_area $marginals.hyperpar.autotyp_area <- as.list(df_spatial_phylo_area$marginals.hyperpar.autotyp_area)
+df_trial <- data.frame(matrix(ncol = 12, nrow = 0))
+colnames(df_trial) <- c("2.5%","50%", "97.5%", "Feature_ID", "effect", "waic", "model",  "marginals.hyperpar.phy_id_iid_model", "marginals.hyperpar.phy_id_generic", "marginals.hyperpar.spatial_id_iid_model", "marginals.hyperpar.spatial_id_generic", "marginals.hyperpar.AUTOTYP_area_id_iid_model") 
+df_trial $`2.5%` <- as.numeric(df_trial $`2.5%`)
+df_trial $`50%` <- as.numeric(df_trial $`50%`)
+df_trial $`50%` <- as.numeric(df_trial $`97.5%`)
+df_trial $Feature_ID <- as.character(df_trial $Feature_ID)
+df_trial $effect <- as.character(df_trial $effect)
+df_trial $waic <- as.numeric(df_trial$waic)
+df_trial $model <- as.character(df_trial$model)
+df_trial$marginals.hyperpar.phy_id_iid_model <- as.list(df_trial$marginals.hyperpar.phy_id_iid_model)
+df_trial$marginals.hyperpar.phy_id_generic <- as.list(df_trial$marginals.hyperpar.phy_id_generic)
+df_trial$marginals.hyperpar.spatial_id_iid_model <- as.list(df_trial$marginals.hyperpar.spatial_id_iid_model)
+df_trial$marginals.hyperpar.spatial_id_generic <- as.list(df_trial$marginals.hyperpar.spatial_id_generic)
+df_trial$marginals.hyperpar.AUTOTYP_area_id_iid_model <- as.list(df_trial$marginals.hyperpar.AUTOTYP_area_id_iid_model)
 
 for(fn in spatial_phylo_area_rdata_fns){
   
@@ -506,60 +607,99 @@ for(fn in spatial_phylo_area_rdata_fns){
   
   feature <- fn %>% str_extract("GB[0-9]*[a|b]?")
   
-  cat(paste0("I'm processing the inla output for feature ", feature, ".\n" ))
+  cat(paste0("I'm processing the inla output for feature ", feature, "in the trial model.\n" ))
 
-  phylo_effect = inla.tmarginal(function(x) 1/sqrt(x), 
-                                output$marginals.hyperpar$`Precision for phy_id`, 
-                                method = "linear") %>%
+  
+  phylo_effect_generic = inla.tmarginal(function(x) 1/sqrt(x),
+                                        output$marginals.hyperpar$`Precision for phy_id_generic`,
+                                        method = "linear") %>%
     inla.qmarginal(c(0.025, 0.5, 0.975), .)
   
-  spatial_effect = inla.tmarginal(function(x) 1/sqrt(x), 
-                                  output$marginals.hyperpar$`Precision for sp_id`, 
-                                  method = "linear") %>%
-    inla.qmarginal(c(0.025, 0.5, 0.975), .)
-
-  area_effect = inla.tmarginal(function(x) 1/sqrt(x), 
-                                  output$marginals.hyperpar$`Precision for AUTOTYP_area`, 
-                                  method = "linear") %>%
+  phylo_effect_iid_model = inla.tmarginal(function(x) 1/sqrt(x),
+                                          output$marginals.hyperpar$`Precision for phy_id_iid_model`,
+                                          method = "linear") %>%
     inla.qmarginal(c(0.025, 0.5, 0.975), .)
   
-    
-  df_phylo <- phylo_effect %>% 
+  
+  spatial_effect_generic = inla.tmarginal(function(x) 1/sqrt(x),
+                                          output$marginals.hyperpar$`Precision for spatial_id_generic`,
+                                          method = "linear") %>%
+    inla.qmarginal(c(0.025, 0.5, 0.975), .)
+  
+  spatial_effect_iid_model = inla.tmarginal(function(x) 1/sqrt(x),
+                                            output$marginals.hyperpar$`Precision for spatial_id_iid_model`,
+                                            method = "linear") %>%
+    inla.qmarginal(c(0.025, 0.5, 0.975), .)
+  
+  autotyp_area_effect_iid_model = inla.tmarginal(function(x) 1/sqrt(x),
+                                            output$marginals.hyperpar$`Precision for AUTOTYP_area_id_iid_model`,
+                                            method = "linear") %>%
+    inla.qmarginal(c(0.025, 0.5, 0.975), .)
+  
+
+  df_phylo_generic  <- phylo_effect_generic %>% 
     as.data.frame() %>% 
     t() %>% 
     as.data.frame() %>% 
     rename("2.5%" = V1, "50%" = V2, "97.5%" = V3) %>% 
     mutate(Feature_ID = feature) %>% 
-    mutate(effect = "phylo_in_trial") %>% 
-    mutate(waic = output$waic$waic) %>% 
-    mutate(marginals.hyperpar.phy_id = output$marginals.hyperpar[1])
+    mutate(effect = "phylo_generic_in_trial") %>% 
+    mutate(model = "trial") %>% 
+    mutate(waic = output$waic$waic)  %>% 
+    mutate(marginals.hyperpar.phy_id_generic = output$marginals.hyperpar[1])
   
-  df_space <- spatial_effect %>% 
+  df_phylo_iid_model <-   phylo_effect_iid_model %>% 
     as.data.frame() %>% 
     t() %>% 
     as.data.frame() %>% 
     rename("2.5%" = V1, "50%" = V2, "97.5%" = V3) %>% 
     mutate(Feature_ID = feature) %>% 
-    mutate(effect = "spatial_in_trial") %>% 
-    mutate(waic = output$waic$waic) %>% 
-    mutate(marginals.hyperpar.sp_id = output$marginals.hyperpar[2])
-
-  df_area <-  area_effect  %>% 
+    mutate(effect = "phylo_iid_model_in_trial") %>% 
+    mutate(model = "trial") %>% 
+    mutate(waic = output$waic$waic)  %>% 
+    mutate(marginals.hyperpar.phy_id_iid_model = output$marginals.hyperpar[2])
+  
+  df_spatial_generic  <- spatial_effect_generic %>% 
     as.data.frame() %>% 
     t() %>% 
     as.data.frame() %>% 
     rename("2.5%" = V1, "50%" = V2, "97.5%" = V3) %>% 
     mutate(Feature_ID = feature) %>% 
-    mutate(effect = "area_in_trial") %>% 
-    mutate(waic = output$waic$waic) %>% 
-    mutate(marginals.hyperpar.autotyp_area = output$marginals.hyperpar[3])
+    mutate(effect = "spatia_generic_in_trial") %>% 
+    mutate(model = "trial") %>% 
+    mutate(waic = output$waic$waic)  %>% 
+    mutate(marginals.hyperpar.spatial_id_generic = output$marginals.hyperpar[3])
   
-  df_spatial_phylo_area <- df_spatial_phylo_area  %>% 
-    full_join(df_space, by = c("2.5%", "50%", "97.5%", "Feature_ID", "effect", "waic", "marginals.hyperpar.sp_id")) %>% 
-    full_join(df_phylo, by = c("2.5%", "50%", "97.5%", "Feature_ID", "effect", "waic", "marginals.hyperpar.phy_id")) %>% 
-    full_join(df_area, by = c("2.5%", "50%", "97.5%", "Feature_ID", "effect", "waic", "marginals.hyperpar.autotyp_area")) 
-    
+  df_spatial_iid_model <-   spatial_effect_iid_model %>% 
+    as.data.frame() %>% 
+    t() %>% 
+    as.data.frame() %>% 
+    rename("2.5%" = V1, "50%" = V2, "97.5%" = V3) %>% 
+    mutate(Feature_ID = feature) %>% 
+    mutate(effect = "spatial_iid_model_in_trial") %>% 
+    mutate(model = "trial") %>% 
+    mutate(waic = output$waic$waic)  %>% 
+    mutate(marginals.hyperpar.spatial_id_iid_model = output$marginals.hyperpar[4])
+  
+  df_autotyp_iid  <- autotyp_area_effect_iid_model %>% 
+    as.data.frame() %>% 
+    t() %>% 
+    as.data.frame() %>% 
+    rename("2.5%" = V1, "50%" = V2, "97.5%" = V3) %>% 
+    mutate(Feature_ID = feature) %>% 
+    mutate(effect = "autotyp_iid_in_trial") %>% 
+    mutate(model = "trial") %>% 
+    mutate(waic = output$waic$waic)  %>% 
+    mutate(marginals.hyperpar.AUTOTYP_area_id_iid_model = output$marginals.hyperpar[5])
+  
+  df_trial <- df_trial  %>% 
+    full_join(df_phylo_generic, by = c("2.5%", "50%", "97.5%", "Feature_ID", "effect", "waic", "model","marginals.hyperpar.phy_id_generic")) %>% 
+    full_join(df_phylo_iid_model, by = c("2.5%", "50%", "97.5%", "Feature_ID", "effect", "waic", "model","marginals.hyperpar.phy_id_iid_model")) %>% 
+    full_join(df_spatial_generic, by = c("2.5%", "50%", "97.5%", "Feature_ID", "effect", "waic", "model", "marginals.hyperpar.spatial_id_generic")) %>% 
+    full_join(df_spatial_iid_model, by = c("2.5%", "50%", "97.5%", "Feature_ID", "effect", "waic", "model","marginals.hyperpar.spatial_id_iid_model")) %>% 
+    full_join(df_autotyp_iid , by = c("2.5%", "50%", "97.5%", "Feature_ID", "effect", "waic", "model","marginals.hyperpar.AUTOTYP_area_id_iid_model"))
+  
 }
 
-df_spatial_phylo_area %>% write_tsv("output/spatiophylogenetic_modelling/results/df_spatial_phylo_area.tsv")
-df_spatial_phylo_area %>% saveRDS("output/spatiophylogenetic_modelling/results/df_spatial_phylo_area.Rdata")
+df_trial %>% write_tsv("output/spatiophylogenetic_modelling/results/df_trial.tsv")
+df_trial %>% saveRDS("output/spatiophylogenetic_modelling/results/df_trial.Rdata")
