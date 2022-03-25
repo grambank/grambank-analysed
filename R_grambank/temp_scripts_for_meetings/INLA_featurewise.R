@@ -199,10 +199,10 @@ for(feature in features){
                                  data = grambank_df,family = "binomial"),
                             list(this_feature=as.name(feature))))
 
-  
-  output %>% 
-    saveRDS(file = paste0("output/spatiophylogenetic_modelling/results/phylo_only/phylo_only_", feature, ".rdata"))
+suppressWarnings(  saveRDS(output, file = paste0("output/spatiophylogenetic_modelling/results/phylo_only/phylo_only_", feature, ".rdata")) )
+#Don't be alaramed by the supress warnings. saveRDS() is being kind and reminding us that the package stats may not be available when loading. However, this is not a necessary warning for us so we've wrapped saveRDS in suppressWarnings.
     
+
   phylo_effect_generic = inla.tmarginal(function(x) 1/sqrt(x),
                                 output$marginals.hyperpar$`Precision for phy_id_generic`,
                                 method = "linear") %>%
