@@ -34,7 +34,10 @@ cat("#### Building Jaeger tree models ####\n")
 
 #reading in GB
 GB_imputed_filename <- file.path("output", "GB_wide", "GB_wide_imputed_binarized.tsv")
-GB_imputed <- read_tsv(GB_imputed_filename, col_types= cols())
+GB_imputed <- read_tsv(GB_imputed_filename, col_types= cols()) 
+
+#subset GB to test code swiftly
+#GB_imputed <- GB_imputed[1:10,]
 
 #### Inputs ####
 # language metadata
@@ -131,18 +134,19 @@ if(all(rownames(phylo_prec_mat) == rownames(spatial_covar_mat))){
 ### phylogenetic effect based on it’s diagonal entries, which are all equal
 ### to 2.7373648. So to get to 1, the scaling factor would have to be about 0.36
 
-prior_phylo = list(prec =list(prior="pc.prec", param = c(1, 0.1)))
-prior_spatial = list(prec =list(prior="pc.prec", param = c(1, 0.1)))
-prior_autotyp_area <- list(prec = list(prior = "pc.prec", param = c(1, 0.1)))
+pcprior = list(prec =list(prior="pc.prec", param = c(1, 0.1)))
 
 ## Note that sigma and kappa are set in requirements.R
 
 ## Adding random effect ids
 grambank_df = GB_imputed %>%
   left_join(tibble(Language_ID = rownames(phylo_prec_mat),
-                   phy_id = 1:nrow(phylo_prec_mat),
-                   sp_id = 1:nrow(spatial_prec_mat)), by = "Language_ID") %>% 
-  left_join(languages,  by = "Language_ID")
+                   phy_id_generic = 1:nrow(phylo_prec_mat),
+                   phy_id_iid_model = 1:nrow(phylo_prec_mat),
+                   sp_id_int = 1:nrow(spatial_prec_mat),
+                  sp_id2_int = 1:nrow(spatial_prec_mat)), by = "Language_ID") %>% 
+  left_join(languages,  by = "Language_ID") %>% 
+  mutate(AUTOTYP_area2 = AUTOTYP_area)
 
 #################
 ###INLA LOOPS####
@@ -151,20 +155,25 @@ grambank_df = GB_imputed %>%
 
 features <- GB_imputed %>% 
   dplyr::select(-Language_ID) %>% 
-  colnames()
+  colnames() 
+
+#subsetting for debugging code
+#features <- features[1:10]
 
 cat("#### Phylogenetic only model ####\n")
 
 #make empty df to bind to
-df_phylo_only <- data.frame(matrix(ncol = 7, nrow = 0))
-colnames(df_phylo_only) <- c("2.5%","50%", "97.5%", "Feature_ID", "effect", "waic", "marginals.hyperpar.phy_id") 
+df_phylo_only <- data.frame(matrix(ncol = 8, nrow = 0))
+colnames(df_phylo_only) <- c("2.5%","50%", "97.5%", "Feature_ID", "effect", "waic", "marginals.hyperpar.phy_id_iid_model", "marginals.hyperpar.phy_id_generic") 
 df_phylo_only$`2.5%` <- as.numeric(df_phylo_only$`2.5%`)
 df_phylo_only$`50%` <- as.numeric(df_phylo_only$`50%`)
 df_phylo_only$`97.5%` <- as.numeric(df_phylo_only$`97.5%`)
 df_phylo_only$Feature_ID <- as.character(df_phylo_only$Feature_ID)
 df_phylo_only$effect <- as.character(df_phylo_only$effect)
 df_phylo_only$waic <- as.numeric(df_phylo_only$waic)
-df_phylo_only$marginals.hyperpar.phy_id <- as.list(df_phylo_only$marginals.hyperpar.phy_id)
+df_phylo_only$marginals.hyperpar.phy_id_iid_model <- as.list(df_phylo_only$marginals.hyperpar.phy_id_iid_model)
+df_phylo_only$marginals.hyperpar.phy_id_generic <- as.list(df_phylo_only$marginals.hyperpar.phy_id_generic)
+
 
 index <- 0
 
@@ -175,34 +184,58 @@ for(feature in features){
   cat(paste0("# Running the phylo-only model on feature ", feature, ". That means I'm ", round(index/length(features) * 100, 2), "% done.\n"))
   index <- index + 1 
   
+  
   output <- eval(substitute(inla(formula = this_feature ~
-                                   f(phy_id, model = "generic0", Cmatrix = phylo_prec_mat,
-                                     constr = TRUE, hyper = prior_phylo),
+                                   f((phy_id_generic), 
+                                     model = "generic0",
+                                     Cmatrix = phylo_prec_mat,
+                                     constr = FALSE, 
+                                     hyper = pcprior) + 
+                                   f(phy_id_iid_model,
+                                     model = "iid", 
+                                     hyper = pcprior),
                                  control.compute = list(waic=TRUE, dic = TRUE, mlik = FALSE, config = TRUE),
                                  control.predictor = list(compute = TRUE),
                                  data = grambank_df,family = "binomial"),
                             list(this_feature=as.name(feature))))
+
   
   output %>% 
     saveRDS(file = paste0("output/spatiophylogenetic_modelling/results/phylo_only/phylo_only_", feature, ".rdata"))
     
-  phylo_effect = inla.tmarginal(function(x) 1/sqrt(x),
-                                output$marginals.hyperpar$`Precision for phy_id`,
+  phylo_effect_generic = inla.tmarginal(function(x) 1/sqrt(x),
+                                output$marginals.hyperpar$`Precision for phy_id_generic`,
                                 method = "linear") %>%
     inla.qmarginal(c(0.025, 0.5, 0.975), .)
+
+  phylo_effect_iid_model = inla.tmarginal(function(x) 1/sqrt(x),
+                                        output$marginals.hyperpar$`Precision for phy_id_iid_model`,
+                                        method = "linear") %>%
+    inla.qmarginal(c(0.025, 0.5, 0.975), .)
   
-  df <- phylo_effect %>% 
+df_phylo_only_generic  <- phylo_effect_generic %>% 
     as.data.frame() %>% 
     t() %>% 
     as.data.frame() %>% 
     rename("2.5%" = V1, "50%" = V2, "97.5%" = V3) %>% 
     mutate(Feature_ID = feature) %>% 
-    mutate(effect = "phylo_only") %>% 
+    mutate(effect = "phylo_only_generic") %>% 
     mutate(waic = output$waic$waic)  %>% 
-    mutate(marginals.hyperpar.phy_id = output$marginals.hyperpar[1])
+    mutate(marginals.hyperpar.phy_id_generic = output$marginals.hyperpar[1])
 
-    df_phylo_only <- df_phylo_only  %>% 
-    full_join(df, by = c("2.5%", "50%", "97.5%", "Feature_ID", "effect", "waic", "marginals.hyperpar.phy_id"))
+df_phylo_only_iid_model <-   phylo_effect_iid_model %>% 
+  as.data.frame() %>% 
+  t() %>% 
+  as.data.frame() %>% 
+  rename("2.5%" = V1, "50%" = V2, "97.5%" = V3) %>% 
+  mutate(Feature_ID = feature) %>% 
+  mutate(effect = "phylo_only_iid_model") %>% 
+  mutate(waic = output$waic$waic)  %>% 
+  mutate(marginals.hyperpar.phy_id_iid_model = output$marginals.hyperpar[2])
+
+df_phylo_only <- df_phylo_only  %>% 
+  full_join(df_phylo_only_iid_model, by = c("2.5%", "50%", "97.5%", "Feature_ID", "effect", "waic", "marginals.hyperpar.phy_id_iid_model")) %>% 
+  full_join(df_phylo_only_generic, by = c("2.5%", "50%", "97.5%", "Feature_ID", "effect", "waic", "marginals.hyperpar.phy_id_generic"))
   
 }
 cat("All done with the phylo only model, 100% done!")
