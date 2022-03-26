@@ -9,6 +9,9 @@ if (!file.exists("output/spatiophylogenetic_modelling/processed_data/jaeger_prun
 
 #make output dirs
 
+if (!dir.exists("output/spatiophylogenetic_modelling/")) {
+  dir.create("output/spatiophylogenetic_modelling/")
+}
 if (!dir.exists("output/spatiophylogenetic_modelling/results/")) {
   dir.create("output/spatiophylogenetic_modelling/results/")
   }
