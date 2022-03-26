@@ -3,7 +3,7 @@ p_load(beepr)
 
 #If the tree hasn't been prune yet - prune the tree :)
 if (!file.exists("output/spatiophylogenetic_modelling/processed_data/jaeger_pruned.tree")) {
-  mkdi
+
   source("spatiophylogenetic_modelling/processing/pruning_jagertree.R") 
   }		
 
@@ -108,7 +108,7 @@ phylo_covar_mat <- phylo_covar_mat / max(phylo_covar_mat)
 # The diagonal of phylo_covar_mat should inform our prior
 phylo_prec_mat = cov2precision(phylo_covar_mat)
 
-# Phylogenetic matrix is right dims
+# Phylogenetic matrix is right dims #comment out if debugging swiftly
 x <- assert_that(all(dim(phylo_prec_mat) == c(n_overlap_imputed_and_jaeger_tree,
                 n_overlap_imputed_and_jaeger_tree)), 
                 msg = "The phylogeny has changed and will not match the data")
@@ -171,7 +171,7 @@ features <- GB_imputed %>%
   dplyr::select(-Language_ID) %>% 
   colnames() 
 
-#subsetting for debugging code
+#subsetting for debugging code swiftly
 #features <- features[1:3]
 
 cat("#### Phylogenetic only model ####\n")
