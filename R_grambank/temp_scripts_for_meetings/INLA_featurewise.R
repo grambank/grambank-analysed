@@ -1,5 +1,6 @@
+sink(file = "output/spatiophylogenetic_modelling/results/INLA_featurewise_log.txt", )
+
 source("requirements.R")
-p_load(beepr)
 
 #If the tree hasn't been prune yet - prune the tree :)
 if (!file.exists("output/spatiophylogenetic_modelling/processed_data/jaeger_pruned.tree")) {
@@ -744,3 +745,5 @@ for(fn in spatial_phylo_area_rdata_fns){
 
 df_trial %>% write_tsv("output/spatiophylogenetic_modelling/results/df_trial.tsv")
 df_trial %>% saveRDS("output/spatiophylogenetic_modelling/results/df_trial.Rdata")
+
+sink(file = NULL)
