@@ -195,8 +195,7 @@ for(feature in features){
                                      model = "iid", 
                                      hyper = pcprior),
                                  control.compute = list(waic=TRUE, dic = TRUE, mlik = FALSE, config = TRUE),
-                                 control.predictor = list(compute = TRUE),
-                                 data = grambank_df,family = "binomial"),
+                                 control.inla = list(tolerance = 1e-6, h = 0.001),                                 data = grambank_df,family = "binomial"),
                             list(this_feature=as.name(feature))))
 
 suppressWarnings(  saveRDS(output, file = paste0("output/spatiophylogenetic_modelling/results/phylo_only/phylo_only_", feature, ".rdata")) )
@@ -281,8 +280,7 @@ for(feature in features){
                                      model = "iid", 
                                      hyper = pcprior),
                                  control.compute = list(waic=TRUE, dic = TRUE, mlik = FALSE, config = TRUE),
-                                 control.predictor = list(compute = TRUE),
-                                 data = grambank_df,family = "binomial"),
+                                 control.inla = list(tolerance = 1e-6, h = 0.001),                                 data = grambank_df,family = "binomial"),
                             list(this_feature=as.name(feature))))
   
   suppressWarnings(  saveRDS(output, file = paste0("output/spatiophylogenetic_modelling/results/spatial_only/spatial_only_", feature, ".rdata")) )
@@ -360,8 +358,7 @@ for(feature in features){
                                      hyper = pcprior,
                                      model = "iid"),
                                  control.compute = list(waic=TRUE, dic = TRUE, mlik = FALSE, config = TRUE),
-                                 control.predictor = list(compute = TRUE),
-                                 data = grambank_df,family = "binomial"),
+                                 control.inla = list(tolerance = 1e-6, h = 0.001),                                 data = grambank_df,family = "binomial"),
                             list(this_feature=as.name(feature))))
 
 
@@ -425,6 +422,7 @@ for(feature in features){
                                      model = "iid", 
                                      hyper = pcprior),
                                  control.compute = list(waic=TRUE),
+                                 control.inla = list(tolerance = 1e-6, h = 0.001),
                                  data = grambank_df, family = "binomial"),
                             list(this_feature=as.name(feature))))
   
@@ -571,6 +569,7 @@ for(feature in features){
                                    model = "iid",
                                    hyper = pcprior),
                                  control.compute = list(waic=TRUE),
+                                 control.inla = list(tolerance = 1e-6, h = 0.001),
                                  data = grambank_df, family = "binomial"),
                             list(this_feature=as.name(feature))))
   
