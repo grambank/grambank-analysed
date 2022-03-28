@@ -1,6 +1,12 @@
 source("requirements.R")
 p_load("BayesLCA")
 
+if(!file.exists("output/GB_wide/GB_wide_imputed_binarized.tsv")){
+source("make_wide.R")
+source("make_wide_binarized.R")
+source("impute_missing_values.R")
+}
+
 # Grambank unusualness
 
 # Load imputed binarized data
