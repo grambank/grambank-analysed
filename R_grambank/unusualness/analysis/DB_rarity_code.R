@@ -7,6 +7,13 @@ source("make_wide_binarized.R")
 source("impute_missing_values.R")
 }
 
+if(!dir.exists("output/unusualness/")){
+  dir.create("unusualness/")
+}
+if(!dir.exists("output/unusualness/plots")){
+  dir.create("unusualness/plots")
+}
+
 # Grambank unusualness
 
 # Load imputed binarized data
@@ -46,7 +53,7 @@ estimate_prob_LCA<-function(obs,p){
 # Apply
 rarity_df<-estimate_rarity_LCA(LCA_clusters[[1]],gb[,-1])
 
-write_tsv(rarity_df, "output/unusualness/DB_rarity.tsv", na = "")
+write_tsv(rarity_df, "output/unusualness/tables/DB_rarity.tsv", na = "")
 
 # Plot
 
