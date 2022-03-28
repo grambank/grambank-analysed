@@ -1,4 +1,4 @@
-sink(file = "output/spatiophylogenetic_modelling/results/INLA_featurewise_log.txt", )
+sink(file = "output/spatiophylogenetic_modelling/results/INLA_featurewise_log.txt", split = T)
 
 source("requirements.R")
 
