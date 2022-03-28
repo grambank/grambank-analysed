@@ -216,12 +216,11 @@ for(feature in features){
                                      hyper = pcprior) + 
                                    f(phy_id_iid_model,
                                      model = "iid", 
-                                     hyper = pcprior,
-                                     constr = TRUE),
-                                 control.compute = list(waic=TRUE, dic = FALSE, 
-                                                        mlik = FALSE, config = TRUE),
-                                 control.predictor = list(compute = TRUE),
+                                     hyper = pcprior),
+                                 control.compute = list(waic=TRUE, dic = TRUE, mlik = FALSE, config = TRUE),
+                                 control.inla = list(tolerance = 1e-6, h = 0.001),
                                  data = grambank_df,family = "binomial"),
+
                             list(this_feature=as.name(feature))))
 
 suppressWarnings(  saveRDS(output, file = paste0("output/spatiophylogenetic_modelling/results/phylo_only/phylo_only_", feature, ".rdata")) )
@@ -307,11 +306,9 @@ for(feature in features){
                                      hyper = pcprior) + 
                                    f(spatial_id_iid_model,
                                      model = "iid", 
-                                     hyper = pcprior, 
-                                     constr = TRUE),
-                                 control.compute = list(waic=TRUE, dic = FALSE, 
-                                                        mlik = FALSE, config = TRUE),
-                                 control.predictor = list(compute = TRUE),
+                                     hyper = pcprior),
+                                 control.compute = list(waic=TRUE, dic = TRUE, mlik = FALSE, config = TRUE),
+                                 control.inla = list(tolerance = 1e-6, h = 0.001),
                                  data = grambank_df,family = "binomial"),
                             list(this_feature=as.name(feature))))
   
@@ -390,8 +387,8 @@ for(feature in features){
                                    f(AUTOTYP_area_id_iid_model, 
                                      hyper = pcprior,
                                      model = "iid"),
-                                 control.compute = list(waic=TRUE, dic = FALSE, mlik = FALSE, config = TRUE),
-                                 control.predictor = list(compute = TRUE),
+                                 control.compute = list(waic=TRUE, dic = TRUE, mlik = FALSE, config = TRUE),
+                                 control.inla = list(tolerance = 1e-6, h = 0.001),
                                  data = grambank_df,family = "binomial"),
                             list(this_feature=as.name(feature))))
 
@@ -456,7 +453,8 @@ for(feature in features){
                                      model = "iid", 
                                      hyper = pcprior,
                                      constr = TRUE),
-                                 control.compute = list(waic=TRUE),
+                                 control.compute = list(waic=TRUE, dic = TRUE, mlik = FALSE, config = TRUE),
+                                 control.inla = list(tolerance = 1e-6, h = 0.001),
                                  data = grambank_df, family = "binomial"),
                             list(this_feature=as.name(feature))))
   
@@ -580,40 +578,38 @@ index <- 0
 
 for(feature in features){
   
-    #feature <- features[2]
-    
-    cat(paste0("# Running the spatial-phylo-area (trial-process) model on feature ", feature, ". That means I'm ", round(index/length(features) * 100, 2), "% done.\n"))
-    index <- index + 1 
-    
-    output <- eval(substitute(inla(formula = this_feature ~
-                                     f((phy_id_generic), 
-                                       model = "generic0",
-                                       Cmatrix = phylo_prec_mat,
-                                       constr = TRUE, 
-                                       hyper = pcprior) + 
-                                     f(phy_id_iid_model,
-                                       model = "iid", 
-                                       hyper = pcprior,
-                                       constr = TRUE) +
-                                     f((spatial_id_generic), 
-                                       model = "generic0",
-                                       Cmatrix = spatial_prec_mat,
-                                       constr = TRUE, 
-                                       hyper = pcprior) + 
-                                     f(spatial_id_iid_model,
-                                       model = "iid", 
-                                       hyper = pcprior,
-                                       constr = TRUE) +  
-                                   f(AUTOTYP_area_id_iid_model,
-                                     model = "iid",
-                                     hyper = pcprior,
-                                     constr = TRUE),
-                                   control.compute = list(waic=TRUE),
-                                   data = grambank_df, family = "binomial"),
-                              list(this_feature=as.name(feature))))
-    
-  suppressWarnings(saveRDS(output, file = paste0("output/spatiophylogenetic_modelling/results/trial_process_rdata/spatial_phylo_area_", feature, ".rdata")))
-  #Don't be alarmed by the suppress warnings. saveRDS() is being kind and reminding us that the package stats may not be available when loading. However, this is not a necessary warning for us so we've wrapped saveRDS in suppressWarnings
+  #feature <- features[2]
+  
+  cat(paste0("# Running the spatial-phylo-area (trial-process) model on feature ", feature, ". That means I'm ", round(index/length(features) * 100, 2), "% done.\n"))
+  index <- index + 1 
+  
+  output <- eval(substitute(inla(formula = this_feature ~
+                                   f((phy_id_generic), 
+                                     model = "generic0",
+                                     Cmatrix = phylo_prec_mat,
+                                     constr = TRUE, 
+                                     hyper = pcprior) + 
+                                   f(phy_id_iid_model,
+                                     model = "iid", 
+                                     hyper = pcprior) +
+                                   f((spatial_id_generic), 
+                                     model = "generic0",
+                                     Cmatrix = spatial_prec_mat,
+                                     constr = TRUE, 
+                                     hyper = pcprior) + 
+                                   f(spatial_id_iid_model,
+                                     model = "iid", 
+                                     hyper = pcprior) +  
+                                 f(AUTOTYP_area_id_iid_model,
+                                   model = "iid",
+                                   hyper = pcprior),
+                                 control.compute = list(waic=TRUE, dic = TRUE, mlik = FALSE, config = TRUE),
+                                 control.inla = list(tolerance = 1e-6, h = 0.001),
+                                 data = grambank_df, family = "binomial"),
+                            list(this_feature=as.name(feature))))
+  
+suppressWarnings(saveRDS(output, file = paste0("output/spatiophylogenetic_modelling/results/trial_process_rdata/spatial_phylo_area_", feature, ".rdata")))
+#Don't be alarmed by the suppress warnings. saveRDS() is being kind and reminding us that the package stats may not be available when loading. However, this is not a necessary warning for us so we've wrapped saveRDS in suppressWarnings
 }
 
 spatial_phylo_area_rdata_fns <- list.files("output/spatiophylogenetic_modelling/results/trial_process_rdata/", full.names = T, pattern = ".*rdata")
