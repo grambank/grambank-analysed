@@ -59,7 +59,7 @@ cat("Unusualness scores calculated.\n")
 limit <- quantile(scores$score, 0.02, na.rm = T)  # top 2 %
 
 h <- ggplot(scores, aes(score, fill=..x..)) +
-    geom_histogram(bins = 30) +
+    geom_histogram(bins = 50) +
     annotate("segment",col="black", alpha = 0.6, x = limit, xend = limit, y = 0, yend = 100, size = 0.5, linetype = "dashed") +
     scale_fill_viridis_c('Score', option="A", direction=-1) +
     xlab("Unusualness Score") + ylab("Number of Languages") +
