@@ -5,7 +5,7 @@ source("unusualness/analysis/unusualness_fun.R")
 
 cat("Calcualting the unusualness score per language and make a map plot.\n")
 
-OUTPUTDIR <- file.path("output/unusualness")
+OUTPUTDIR <- file.path("output/unusualness/")
 if (!dir.exists(OUTPUTDIR)) { dir.create(OUTPUTDIR) }		
 
 OUTPUTDIR_tables <- file.path("output/unusualness/tables")
