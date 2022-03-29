@@ -15,11 +15,12 @@ languages_df <- read_csv(GRAMBANK_LANGUAGES, col_types=LANGUAGES_COLSPEC) %>%
 limit <- quantile(rarity_df$surprisal, 0.98, na.rm = T)  # top 2 %
 
 h <- rarity_df %>% 
-  ggplot() +
-  geom_histogram(aes(x = surprisal), bins = 50, fill = "#1F968BFF") +
-  annotate("segment",col="black", alpha = 0.6, x = limit, xend = limit, y = 0, yend = 80, size = 0.5, linetype = "dashed") +
-  scale_fill_viridis_c('surprisal', option="A", direction=-1) +
+  ggplot(aes(x = surprisal, fill=..x..)) +
+  geom_histogram(bins = 50) +
+  annotate("segment",col="black", alpha = 0.6, x = limit, xend = limit, y = 0, yend = 50, size = 0.5, linetype = "dashed") +
+  scale_fill_viridis('surprisal', option="D", direction = -1) +
   guides(fill="none") +
+  xlab("Surprisal") + ylab("Number of Languages") +
   theme_classic() +
   theme(    axis.title = element_text(size = 8),
             panel.background = element_rect(fill = "transparent", colour = NA),  
@@ -48,7 +49,7 @@ map <- ggplot(scores_joined_for_plotting) +
     data=scores_joined_for_plotting[scores_joined_for_plotting$surprisal >= limit, ],
     aes(x=Longitude, y=Latitude, label=Name),color="black", max.overlaps = 20
   ) +
-  scale_color_viridis('surprisal', option="D") +
+  scale_color_viridis('surprisal', option="D", direction = -1) +
   theme(
     legend.position = "none",
     # all of these lines are just removing default things like grid lines, axes etc
