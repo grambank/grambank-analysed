@@ -11,7 +11,7 @@ if(!dir.exists("output/unusualness/")){
   dir.create("unusualness/")
 }
 if(!dir.exists("output/unusualness/plots")){
-  dir.create("unusualness/plots")
+  dir.create("output/unusualness/plots")
 }
 
 # Grambank unusualness
