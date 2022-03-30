@@ -76,3 +76,30 @@ get_lang_score <- function(lang, gb_data, language_metadata, family_probabilitie
     if (raw) { return(lang_score) }
     return(sum(log(lang_score)))
 }
+
+## OLD code
+# this is simons original code, which is the same as above except for not controlling for families or area
+# core functions for `rare languages` analysis.
+# extracted here so we can run tests against it.
+
+get_col_prob_simons_original <- function(df, col) {
+  counts <- table(as.factor(df[[col]]))
+  lapply(as.list(counts), function (x) x / sum(counts))
+}
+
+get_probabilities_simons_original <- function(df) {
+  sapply(colnames(df), function (x) get_col_prob(df, x), simplify=FALSE)
+}
+
+get_var_score_simons_original <- function(var, state, probabilities) {
+  p <- probabilities[[var]][[as.character(state)]]
+  ifelse(is.null(p), 0.0, p)  # return 0.0 if state is not seen in data
+}
+
+get_lang_score_simons_original <- function(lang, df, probabilities, raw=FALSE) {
+  lang_score <- sapply(
+    colnames(df), function (var) get_var_score(var, df[lang, var], probabilities)
+  )
+  if (raw) { return(lang_score) }
+  return(sum(log(lang_score)))
+}
