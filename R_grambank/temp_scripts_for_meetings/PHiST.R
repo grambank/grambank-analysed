@@ -38,7 +38,7 @@ GB_dist <- GB_matrix %>%
 rownames(GB_dist) <- rownames(GB)
 colnames(GB_dist) <- rownames(GB)
 
-GB_dist_2 = GB_dist^2
+#GB_dist_2 = GB_dist^2
 
 #PHiST family
 
@@ -94,3 +94,43 @@ phist_macroarea %>%
   saveRDS("temp_scripts_for_meetings/phist_macroarea.rdata")
 
 
+#using Muthukrishna's et al's approach
+
+source("temp_scripts_for_meetings/Muthukrishna_2020_CultureFst.r")
+
+group_df <- Language_meta_data %>% 
+  dplyr::select(Language_ID, Macroarea)
+
+GB_cropped <- GB %>% 
+  left_join(group_df, by = "Language_ID") %>% 
+  dplyr::select(-Language_ID) %>% 
+  dplyr::select(Macroarea, everything())
+
+features <- GB_cropped[,-1] %>% colnames()
+types <- rep(0, length(features))
+names(types) <- features
+
+cfx_object <- CultureFst(d = GB_cropped, loci = features, type = types, bootstrap = T, no.samples = 100, label = "output/CFx_test") 
+
+cfx_macroarea_matrix <- cfx_object$mean.fst %>% as.matrix()
+cfx_macroarea_matrix[upper.tri(x = cfx_macroarea_matrix, diag = T)] <- NA
+
+cfx_macroarea_list <-cfx_macroarea_matrix %>% 
+  reshape2::melt() %>% 
+  filter(!is.na(value)) %>% 
+  unite(Var1, Var2, col = "Vars", sep = " - ") %>% 
+  rename(Value_cfx = value)
+
+
+joined <- phist_macroarea_list %>% 
+  rename(Value_PHiST = value) %>% 
+  full_join(cfx_macroarea_list)
+
+joined %>% 
+  ggplot() +
+  geom_point(aes(x = Value_PHiST, y = Value_cfx)) +
+  theme_minimal()
+
+ggsave("comparison_phist_cfx.png")
+
+cor.test(joined$Value_PHiST, joined$Value_cfx)
