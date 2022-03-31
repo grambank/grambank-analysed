@@ -57,7 +57,7 @@ setTxtProgressBar(pb, idx)
 close(pb)
 
 df_vario %>% 
-  write_tsv("df_vario.tsv")
+  write_tsv("output/spatiophylogenetic_modelling/results/df_spatial_vario_featurewise.tsv")
 
 df_vario <-   read.delim("df_vario.tsv", sep ="\t")
 
