@@ -1,7 +1,7 @@
 #This is a script for running binomial INLA over 113 binary Grambank features, with phylo and spatial effects.
 
 #set this as 1 if you're just running this script on 20 lgs over 3 features to debug. Otherwise set to 0.
-debug_run = 1
+debug_run = 0
 
 source("requirements.R")
 
@@ -22,7 +22,7 @@ if (!dir.exists("output/spatiophylogenetic_modelling/")) {
 }
 
 if(debug_run == 1){
-  OUTPUTDIR  <- file.path("output", "spatiophylogenetic_modelling", "results_debug/")
+  OUTPUTDIR  <- file.path("output", "spatiophylogenetic_modelling", "results_debug_tweak/")
 } else{
   OUTPUTDIR <- file.path("output", "spatiophylogenetic_modelling", "results/")
 }
@@ -241,8 +241,8 @@ for(feature in features){
                                      hyper = pcprior),
                                  control.compute = list(waic=TRUE, dic = FALSE, mlik = FALSE, config = TRUE),
                                  control.inla = list(tolerance = 1e-6, h = 0.001),
-                                 #control.predictor = list(compute=TRUE, link=1), #@Sam should we do this?
-                                 #control.family = list(control.link=list(model="logit")),   #@Sam should we do this?
+                                 control.predictor = list(compute=TRUE, link=1), #@Sam should we do this?
+                                 control.family = list(control.link=list(model="logit")),   #@Sam should we do this?
                                  data = grambank_df,family = "binomial"),
                             list(this_feature=as.name(feature))))
 
@@ -334,8 +334,8 @@ for(feature in features){
                                      hyper = pcprior),
                                  control.compute = list(waic=TRUE, dic = FALSE, mlik = FALSE, config = TRUE),
                                  control.inla = list(tolerance = 1e-6, h = 0.001),
-                                 #control.predictor = list(compute=TRUE, link=1), #@Sam should we do this?
-                                 #control.family = list(control.link=list(model="logit")),   #@Sam should we do this?
+                                 control.predictor = list(compute=TRUE, link=1), #@Sam should we do this?
+                                 control.family = list(control.link=list(model="logit")),   #@Sam should we do this?
                                  data = grambank_df,family = "binomial"),
                             list(this_feature=as.name(feature))))
   
@@ -417,8 +417,8 @@ for(feature in features){
                                      hyper = pcprior,
                                      model = "iid"),
                                  control.compute = list(waic=TRUE, dic = FALSE, mlik = FALSE, config = TRUE),
-                                 #control.predictor = list(compute=TRUE, link=1), #@Sam should we do this?
-                                 #control.family = list(control.link=list(model="logit")),   #@Sam should we do this?
+                                 control.predictor = list(compute=TRUE, link=1), #@Sam should we do this?
+                                 control.family = list(control.link=list(model="logit")),   #@Sam should we do this?
                                  control.inla = list(tolerance = 1e-6, h = 0.001),
                                  data = grambank_df,family = "binomial"),
                             list(this_feature=as.name(feature))))
@@ -488,8 +488,8 @@ for(feature in features){
                                      constr = TRUE),
                                  control.compute = list(waic=TRUE, dic = FALSE, mlik = FALSE, config = TRUE),
                                  control.inla = list(tolerance = 1e-6, h = 0.001),
-                                 #control.predictor = list(compute=TRUE, link=1), #@Sam should we do this?
-                                 #control.family = list(control.link=list(model="logit")),  #@Sam should we do this?
+                                 control.predictor = list(compute=TRUE, link=1), #@Sam should we do this?
+                                 control.family = list(control.link=list(model="logit")),  #@Sam should we do this?
                                  data = grambank_df, family = "binomial"),
                             list(this_feature=as.name(feature))))
   
@@ -641,8 +641,8 @@ for(feature in features){
                                    model = "iid",
                                    hyper = pcprior),
                                  control.compute = list(waic=TRUE, dic = FALSE, mlik = FALSE, config = TRUE),
-                                 #control.predictor = list(compute=TRUE, link=1), #@Sam should we do this?
-                                 #control.family = list(control.link=list(model="logit")),   #@Sam should we do this?
+                                 control.predictor = list(compute=TRUE, link=1), #@Sam should we do this?
+                                 control.family = list(control.link=list(model="logit")),   #@Sam should we do this?
                                  control.inla = list(tolerance = 1e-6, h = 0.001),
                                  data = grambank_df, family = "binomial"),
                             list(this_feature=as.name(feature))))
