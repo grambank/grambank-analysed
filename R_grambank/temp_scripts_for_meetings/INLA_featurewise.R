@@ -230,7 +230,8 @@ for(feature in features){
   
   index <- index + 1 
   
-  output <- eval(substitute(inla(formula = this_feature ~
+  output <- try(expr = {
+    eval(substitute(inla(formula = this_feature ~
                                    f((phy_id_generic), 
                                      model = "generic0",
                                      Cmatrix = phylo_prec_mat,
@@ -244,8 +245,11 @@ for(feature in features){
                                  control.predictor = list(compute=TRUE, link=1), #@Sam should we do this?
                                  control.family = list(control.link=list(model="logit")),   #@Sam should we do this?
                                  data = grambank_df,family = "binomial"),
-                            list(this_feature=as.name(feature))))
+                            list(this_feature=as.name(feature))))})
 
+  
+  if (class(output) != "try-error") {
+  
 suppressWarnings(  saveRDS(output, file = paste0(OUTPUTDIR, "phylo_only/phylo_only_", feature, ".rdata")) )
 #Don't be alarmed by the suppress warnings. saveRDS() is being kind and reminding us that the package stats may not be available when loading. However, this is not a necessary warning for us so we've wrapped saveRDS in suppressWarnings.
 
@@ -286,7 +290,7 @@ df_phylo_only <- df_phylo_only  %>%
             by = c(join_columns, "marginals.hyperpar.phy_id_iid_model")) %>% 
   full_join(df_phylo_only_generic, 
             by = c(join_columns, "marginals.hyperpar.phy_id_generic"))
-  
+  }
 }
 cat("All done with the phylo only model, 100% done!")
 
@@ -323,7 +327,7 @@ for(feature in features){
   cat(paste0("# Running the spatial-only model on feature ", feature, ". That means I'm ", round(index/length(features) * 100, 2), "% done.\n"))
   index <- index + 1 
 
-  output <- eval(substitute(inla(formula = this_feature ~
+  output <- try({eval(substitute(inla(formula = this_feature ~
                                    f((spatial_id_generic), 
                                      model = "generic0",
                                      Cmatrix = spatial_prec_mat,
@@ -337,7 +341,9 @@ for(feature in features){
                                  control.predictor = list(compute=TRUE, link=1), #@Sam should we do this?
                                  control.family = list(control.link=list(model="logit")),   #@Sam should we do this?
                                  data = grambank_df,family = "binomial"),
-                            list(this_feature=as.name(feature))))
+                            list(this_feature=as.name(feature))))   })
+      
+  if (class(output) != "try-error") {
   
   suppressWarnings(  saveRDS(output, file = paste0(OUTPUTDIR, "spatial_only/spatial_only_", feature, ".rdata")) )
   #Don't be alarmed by the suppress warnings. saveRDS() is being kind and reminding us that the package stats may not be available when loading. However, this is not a necessary warning for us so we've wrapped saveRDS in suppressWarnings.
@@ -378,6 +384,7 @@ for(feature in features){
               by = c(join_columns, "marginals.hyperpar.spatial_id_iid_model")) %>% 
     full_join(df_spatial_only_generic, 
               by = c(join_columns, "marginals.hyperpar.spatial_id_generic"))
+  }
 }
 
 df_spatial_only %>% write_tsv(file = file.path(OUTPUTDIR, "df_spatial_only.tsv"))
@@ -412,7 +419,7 @@ for(feature in features){
   cat(paste0("# Running the autotyp_area-only model on feature ", feature, ". That means I'm ", round(index/length(features) * 100, 2), "% done.\n"))
   index <- index + 1 
   
-  output <- eval(substitute(inla(formula = this_feature ~ 
+  output <- try({eval(substitute(inla(formula = this_feature ~ 
                                    f(AUTOTYP_area_id_iid_model, 
                                      hyper = pcprior,
                                      model = "iid"),
@@ -421,8 +428,9 @@ for(feature in features){
                                  control.family = list(control.link=list(model="logit")),   #@Sam should we do this?
                                  control.inla = list(tolerance = 1e-6, h = 0.001),
                                  data = grambank_df,family = "binomial"),
-                            list(this_feature=as.name(feature))))
-
+                            list(this_feature=as.name(feature)))) })
+  
+  if (class(output) != "try-error") {
 
 suppressWarnings(    saveRDS(output, file = paste0(OUTPUTDIR, "autotyp_area_only/autotyp_area_only_", feature, ".rdata")))
 #Don't be alarmed by the suppress warnings. saveRDS() is being kind and reminding us that the package stats may not be available when loading. However, this is not a necessary warning for us so we've wrapped saveRDS in suppressWarnings
@@ -444,6 +452,7 @@ suppressWarnings(    saveRDS(output, file = paste0(OUTPUTDIR, "autotyp_area_only
   
   df_autotyp_area_only <- df_autotyp_area_only  %>% 
     full_join(df, by = c(join_columns, "marginals.hyperpar.AUTOTYP_area_id_iid_model"))
+  }
   
 }
 cat("All done with the autotyp_area only model, 100% done!")
@@ -467,7 +476,7 @@ for(feature in features){
   cat(paste0("# Running the spatial-phylo (double-process) model on feature ", feature, ". That means I'm ", round(index/length(features) * 100, 2), "% done.\n"))
   index <- index + 1 
   
-  output <- eval(substitute(inla(formula = this_feature ~
+  output <- try({eval(substitute(inla(formula = this_feature ~
                                    f((phy_id_generic), 
                                      model = "generic0",
                                      Cmatrix = phylo_prec_mat,
@@ -491,10 +500,14 @@ for(feature in features){
                                  control.predictor = list(compute=TRUE, link=1), #@Sam should we do this?
                                  control.family = list(control.link=list(model="logit")),  #@Sam should we do this?
                                  data = grambank_df, family = "binomial"),
-                            list(this_feature=as.name(feature))))
+                            list(this_feature=as.name(feature)))) })
   
+  
+  if (class(output) != "try-error") {
 suppressWarnings(    saveRDS(output, file = paste0(OUTPUTDIR, "dual_process_rdata/spatial_phylo_", feature, ".rdata")))
  #Don't be alarmed by the suppress warnings. saveRDS() is being kind and reminding us that the package stats may not be available when loading. However, this is not a necessary warning for us so we've wrapped saveRDS in suppressWarnings
+    
+  }
 }
 
 spatial_phylo_rdata_fns <- list.files(file.path(OUTPUTDIR, "/dual_process_rdata/"), full.names = T, pattern = ".*rdata")
@@ -620,7 +633,7 @@ for(feature in features){
   cat(paste0("# Running the spatial-phylo-area (trial-process) model on feature ", feature, ". That means I'm ", round(index/length(features) * 100, 2), "% done.\n"))
   index <- index + 1 
   
-  output <- eval(substitute(inla(formula = this_feature ~
+  output <- try({eval(substitute(inla(formula = this_feature ~
                                    f((phy_id_generic), 
                                      model = "generic0",
                                      Cmatrix = phylo_prec_mat,
@@ -645,11 +658,14 @@ for(feature in features){
                                  control.family = list(control.link=list(model="logit")),   #@Sam should we do this?
                                  control.inla = list(tolerance = 1e-6, h = 0.001),
                                  data = grambank_df, family = "binomial"),
-                            list(this_feature=as.name(feature))))
+                            list(this_feature=as.name(feature)))) })
   
+  if (class(output) != "try-error") {
+    
 suppressWarnings(saveRDS(output, file = paste0(OUTPUTDIR, "/trial_process_rdata/spatial_phylo_area_", feature, ".rdata")))
 #Don't be alarmed by the suppress warnings. saveRDS() is being kind and reminding us that the package stats may not be available when loading. However, this is not a necessary warning for us so we've wrapped saveRDS in suppressWarnings
-}
+  }
+    }
 
 spatial_phylo_area_rdata_fns <- list.files(file.path(OUTPUTDIR, "trial_process_rdata/"), full.names = T, pattern = ".*rdata")
 
