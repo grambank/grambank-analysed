@@ -3,16 +3,15 @@ p_load(beepr)
 
 parameters <- read_csv("feature_grouping_for_analysis.csv", show_col_types = F, col_types = cols()) 
 
-df_phylo_only <- readRDS("spatiophylogenetic_modelling/results/df_phylo_only.Rdata") %>%  
+df_phylo_only <- readRDS("output/spatiophylogenetic_modelling/results/df_phylo_only.Rdata") %>%  
   left_join(parameters, by = "Feature_ID") %>% 
   mutate(model = "phylo_only")
 
-df_spatial_only <- readRDS("spatiophylogenetic_modelling/results/df_spatial_only.Rdata") %>%
+df_spatial_only <- readRDS("output/spatiophylogenetic_modelling/results/df_spatial_only.Rdata") %>%
   left_join(parameters, by = "Feature_ID") %>% 
-  mutate(model = "spatial_only") %>% 
-  dplyr::select(-c(X1, X2, X3, X4, X5, X6)) #don't know where these cols are from, am investigating
+  mutate(model = "spatial_only") 
 
-df_dual <- readRDS("spatiophylogenetic_modelling/results/df_spatial_phylo.Rdata") %>%
+df_dual <- readRDS("output/spatiophylogenetic_modelling/results/df_spatial_phylo.Rdata") %>%
   left_join(parameters, by = "Feature_ID") %>%
   mutate(model = "dual")
 
@@ -49,15 +48,14 @@ plot_df_summ_hed_subset <- plot_df_summ_hed %>%
   filter(model == "dual") %>% 
   left_join(plot_df_hed) %>%
   reshape2::dcast(Feature_ID+ effect+ model+ n+Mean+Conf.level+Trad.lower+Trad.upper ~ variable, value.var =    "value" ) %>% 
-#  filter(Feature_ID == "GB430") %>% 
   mutate(xmin = `2.5%`, 
          xmax = `97.5%`) 
 
 plot <- plot_df_summ_hed_subset %>% 
-  ggplot(aes(y = Feature_ID, x = Mean, fill = effect, col = effect), stat = "identity") +
+  ggplot(aes(y = Feature_ID, x = `50%`, fill = effect, col = effect), stat = "identity") +
   theme_classic() +
-  scale_colour_manual(values = col_vector) + 
-  scale_fill_manual(values = col_vector) +
+#  scale_colour_manual(values = col_vector) + 
+#  scale_fill_manual(values = col_vector) +
   geom_errorbar(width = 0.2, 
                 aes(xmin = xmin, 
                     xmax = xmax),
