@@ -1,42 +1,47 @@
-sink(file = "output/spatiophylogenetic_modelling/results/INLA_featurewise_log.txt", split = T)
+#This is a script for running binomial INLA over 113 binary Grambank features, with phylo and spatial effects.
+
+#set this as 1 if you're just running this script on 10 lgs over 3 features to debug. Otherwise set to 0.
+debug_run = 1
 
 source("requirements.R")
 
 #If the tree hasn't been prune yet - prune the tree :)
 if (!file.exists("output/spatiophylogenetic_modelling/processed_data/jaeger_pruned.tree")) {
-
   source("spatiophylogenetic_modelling/processing/pruning_jagertree.R") 
-  }		
-
-#make output dirs
-
-if (!dir.exists("output/spatiophylogenetic_modelling/")) {
-  dir.create("output/spatiophylogenetic_modelling/")
-}
-if (!dir.exists("output/spatiophylogenetic_modelling/results/")) {
-  dir.create("output/spatiophylogenetic_modelling/results/")
-  }
-if (!dir.exists("output/spatiophylogenetic_modelling/results/phylo_only/")) {
-  dir.create("output/spatiophylogenetic_modelling/results/phylo_only/")
-  dir.create("output/spatiophylogenetic_modelling/results/spatial_only/")
-  dir.create("output/spatiophylogenetic_modelling/results/autotyp_area_only")
-  dir.create("output/spatiophylogenetic_modelling/results/dual_process_rdata")
-  dir.create("output/spatiophylogenetic_modelling/results/trial_process_rdata")
-  }		
+}		
 
 # load variational covariance matrix function taken from geoR::varcov_spatial
 source('spatiophylogenetic_modelling/analysis/varcov_spatial.R')
 
 # Check that INLA is installed
-if (!is_installed("INLA")) { 
-  cat("INLA wasn't installed, installing now.\n") 
-  source(file.path("spatiophylogenetic_modelling", "install_inla.R")) 
-  } else {
-    cat("Great, INLA was already installed, loading now.\n") 
-    }
-suppressPackageStartupMessages(
-  library(INLA, quietly = T, warn.conflicts = F, verbose = F)
-)
+source(file.path("spatiophylogenetic_modelling", "install_inla.R")) 
+
+#make output dirs
+if (!dir.exists("output/spatiophylogenetic_modelling/")) {
+  dir.create("output/spatiophylogenetic_modelling/")
+}
+
+if(debug_run == 1){
+  OUTPUTDIR  <- file.path("output", "spatiophylogenetic_modelling", "results_debug/")
+} else{
+  OUTPUTDIR <- file.path("output", "spatiophylogenetic_modelling", "results/")
+}
+
+if (!dir.exists(  OUTPUTDIR )) {
+  dir.create(  OUTPUTDIR )
+}
+
+if (!dir.exists(file.path(  OUTPUTDIR , "phylo_only/"))) {
+  dir.create(file.path(  OUTPUTDIR , "phylo_only/"))
+  dir.create(file.path(  OUTPUTDIR , "spatial_only/"))
+  dir.create(file.path(  OUTPUTDIR , "autotyp_area_only/"))
+  dir.create(file.path(  OUTPUTDIR , "dual_process_rdata/"))
+  dir.create(file.path(  OUTPUTDIR , "trial_process_rdata/"))
+  }		
+
+sink(file = file.path(  OUTPUTDIR , "INLA_featurewise_log.txt"), split = T)
+
+cat("Starting INLA runs at", as.character(Sys.time()), ".\n")
 
 #### Functions ####
 
@@ -53,7 +58,6 @@ join_columns = c("2.5%", "50%", "97.5%", "Feature_ID",
 
 
 #### Main Analyses ####
-OUTPUTDIR <- file.path("output", "spatiophylogenetic_modelling", "results")
 
 cat("#### Building Jaeger tree models ####\n")
 
@@ -61,8 +65,10 @@ cat("#### Building Jaeger tree models ####\n")
 GB_imputed_filename <- file.path("output", "GB_wide", "GB_wide_imputed_binarized.tsv")
 GB_imputed <- read.delim(GB_imputed_filename, sep = "\t")
 
-#subset GB to test code swiftly
-#GB_imputed <- GB_imputed[1:20,]
+#subset GB to test code for debugging
+if(debug_run == 1){
+GB_imputed <- GB_imputed[1:20,]
+}
 
 #### Inputs ####
 # language metadata
@@ -82,7 +88,7 @@ languages <- read.delim("output/non_GB_datasets/glottolog-cldf_wide_df.tsv") %>%
 tree_filename = 'output/spatiophylogenetic_modelling/processed_data/jaeger_pruned.tree'
 phylogenetic_tree = read.tree(tree_filename)
 
-# Subset PCA and languages to Jaeger set
+# Subset GB and languages to Jaeger set
 GB_imputed  <- GB_imputed[GB_imputed$Language_ID %in% phylogenetic_tree$tip.label,]
 languages = languages[languages$Language_ID %in% GB_imputed $Language_ID,]
 
@@ -113,9 +119,9 @@ phylo_covar_mat <- phylo_covar_mat / max(phylo_covar_mat)
 phylo_prec_mat = cov2precision(phylo_covar_mat)
 
 # Phylogenetic matrix is right dims #comment out if debugging swiftly
-x <- assert_that(all(dim(phylo_prec_mat) == c(n_overlap_imputed_and_jaeger_tree,
-                n_overlap_imputed_and_jaeger_tree)), 
-                msg = "The phylogeny has changed and will not match the data")
+#x <- assert_that(all(dim(phylo_prec_mat) == c(n_overlap_imputed_and_jaeger_tree,
+#                n_overlap_imputed_and_jaeger_tree)), 
+#                msg = "The phylogeny has changed and will not match the data")
 
 #### Spatial covariance matrix ####
 
@@ -130,8 +136,10 @@ dimnames(spatial_covar_mat) = list(languages$Language_ID, languages$Language_ID)
 spatial_prec_mat = cov2precision(spatial_covar_mat)
 
 # Do Phylo and Spatial rownames match?
+if(debug_run != 1){
 x = assert_that(all(rownames(phylo_prec_mat) == rownames(spatial_covar_mat)),
                 msg = "Spatial and Phylo matrices do not align")
+}
 
 #### Set up model priors ####
 
@@ -176,7 +184,9 @@ features <- GB_imputed %>%
   colnames() 
 
 #subsetting for debugging code swiftly
-#features <- features[1:3]
+if(debug_run == 1) {
+features <- features[1:3]
+}
 
 cat("#### Phylogenetic only model ####\n")
 
@@ -194,6 +204,9 @@ df_phylo_only$marginals.hyperpar.phy_id_iid_model <- as.list(df_phylo_only$margi
 df_phylo_only$marginals.hyperpar.phy_id_generic <- as.list(df_phylo_only$marginals.hyperpar.phy_id_generic)
 
 index <- 0
+
+cat("Starting INLA phylo-only featurewise runs at", as.character(Sys.time()), ".\n")
+
 
 for(feature in features){
   
@@ -217,13 +230,14 @@ for(feature in features){
                                    f(phy_id_iid_model,
                                      model = "iid", 
                                      hyper = pcprior),
-                                 control.compute = list(waic=TRUE, dic = TRUE, mlik = FALSE, config = TRUE),
+                                 control.compute = list(waic=TRUE, dic = FALSE, mlik = FALSE, config = TRUE),
                                  control.inla = list(tolerance = 1e-6, h = 0.001),
+#                                 control.predictor = list(compute=TRUE, link=1), #@Sam should we do this?
+#                                 control.family = list(control.link=list(model="logit")),  
                                  data = grambank_df,family = "binomial"),
-
                             list(this_feature=as.name(feature))))
 
-suppressWarnings(  saveRDS(output, file = paste0("output/spatiophylogenetic_modelling/results/phylo_only/phylo_only_", feature, ".rdata")) )
+suppressWarnings(  saveRDS(output, file = paste0(OUTPUTDIR, "phylo_only/phylo_only_", feature, ".rdata")) )
 #Don't be alarmed by the suppress warnings. saveRDS() is being kind and reminding us that the package stats may not be available when loading. However, this is not a necessary warning for us so we've wrapped saveRDS in suppressWarnings.
     
 phylo_effect_generic = inla.tmarginal(function(x) 1/sqrt(x),
@@ -267,8 +281,8 @@ df_phylo_only <- df_phylo_only  %>%
 }
 cat("All done with the phylo only model, 100% done!")
 
-df_phylo_only %>% write_tsv("output/spatiophylogenetic_modelling/results/df_phylo_only.tsv")
-df_phylo_only %>% saveRDS("output/spatiophylogenetic_modelling/results/df_phylo_only.Rdata")
+df_phylo_only %>% write_tsv(file = file.path(OUTPUTDIR, "df_phylo_only.tsv"))
+df_phylo_only %>% saveRDS(file = file.path(OUTPUTDIR, "df_phylo_only.Rdata"))
 
 ###
 
@@ -290,6 +304,8 @@ df_spatial_only$marginals.hyperpar.spatial_id_generic <- as.list(df_spatial_only
 
 index <- 0
 
+cat("Starting INLA spatial-only featurewise runs at", as.character(Sys.time()), ".\n")
+
 cat("#### spatial only model ####\n")
 for(feature in features){
   
@@ -307,12 +323,12 @@ for(feature in features){
                                    f(spatial_id_iid_model,
                                      model = "iid", 
                                      hyper = pcprior),
-                                 control.compute = list(waic=TRUE, dic = TRUE, mlik = FALSE, config = TRUE),
+                                 control.compute = list(waic=TRUE, dic = FALSE, mlik = FALSE, config = TRUE),
                                  control.inla = list(tolerance = 1e-6, h = 0.001),
                                  data = grambank_df,family = "binomial"),
                             list(this_feature=as.name(feature))))
   
-  suppressWarnings(  saveRDS(output, file = paste0("output/spatiophylogenetic_modelling/results/spatial_only/spatial_only_", feature, ".rdata")) )
+  suppressWarnings(  saveRDS(output, file = paste0(OUTPUTDIR, "spatial_only/spatial_only_", feature, ".rdata")) )
   #Don't be alarmed by the suppress warnings. saveRDS() is being kind and reminding us that the package stats may not be available when loading. However, this is not a necessary warning for us so we've wrapped saveRDS in suppressWarnings.
     spatial_effect_generic = inla.tmarginal(function(x) 1/sqrt(x),
                                         output$marginals.hyperpar$`Precision for spatial_id_generic`,
@@ -353,8 +369,8 @@ for(feature in features){
               by = c(join_columns, "marginals.hyperpar.spatial_id_generic"))
 }
 
-df_spatial_only %>% write_tsv("output/spatiophylogenetic_modelling/results/df_spatial_only.tsv")
-df_spatial_only %>% saveRDS("output/spatiophylogenetic_modelling/results/df_spatial_only.Rdata")
+df_spatial_only %>% write_tsv(file = file.path(OUTPUTDIR, "df_spatial_only.tsv"))
+df_spatial_only %>% saveRDS(file = file.path(OUTPUTDIR, "df_spatial_only.Rdata"))
 
 cat("All done with the spatial only model, 100% done!")
 
@@ -376,6 +392,8 @@ df_autotyp_area_only$marginals.hyperpar.AUTOTYP_area_id_iid_model <- as.list(df_
 
 index <- 0
 
+cat("Starting INLA AUTOTYP-area only runs featurewise runs at", as.character(Sys.time()), ".\n")
+
 for(feature in features){
   
   #feature <- features[1]
@@ -387,13 +405,13 @@ for(feature in features){
                                    f(AUTOTYP_area_id_iid_model, 
                                      hyper = pcprior,
                                      model = "iid"),
-                                 control.compute = list(waic=TRUE, dic = TRUE, mlik = FALSE, config = TRUE),
+                                 control.compute = list(waic=TRUE, dic = FALSE, mlik = FALSE, config = TRUE),
                                  control.inla = list(tolerance = 1e-6, h = 0.001),
                                  data = grambank_df,family = "binomial"),
                             list(this_feature=as.name(feature))))
 
 
-suppressWarnings(    saveRDS(output, file = paste0("output/spatiophylogenetic_modelling/results/autotyp_area_only/autotyp_area_only_", feature, ".rdata")))
+suppressWarnings(    saveRDS(output, file = paste0(OUTPUTDIR, "autotyp_area_only/autotyp_area_only_", feature, ".rdata")))
 #Don't be alarmed by the suppress warnings. saveRDS() is being kind and reminding us that the package stats may not be available when loading. However, this is not a necessary warning for us so we've wrapped saveRDS in suppressWarnings
 
   autotyp_area_effect = inla.tmarginal(function(x) 1/sqrt(x),
@@ -417,8 +435,8 @@ suppressWarnings(    saveRDS(output, file = paste0("output/spatiophylogenetic_mo
 }
 cat("All done with the autotyp_area only model, 100% done!")
 
-df_autotyp_area_only %>% write_tsv("output/spatiophylogenetic_modelling/results/df_autotyp_area_only.tsv")
-df_autotyp_area_only %>% saveRDS("output/spatiophylogenetic_modelling/results/df_autotyp_area_only.Rdata")
+df_autotyp_area_only %>% write_tsv(file = file.path(OUTPUTDIR, "df_autotyp_area_only.tsv"))
+df_autotyp_area_only %>% saveRDS(file = file.path(OUTPUTDIR, "df_autotyp_area_only.Rdata"))
 
 
 cat("#### Spatial & Phylo Model ####\n")
@@ -426,6 +444,8 @@ cat("#### Spatial & Phylo Model ####\n")
 index <- 0
 
 #something was going awry with calculating the marginal effects of a specific features, GB051, so the for loop above has been split in twain: one which saves the entire output of inla() as an rdata object in a directory and one that calculates the effects and renders the same kind of df as above. This way running the for loop with inla() can still happen and we can debug the particulars after. 
+
+cat("Starting INLA dual process (spatial and phylo) runs featurewise runs at", as.character(Sys.time()), ".\n")
 
 for(feature in features){
   
@@ -453,16 +473,16 @@ for(feature in features){
                                      model = "iid", 
                                      hyper = pcprior,
                                      constr = TRUE),
-                                 control.compute = list(waic=TRUE, dic = TRUE, mlik = FALSE, config = TRUE),
+                                 control.compute = list(waic=TRUE, dic = FALSE, mlik = FALSE, config = TRUE),
                                  control.inla = list(tolerance = 1e-6, h = 0.001),
                                  data = grambank_df, family = "binomial"),
                             list(this_feature=as.name(feature))))
   
-suppressWarnings(    saveRDS(output, file = paste0("output/spatiophylogenetic_modelling/results/dual_process_rdata/spatial_phylo_", feature, ".rdata")))
+suppressWarnings(    saveRDS(output, file = paste0(OUTPUTDIR, "dual_process_rdata/spatial_phylo_", feature, ".rdata")))
  #Don't be alarmed by the suppress warnings. saveRDS() is being kind and reminding us that the package stats may not be available when loading. However, this is not a necessary warning for us so we've wrapped saveRDS in suppressWarnings
 }
 
-spatial_phylo_rdata_fns <- list.files("output/spatiophylogenetic_modelling/results/dual_process_rdata/", full.names = T, pattern = ".*rdata")
+spatial_phylo_rdata_fns <- list.files(file.path(OUTPUTDIR, "/dual_process_rdata/"), full.names = T, pattern = ".*rdata")
 
 #second for loop for the dual process model because of previously discussing debugging workflow the for loop is split in twain.
 
@@ -567,14 +587,16 @@ for(fn in spatial_phylo_rdata_fns){
 
 }
 
-df_dual_spatial_phylo %>% write_tsv("output/spatiophylogenetic_modelling/results/df_spatial_phylo.tsv")
-df_dual_spatial_phylo %>% saveRDS("output/spatiophylogenetic_modelling/results/df_spatial_phylo.Rdata")
+df_dual_spatial_phylo %>% write_tsv(file = file.path(OUTPUTDIR, "df_spatial_phylo.tsv"))
+df_dual_spatial_phylo %>% saveRDS(file = file.path(OUTPUTDIR, "df_spatial_phylo.Rdata"))
 
 #TRIAL PROCESS
 
 cat("#### Spatial & Phylo Model + AUTOTYP area ####\n")
 
 index <- 0
+
+cat("Starting INLA trial process (AUTOTYP-area, spatial and phylo) runs featurewise runs at", as.character(Sys.time()), ".\n")
 
 for(feature in features){
   
@@ -603,16 +625,16 @@ for(feature in features){
                                  f(AUTOTYP_area_id_iid_model,
                                    model = "iid",
                                    hyper = pcprior),
-                                 control.compute = list(waic=TRUE, dic = TRUE, mlik = FALSE, config = TRUE),
+                                 control.compute = list(waic=TRUE, dic = FALSE, mlik = FALSE, config = TRUE),
                                  control.inla = list(tolerance = 1e-6, h = 0.001),
                                  data = grambank_df, family = "binomial"),
                             list(this_feature=as.name(feature))))
   
-suppressWarnings(saveRDS(output, file = paste0("output/spatiophylogenetic_modelling/results/trial_process_rdata/spatial_phylo_area_", feature, ".rdata")))
+suppressWarnings(saveRDS(output, file = paste0(OUTPUTDIR, "/trial_process_rdata/spatial_phylo_area_", feature, ".rdata")))
 #Don't be alarmed by the suppress warnings. saveRDS() is being kind and reminding us that the package stats may not be available when loading. However, this is not a necessary warning for us so we've wrapped saveRDS in suppressWarnings
 }
 
-spatial_phylo_area_rdata_fns <- list.files("output/spatiophylogenetic_modelling/results/trial_process_rdata/", full.names = T, pattern = ".*rdata")
+spatial_phylo_area_rdata_fns <- list.files(file.path(OUTPUTDIR, "trial_process_rdata/"), full.names = T, pattern = ".*rdata")
 
 #second for loop for the dual process model because of previously discussing debugging workflow the for loop is split in twain.
 
@@ -635,7 +657,7 @@ df_trial$marginals.hyperpar.AUTOTYP_area_id_iid_model <- as.list(df_trial$margin
 for(fn in spatial_phylo_area_rdata_fns){
   
   #  fn <- spatial_phylo_area_rdata_fns[1]
-  # fn <- "output/spatiophylogenetic_modelling/results/dual_process_rdata/spatial_phylo_area_GB051.rdata"
+  # fn <- "output/spatiophylogenetic_modelling/results_small/dual_process_rdata/spatial_phylo_area_GB051.rdata"
   
   output <- readRDS(fn)
   
@@ -739,7 +761,11 @@ for(fn in spatial_phylo_area_rdata_fns){
               by = c(join_columns,"marginals.hyperpar.AUTOTYP_area_id_iid_model"))
 }
 
-df_trial %>% write_tsv("output/spatiophylogenetic_modelling/results/df_trial.tsv")
-df_trial %>% saveRDS("output/spatiophylogenetic_modelling/results/df_trial.Rdata")
+df_trial %>% write_tsv(file = file.path(OUTPUTDIR, "df_trial.tsv"))
+df_trial %>% saveRDS(file = file.path(OUTPUTDIR, "df_trial.Rdata"))
+
+cat("All done with all INLA runs at ", as.character(Sys.time())[1], ".\n")
+
+
 
 sink(file = NULL)
