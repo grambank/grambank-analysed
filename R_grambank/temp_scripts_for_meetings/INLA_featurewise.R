@@ -1,6 +1,6 @@
 #This is a script for running binomial INLA over 113 binary Grambank features, with phylo and spatial effects.
 
-#set this as 1 if you're just running this script on 10 lgs over 3 features to debug. Otherwise set to 0.
+#set this as 1 if you're just running this script on 20 lgs over 3 features to debug. Otherwise set to 0.
 debug_run = 1
 
 source("requirements.R")
@@ -63,11 +63,15 @@ cat("#### Building Jaeger tree models ####\n")
 
 #reading in GB
 GB_imputed_filename <- file.path("output", "GB_wide", "GB_wide_imputed_binarized.tsv")
+if (!file.exists(GB_imputed_filename)) { 
+  source("make_wide.R")
+  source("make_wide_binarized.R")
+  source("impute_missing_values.R")}		
 GB_imputed <- read.delim(GB_imputed_filename, sep = "\t")
 
 #subset GB to test code for debugging
 if(debug_run == 1){
-GB_imputed <- GB_imputed[1:20,]
+GB_imputed <- GB_imputed[1:50,]
 }
 
 #### Inputs ####
@@ -76,7 +80,10 @@ if (!file.exists("output/non_GB_datasets/glottolog_AUTOTYP_areas.tsv")) { source
 autotyp_area <- read.delim("output/non_GB_datasets/glottolog_AUTOTYP_areas.tsv", sep = "\t") %>%
   dplyr::select(Language_ID, AUTOTYP_area)
 
-languages <- read.delim("output/non_GB_datasets/glottolog-cldf_wide_df.tsv") %>%		
+glottolog_df_fn = "output/non_GB_datasets/glottolog-cldf_wide_df.tsv"
+if (!file.exists(glottolog_df_fn)) { source("make_glottolog-cldf_table.R") }		
+
+languages <- read.delim(glottolog_df_fn, sep = "\t") %>%		
   dplyr::select(Language_ID, Family_ID, Name, Longitude, Latitude, Macroarea) %>% 
   distinct(Language_ID, .keep_all = T) %>% 
   inner_join(dplyr::select(GB_imputed, "Language_ID"), by = "Language_ID") %>% 
@@ -86,6 +93,7 @@ languages <- read.delim("output/non_GB_datasets/glottolog-cldf_wide_df.tsv") %>%
 
 # trees
 tree_filename = 'output/spatiophylogenetic_modelling/processed_data/jaeger_pruned.tree'
+if (!file.exists(tree_filename)) { source("spatiophylogenetic_modelling/processing/pruning_jagertree.R") }		
 phylogenetic_tree = read.tree(tree_filename)
 
 # Subset GB and languages to Jaeger set
@@ -119,10 +127,11 @@ phylo_covar_mat <- phylo_covar_mat / max(phylo_covar_mat)
 phylo_prec_mat = cov2precision(phylo_covar_mat)
 
 # Phylogenetic matrix is right dims #comment out if debugging swiftly
-#x <- assert_that(all(dim(phylo_prec_mat) == c(n_overlap_imputed_and_jaeger_tree,
-#                n_overlap_imputed_and_jaeger_tree)), 
-#                msg = "The phylogeny has changed and will not match the data")
-
+if(debug_run != 1){
+x <- assert_that(all(dim(phylo_prec_mat) == c(n_overlap_imputed_and_jaeger_tree,
+                n_overlap_imputed_and_jaeger_tree)), 
+                msg = "The phylogeny has changed and will not match the data")
+}
 #### Spatial covariance matrix ####
 
 cat("Calculating the spatial variance covariance matrix.\n")
@@ -161,7 +170,7 @@ x = assert_that(all(rownames(phylo_prec_mat) == rownames(spatial_covar_mat)),
 
 pcprior = list(prec =list(prior="pc.prec", param = c(1, 0.1)))
 
-## Note that sigma and kappa are set in requirements.R
+## Note that sigma and kappa values are set in requirements.R
 
 ## Adding random effect ids
 grambank_df = GB_imputed %>%
@@ -177,15 +186,15 @@ grambank_df = GB_imputed %>%
 #################
 ###INLA LOOPS####
 #################
-#features to loop over
 
+#features to loop over
 features <- GB_imputed %>% 
   dplyr::select(-Language_ID) %>% 
   colnames() 
 
 #subsetting for debugging code swiftly
 if(debug_run == 1) {
-features <- features[1:3]
+features <- features[3:7]
 }
 
 cat("#### Phylogenetic only model ####\n")
@@ -232,14 +241,14 @@ for(feature in features){
                                      hyper = pcprior),
                                  control.compute = list(waic=TRUE, dic = FALSE, mlik = FALSE, config = TRUE),
                                  control.inla = list(tolerance = 1e-6, h = 0.001),
-#                                 control.predictor = list(compute=TRUE, link=1), #@Sam should we do this?
-#                                 control.family = list(control.link=list(model="logit")),  
+                                 #control.predictor = list(compute=TRUE, link=1), #@Sam should we do this?
+                                 #control.family = list(control.link=list(model="logit")),   #@Sam should we do this?
                                  data = grambank_df,family = "binomial"),
                             list(this_feature=as.name(feature))))
 
 suppressWarnings(  saveRDS(output, file = paste0(OUTPUTDIR, "phylo_only/phylo_only_", feature, ".rdata")) )
 #Don't be alarmed by the suppress warnings. saveRDS() is being kind and reminding us that the package stats may not be available when loading. However, this is not a necessary warning for us so we've wrapped saveRDS in suppressWarnings.
-    
+
 phylo_effect_generic = inla.tmarginal(function(x) 1/sqrt(x),
                                 output$marginals.hyperpar$`Precision for phy_id_generic`,
                                 method = "linear") %>%
@@ -325,6 +334,8 @@ for(feature in features){
                                      hyper = pcprior),
                                  control.compute = list(waic=TRUE, dic = FALSE, mlik = FALSE, config = TRUE),
                                  control.inla = list(tolerance = 1e-6, h = 0.001),
+                                 #control.predictor = list(compute=TRUE, link=1), #@Sam should we do this?
+                                 #control.family = list(control.link=list(model="logit")),   #@Sam should we do this?
                                  data = grambank_df,family = "binomial"),
                             list(this_feature=as.name(feature))))
   
@@ -406,6 +417,8 @@ for(feature in features){
                                      hyper = pcprior,
                                      model = "iid"),
                                  control.compute = list(waic=TRUE, dic = FALSE, mlik = FALSE, config = TRUE),
+                                 #control.predictor = list(compute=TRUE, link=1), #@Sam should we do this?
+                                 #control.family = list(control.link=list(model="logit")),   #@Sam should we do this?
                                  control.inla = list(tolerance = 1e-6, h = 0.001),
                                  data = grambank_df,family = "binomial"),
                             list(this_feature=as.name(feature))))
@@ -475,6 +488,8 @@ for(feature in features){
                                      constr = TRUE),
                                  control.compute = list(waic=TRUE, dic = FALSE, mlik = FALSE, config = TRUE),
                                  control.inla = list(tolerance = 1e-6, h = 0.001),
+                                 #control.predictor = list(compute=TRUE, link=1), #@Sam should we do this?
+                                 #control.family = list(control.link=list(model="logit")),  #@Sam should we do this?
                                  data = grambank_df, family = "binomial"),
                             list(this_feature=as.name(feature))))
   
@@ -559,7 +574,7 @@ for(fn in spatial_phylo_rdata_fns){
     as.data.frame() %>% 
     rename("2.5%" = V1, "50%" = V2, "97.5%" = V3) %>% 
     mutate(Feature_ID = feature) %>% 
-    mutate(effect = "spatia_generic_in_dual") %>% 
+    mutate(effect = "spatial_generic_in_dual") %>% 
     mutate(model = "dual") %>% 
     mutate(waic = output$waic$waic)  %>% 
     mutate(marginals.hyperpar.spatial_id_generic = output$marginals.hyperpar[3])
@@ -626,6 +641,8 @@ for(feature in features){
                                    model = "iid",
                                    hyper = pcprior),
                                  control.compute = list(waic=TRUE, dic = FALSE, mlik = FALSE, config = TRUE),
+                                 #control.predictor = list(compute=TRUE, link=1), #@Sam should we do this?
+                                 #control.family = list(control.link=list(model="logit")),   #@Sam should we do this?
                                  control.inla = list(tolerance = 1e-6, h = 0.001),
                                  data = grambank_df, family = "binomial"),
                             list(this_feature=as.name(feature))))
