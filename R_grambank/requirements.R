@@ -154,3 +154,5 @@ sigma_vec =  c(1.15, 2, 40, 10, 20)
 if (!dir.exists("output")) {
   dir.create("output")
 }
+
+#ln -s /Users/skirgard/Nextcloud/Git_output/grambank-analysed/output /Users/skirgard/Git/grambank/grambank-analysed/R_grambank
