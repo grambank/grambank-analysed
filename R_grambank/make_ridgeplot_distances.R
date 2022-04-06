@@ -1,0 +1,79 @@
+source("requirements.R")
+p_load(ggridges)
+
+#reading in GB
+GB <- read.delim(file.path("output", "GB_wide", "GB_cropped_for_missing.tsv"), sep ="\t") 
+
+GB_matrix <- GB %>%
+  column_to_rownames("Language_ID") %>%
+  as.matrix()
+
+#reading in lg meta data
+#areas
+if (!file.exists("output/non_GB_datasets/glottolog_AUTOTYP_areas.tsv")) { source("unusualness/processing/assigning_AUTOTYP_areas.R") }		
+autotyp_area <- read_tsv("output/non_GB_datasets/glottolog_AUTOTYP_areas.tsv", col_types = cols()) %>%
+  dplyr::select(Language_ID, AUTOTYP_area)
+
+#meta data
+Language_meta_data <-  read_tsv("output/non_GB_datasets/glottolog-cldf_wide_df.tsv", col_types = cols()) %>% 
+  mutate(Language_level_ID = ifelse(is.na(Language_level_ID), Language_ID, Language_level_ID)) %>% 
+  dplyr::select(-Language_ID) %>% 
+  dplyr::select(Language_ID  = Language_level_ID, Family_ID, Name, Macroarea) %>% 
+  distinct(Language_ID, .keep_all = T) %>% 
+  mutate(Family_ID = ifelse(is.na(Family_ID), "Isolate", Family_ID)) %>% 
+  left_join(autotyp_area, by = "Language_ID")
+
+
+#calculating gower distances %>% 
+GB_dist <- GB_matrix %>% 
+  cluster::daisy(metric = "gower", warnBin = F) %>% 
+  as.matrix()
+
+rownames(GB_dist) <- rownames(GB_matrix)
+colnames(GB_dist) <- rownames(GB_matrix)
+
+GB_dist[upper.tri(GB_dist, diag = T)] <- NA
+
+GB_dist_list <- GB_dist %>% 
+  reshape2::melt()  %>% 
+  filter(!is.na(value)) 
+
+#make dataframe for the globa distribution
+GB_dist_gobal <- GB_dist_list %>% 
+  dplyr::select(value) %>% 
+  mutate(group_var1 = "global", 
+         group_var2 = "global")
+    
+#grouped by autotyp area
+left <- Language_meta_data %>% 
+  dplyr::select(Var1 = Language_ID, group_var1 = AUTOTYP_area)
+
+right <- Language_meta_data %>% 
+  dplyr::select(Var2 = Language_ID, group_var2 = AUTOTYP_area)
+  
+GB_dist_list_sided <- GB_dist_list %>% 
+    left_join(left, by = "Var1") %>% 
+  left_join(right, by = "Var2") %>% 
+  mutate(same = ifelse(group_var1 == group_var2,"same", "diff")) %>% 
+  filter(same == "same") %>% 
+  full_join(GB_dist_gobal, by = c("value", "group_var1", "group_var2")) %>% 
+  rename(AUTOTYP_area = group_var1, 
+         dist = value) 
+
+mean_labels <- GB_dist_list %>% 
+  group_by(AUTOTYP_area) %>% 
+  summarise(mean_dist = mean(dist))
+
+
+
+GB_dist_list %>% 
+  ggplot() +
+  geom_density_ridges(aes(x = dist, y =AUTOTYP_area, fill = AUTOTYP_area), quantile_lines = T, quantile_fun = mean, jittered_points = TRUE, point_size = 2, point_shape = 21  ,  position = position_points_jitter(height = 0))  +
+  geom_label(data = mean_labels, aes(x = mean_dist, y = AUTOTYP_area,
+                                     label = round(mean_dist, 2)), size = 2, nudge_x = 0.01, nudge_y = 0.2, alpha = 0.7, label.padding = unit(0.1, "lines")) +
+  xlim(c(0,0.5)) +
+  theme_classic() +
+  theme(axis.title = element_blank(), 
+        legend.position = "None") 
+
+ggsave("output/ridgeplot_AUTOTYP_area.png")
