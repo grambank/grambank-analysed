@@ -56,22 +56,20 @@ GB_dist_list_sided <- GB_dist_list %>%
   left_join(right, by = "Var2") %>% 
   mutate(same = ifelse(group_var1 == group_var2,"same", "diff")) %>% 
   filter(same == "same") %>% 
-  full_join(GB_dist_gobal, by = c("value", "group_var1", "group_var2")) %>% 
-  rename(AUTOTYP_area = group_var1, 
-         dist = value) 
+  group_by(group_var1) %>% 
+  mutate(mean_value = mean(value)) %>% 
+  full_join(GB_dist_gobal, by = c("value", "group_var1", "group_var2")) 
 
-mean_labels <- GB_dist_list %>% 
-  group_by(AUTOTYP_area) %>% 
-  summarise(mean_dist = mean(dist))
+GB_dist_list_sided$group_var1 <- fct_reorder(GB_dist_list_sided$group_var1, GB_dist_list_sided$mean_value)
 
+mean_labels <- GB_dist_list_sided %>% 
+  distinct(group_var1, mean_value)
 
-
-GB_dist_list %>% 
+GB_dist_list_sided %>% 
   ggplot() +
-  geom_density_ridges(aes(x = dist, y =AUTOTYP_area, fill = AUTOTYP_area), quantile_lines = T, quantile_fun = mean, jittered_points = TRUE, point_size = 2, point_shape = 21  ,  position = position_points_jitter(height = 0))  +
-  geom_label(data = mean_labels, aes(x = mean_dist, y = AUTOTYP_area,
-                                     label = round(mean_dist, 2)), size = 2, nudge_x = 0.01, nudge_y = 0.2, alpha = 0.7, label.padding = unit(0.1, "lines")) +
-  xlim(c(0,0.5)) +
+  geom_density_ridges(aes(x = value, y =group_var1, fill = group_var1), quantile_lines = T, quantile_fun = mean, jittered_points = TRUE, point_size = 2, point_shape = 21  ,  position = position_points_jitter(height = 0))  +
+  geom_label(data = mean_labels, aes(x = mean_value, y = group_var1,
+                                     label = round(mean_value, 2)), size = 2, nudge_x = 0.01, nudge_y = 0.2, alpha = 0.7, label.padding = unit(0.1, "lines")) +
   theme_classic() +
   theme(axis.title = element_blank(), 
         legend.position = "None") 
