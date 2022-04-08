@@ -1,7 +1,7 @@
 #This is a script for running binomial INLA over 113 binary Grambank features, with phylo and spatial effects.
 
-#set this as 1 if you're just running this script on 20 lgs over 3 features to debug. Otherwise set to 0.
-debug_run = 0
+#set this as 1 if you're just running this script on 50 lgs over 3 features to debug. Otherwise set to 0.
+debug_run = 1
 
 source("requirements.R")
 
@@ -219,7 +219,7 @@ cat("Starting INLA phylo-only featurewise runs at", as.character(Sys.time()), ".
 
 for(feature in features){
   
-  #feature <- features[1]
+  #feature <- features[48]
   
   cat(paste0("# Running the phylo-only model on feature ", 
              feature, 
@@ -243,7 +243,7 @@ for(feature in features){
                                  control.compute = list(waic=TRUE, dic = FALSE, mlik = FALSE, config = TRUE),
                                  control.inla = list(tolerance = 1e-6, h = 0.001),
                                  control.predictor = list(compute=TRUE, link=1), #@Sam should we do this?
-                                 control.family = list(control.link=list(model="logit")),   #@Sam should we do this?
+                                 control.link=list(model="logit"),   #@Sam should we do this?
                                  data = grambank_df,family = "binomial"),
                             list(this_feature=as.name(feature))))})
 
@@ -339,7 +339,7 @@ for(feature in features){
                                  control.compute = list(waic=TRUE, dic = FALSE, mlik = FALSE, config = TRUE),
                                  control.inla = list(tolerance = 1e-6, h = 0.001),
                                  control.predictor = list(compute=TRUE, link=1), #@Sam should we do this?
-                                 control.family = list(control.link=list(model="logit")),   #@Sam should we do this?
+                                 control.link=list(model="logit"),   #@Sam should we do this?
                                  data = grambank_df,family = "binomial"),
                             list(this_feature=as.name(feature))))   })
       
@@ -425,7 +425,7 @@ for(feature in features){
                                      model = "iid"),
                                  control.compute = list(waic=TRUE, dic = FALSE, mlik = FALSE, config = TRUE),
                                  control.predictor = list(compute=TRUE, link=1), #@Sam should we do this?
-                                 control.family = list(control.link=list(model="logit")),   #@Sam should we do this?
+                                 control.link=list(model="logit"),   #@Sam should we do this?
                                  control.inla = list(tolerance = 1e-6, h = 0.001),
                                  data = grambank_df,family = "binomial"),
                             list(this_feature=as.name(feature)))) })
@@ -498,7 +498,7 @@ for(feature in features){
                                  control.compute = list(waic=TRUE, dic = FALSE, mlik = FALSE, config = TRUE),
                                  control.inla = list(tolerance = 1e-6, h = 0.001),
                                  control.predictor = list(compute=TRUE, link=1), #@Sam should we do this?
-                                 control.family = list(control.link=list(model="logit")),  #@Sam should we do this?
+                                 control.link=list(model="logit"),   #@Sam should we do this?
                                  data = grambank_df, family = "binomial"),
                             list(this_feature=as.name(feature)))) })
   
@@ -655,7 +655,7 @@ for(feature in features){
                                    hyper = pcprior),
                                  control.compute = list(waic=TRUE, dic = FALSE, mlik = FALSE, config = TRUE),
                                  control.predictor = list(compute=TRUE, link=1), #@Sam should we do this?
-                                 control.family = list(control.link=list(model="logit")),   #@Sam should we do this?
+                                 control.link=list(model="logit"),   #@Sam should we do this?
                                  control.inla = list(tolerance = 1e-6, h = 0.001),
                                  data = grambank_df, family = "binomial"),
                             list(this_feature=as.name(feature)))) })
@@ -798,7 +798,5 @@ df_trial %>% write_tsv(file = file.path(OUTPUTDIR, "df_trial.tsv"))
 df_trial %>% saveRDS(file = file.path(OUTPUTDIR, "df_trial.Rdata"))
 
 cat("All done with all INLA runs at ", as.character(Sys.time())[1], ".\n")
-
-
 
 sink(file = NULL)
