@@ -1,6 +1,6 @@
 #This is a script for running binomial INLA over 113 binary Grambank features, with phylo and spatial effects.
 
-#set this as 1 if you're just running this script on 20 lgs over 3 features to debug. Otherwise set to 0.
+#set this as 1 if you're just running this script on 50 lgs over 3 features to debug. Otherwise set to 0.
 debug_run = 0
 
 source("requirements.R")
@@ -22,7 +22,7 @@ if (!dir.exists("output/spatiophylogenetic_modelling/")) {
 }
 
 if(debug_run == 1){
-  OUTPUTDIR  <- file.path("output", "spatiophylogenetic_modelling", "results_debug_tweak/")
+  OUTPUTDIR  <- file.path("output", "spatiophylogenetic_modelling", "results_debug/")
 } else{
   OUTPUTDIR <- file.path("output", "spatiophylogenetic_modelling", "results/")
 }
@@ -71,7 +71,7 @@ GB_imputed <- read.delim(GB_imputed_filename, sep = "\t")
 
 #subset GB to test code for debugging
 if(debug_run == 1){
-GB_imputed <- GB_imputed[1:50,]
+GB_imputed <- GB_imputed[1:150,]
 }
 
 #### Inputs ####
@@ -216,10 +216,11 @@ index <- 0
 
 cat("Starting INLA phylo-only featurewise runs at", as.character(Sys.time()), ".\n")
 
-
 for(feature in features){
   
   #feature <- features[1]
+  
+  
   
   cat(paste0("# Running the phylo-only model on feature ", 
              feature, 
@@ -290,7 +291,9 @@ df_phylo_only <- df_phylo_only  %>%
             by = c(join_columns, "marginals.hyperpar.phy_id_iid_model")) %>% 
   full_join(df_phylo_only_generic, 
             by = c(join_columns, "marginals.hyperpar.phy_id_generic"))
+
   }
+rm(output)  
 }
 cat("All done with the phylo only model, 100% done!")
 
@@ -385,6 +388,7 @@ for(feature in features){
     full_join(df_spatial_only_generic, 
               by = c(join_columns, "marginals.hyperpar.spatial_id_generic"))
   }
+  rm(output)  
 }
 
 df_spatial_only %>% write_tsv(file = file.path(OUTPUTDIR, "df_spatial_only.tsv"))
@@ -453,7 +457,7 @@ suppressWarnings(    saveRDS(output, file = paste0(OUTPUTDIR, "autotyp_area_only
   df_autotyp_area_only <- df_autotyp_area_only  %>% 
     full_join(df, by = c(join_columns, "marginals.hyperpar.AUTOTYP_area_id_iid_model"))
   }
-  
+  rm(output)  
 }
 cat("All done with the autotyp_area only model, 100% done!")
 
@@ -508,6 +512,8 @@ suppressWarnings(    saveRDS(output, file = paste0(OUTPUTDIR, "dual_process_rdat
  #Don't be alarmed by the suppress warnings. saveRDS() is being kind and reminding us that the package stats may not be available when loading. However, this is not a necessary warning for us so we've wrapped saveRDS in suppressWarnings
     
   }
+  
+  rm(output)  
 }
 
 spatial_phylo_rdata_fns <- list.files(file.path(OUTPUTDIR, "/dual_process_rdata/"), full.names = T, pattern = ".*rdata")
@@ -612,7 +618,7 @@ for(fn in spatial_phylo_rdata_fns){
                                          "marginals.hyperpar.spatial_id_generic")) %>% 
     full_join(df_spatial_iid_model, by = c(join_columns,
                                            "marginals.hyperpar.spatial_id_iid_model"))
-
+  rm(output)  
 }
 
 df_dual_spatial_phylo %>% write_tsv(file = file.path(OUTPUTDIR, "df_spatial_phylo.tsv"))
@@ -665,6 +671,7 @@ for(feature in features){
 suppressWarnings(saveRDS(output, file = paste0(OUTPUTDIR, "/trial_process_rdata/spatial_phylo_area_", feature, ".rdata")))
 #Don't be alarmed by the suppress warnings. saveRDS() is being kind and reminding us that the package stats may not be available when loading. However, this is not a necessary warning for us so we've wrapped saveRDS in suppressWarnings
   }
+  rm(output)  
     }
 
 spatial_phylo_area_rdata_fns <- list.files(file.path(OUTPUTDIR, "trial_process_rdata/"), full.names = T, pattern = ".*rdata")
@@ -792,6 +799,9 @@ for(fn in spatial_phylo_area_rdata_fns){
               by = c(join_columns,"marginals.hyperpar.spatial_id_iid_model")) %>% 
     full_join(df_autotyp_iid, 
               by = c(join_columns,"marginals.hyperpar.AUTOTYP_area_id_iid_model"))
+  
+  
+  rm(output)  
 }
 
 df_trial %>% write_tsv(file = file.path(OUTPUTDIR, "df_trial.tsv"))
