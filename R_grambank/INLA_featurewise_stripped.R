@@ -232,13 +232,9 @@ for(feature in features){
                          control.family = list(control.link=list(model="logit")),   #@Sam should we do this?
                          data = grambank_df,family = "binomial"),
                     list(this_feature=as.name(feature))))
-  
 
-    
     suppressWarnings(  saveRDS(output, file = paste0(OUTPUTDIR, "phylo_only/phylo_only_", feature, ".rdata")) )
     #Don't be alarmed by the suppress warnings. saveRDS() is being kind and reminding us that the package stats may not be available when loading. However, this is not a necessary warning for us so we've wrapped saveRDS in suppressWarnings.
-  
+  rm(output)
 }
 cat("All done with the phylo only model, 100% done!")
-
-###
