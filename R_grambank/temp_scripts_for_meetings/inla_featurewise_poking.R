@@ -1,7 +1,7 @@
 source("requirements.R")
 p_load(beepr)
 
-fns <- list.files("output/spatiophylogenetic_modelling/fails/phylo_only_old/", pattern = "*.rdata", full.names = T)
+fns <- list.files("output/spatiophylogenetic_modelling/results_debug_2022-04-08/phylo_only/", pattern = "*.rdata", full.names = T)
 
 
 df<- data.frame(matrix(ncol = 3, nrow = 0))
