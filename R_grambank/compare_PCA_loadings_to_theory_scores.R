@@ -23,14 +23,13 @@ df_morph_count_PCA__plot <- df_morph_count_PCA %>%
   geom_smooth(method='lm', formula = 'y ~ x') +
   theme_classic() +
   labs(title="",		
-       x ="Boundness score", y = "PC1") + 		
-  xlim(c(0,0.75))
+       x ="Boundness score", y = "PC1")
 
-tiff(file.path("output", "PCA", "PC1_bound_morph_cor_plot.tiff"), width = 5, height = 4)
+tiff(file.path("output", "PCA", "PC1_bound_morph_cor_plot.tiff"), width = 5, height = 4,  units = "in", res = 300)
 plot(df_morph_count_PCA__plot)
 x <- dev.off()
 
-png(file.path("output", "PCA", "PC1_bound_morph_cor_plot.png"), width = 5, height = 4)
+png(file.path("output", "PCA", "PC1_bound_morph_cor_plot.png"), width = 5, height = 4,  units = "in", res = 300 )
 plot(df_morph_count_PCA__plot)
 x <- dev.off()
 
@@ -161,10 +160,10 @@ PCA2_vs_gender_plot <- lg_df_all_scores  %>%
   xlim(c(0,max(lg_df_all_scores$`Gender/
 noun class`)))
 
-tiff(file.path("output", "PCA", "PC2_gender_cor_plot.tiff"), width = 5, height = 4)
+tiff(file.path("output", "PCA", "PC2_gender_cor_plot.tiff"), width = 5, height = 4,  units = "in", res = 300)
 plot(PCA2_vs_gender_plot)
 x <- dev.off()
 
-png(file.path("output", "PCA", "PC2_gender_cor_plot.png"), width = 5, height = 4)
+png(file.path("output", "PCA", "PC2_gender_cor_plot.png"), width = 5, height = 4,  units = "in", res = 300)
 plot(PCA2_vs_gender_plot)
 x <- dev.off()

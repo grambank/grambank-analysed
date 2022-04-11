@@ -63,11 +63,11 @@ ggplot(aes(x = Family_name, fill = plot_value, y = n)) +
   scale_y_continuous(labels = scales::percent) +
   geom_text(aes(x = `Family_name`, y = n, label = `n`, hjust = 0.5), size=6.5, colour = "white", position= position_fill(0.5)) 
 
-tiff("output/coverage_plots/coverage_top_fifteen_families.tiff", width= 15, height =  8.46)
+tiff("output/coverage_plots/coverage_top_fifteen_families.tiff", width= 15, height =  8.46, units = "in")
 plot(family_bar_plot )
 x <- dev.off()
 
-png("output/coverage_plots/coverage_top_fifteen_families.png", width= 15, height =  8.46)
+png("output/coverage_plots/coverage_top_fifteen_families.png", width= 15, height =  8.46, units = "in")
 plot(family_bar_plot )
 x <- dev.off()
 
@@ -115,11 +115,11 @@ macroarea_plot <- df_for_macroarea_plot%>%
   geom_text(aes(x = `Macroarea`, y = n, label = `n`, hjust = 0.5), size=8, colour = "white", position= position_fill(0.5)) 
 
 
-tiff("output/coverage_plots/coverage_macroarea.tiff", width= 10, height =  8.46)
+tiff("output/coverage_plots/coverage_macroarea.tiff", width= 10, height =  8.46, units = "in", res = 300)
 plot(macroarea_plot)
 x <- dev.off()
 
-png("output/coverage_plots/coverage_macroarea.png", width= 10, height =  8.46)
+png("output/coverage_plots/coverage_macroarea.png", width= 10, height =  8.46, units = "in",res = 300)
 plot(macroarea_plot)
 x <- dev.off()
 
