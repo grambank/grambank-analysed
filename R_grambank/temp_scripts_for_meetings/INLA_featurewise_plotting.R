@@ -11,16 +11,32 @@ if (!dir.exists(  OUTPUTDIR )) {
 
 df_phylo_only <- readRDS(file.path(INPUTDIR, "df_phylo_only.Rdata")) 
 df_spatial_only <- readRDS(file.path(INPUTDIR, "df_spatial_only.Rdata")) 
+df_autotyp_area <- readRDS(file.path(INPUTDIR, "df_autotyp_area_only.Rdata")) 
 df_dual <- readRDS(file.path(INPUTDIR, "/df_spatial_phylo.Rdata"))
-
+df_trial <- readRDS(file.path(INPUTDIR, "/df_trial.Rdata"))
+  
 joined <- full_join(df_phylo_only, df_spatial_only) %>% 
   full_join(df_dual) %>% 
+  full_join(df_trial) %>% 
+  full_join(df_autotyp_area) %>% 
   left_join(parameters, by = "Feature_ID")
 
 lowest_waic_df <- joined %>% 
   distinct(model, waic, Feature_ID) %>% 
   group_by(Feature_ID) %>% 
   slice(which.min(waic))
+ 
+df_waic <- joined %>% 
+  distinct(Feature_ID, model, waic)
+
+df_waic %>% 
+  ggplot() +
+  geom_point(aes(x = Feature_ID, y = waic, col = model))
+
+
+
+
+
 
 #shaping my df to look like the one in Sam's spmodel plots.
 plot_df_hed <- joined %>% 
@@ -31,6 +47,7 @@ col_vector <- c("purple4", "turquoise3")
 
 
 plot_df_summ_hed_subset <- plot_df_hed %>% 
+  filter(Feature_ID !=  "GB028") %>% 
   reshape2::dcast(Feature_ID+ effect+ model ~ variable, value.var =    "value" ) 
 
 plot <- plot_df_summ_hed_subset %>% 
