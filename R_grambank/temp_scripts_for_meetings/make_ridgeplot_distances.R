@@ -1,5 +1,7 @@
 source("requirements.R")
-p_load(ggridges)
+
+OUTPUTDIR <- "output/dist_fixation_scores/"
+if (!dir.exists(OUTPUTDIR)) {dir.create(OUTPUTDIR)}
 
 #reading in GB
 GB <- read.delim(file.path("output", "GB_wide", "GB_cropped_for_missing.tsv"), sep ="\t") 
@@ -14,7 +16,7 @@ if (!file.exists("output/non_GB_datasets/glottolog_AUTOTYP_areas.tsv")) { source
 autotyp_area <- read_tsv("output/non_GB_datasets/glottolog_AUTOTYP_areas.tsv", col_types = cols()) %>%
   dplyr::select(Language_ID, AUTOTYP_area)
 
-#meta data
+#other meta data
 Language_meta_data <-  read_tsv("output/non_GB_datasets/glottolog-cldf_wide_df.tsv", col_types = cols()) %>% 
   mutate(Language_level_ID = ifelse(is.na(Language_level_ID), Language_ID, Language_level_ID)) %>% 
   dplyr::select(-Language_ID) %>% 
@@ -23,55 +25,29 @@ Language_meta_data <-  read_tsv("output/non_GB_datasets/glottolog-cldf_wide_df.t
   mutate(Family_ID = ifelse(is.na(Family_ID), "Isolate", Family_ID)) %>% 
   left_join(autotyp_area, by = "Language_ID")
 
-
 #calculating gower distances %>% 
 GB_dist <- GB_matrix %>% 
   cluster::daisy(metric = "gower", warnBin = F) %>% 
   as.matrix()
 
+#insert back the names
 rownames(GB_dist) <- rownames(GB_matrix)
 colnames(GB_dist) <- rownames(GB_matrix)
 
-GB_dist[upper.tri(GB_dist, diag = T)] <- NA
+source("temp_scripts_for_meetings/dist_viz_funs.R")
 
-GB_dist_list <- GB_dist %>% 
-  reshape2::melt()  %>% 
-  filter(!is.na(value)) 
+#AUTOTYP-area based plots
 
-#make dataframe for the globa distribution
-GB_dist_gobal <- GB_dist_list %>% 
-  dplyr::select(value) %>% 
-  mutate(group_var1 = "global", 
-         group_var2 = "global")
-    
-#grouped by autotyp area
-left <- Language_meta_data %>% 
-  dplyr::select(Var1 = Language_ID, group_var1 = AUTOTYP_area)
+dists_ridgeplot(dist_matrix = GB_dist, group_df = Language_meta_data, group = "AUTOTYP_area", title = "AUTOTYP_area", fn = file.path(OUTPUTDIR, "ridgeplot_AUTOTYP_area.png")) 
 
-right <- Language_meta_data %>% 
-  dplyr::select(Var2 = Language_ID, group_var2 = AUTOTYP_area)
-  
-GB_dist_list_sided <- GB_dist_list %>% 
-    left_join(left, by = "Var1") %>% 
-  left_join(right, by = "Var2") %>% 
-  mutate(same = ifelse(group_var1 == group_var2,"same", "diff")) %>% 
-  filter(same == "same") %>% 
-  group_by(group_var1) %>% 
-  mutate(mean_value = mean(value)) %>% 
-  full_join(GB_dist_gobal, by = c("value", "group_var1", "group_var2")) 
+dists_heatmap(dist_matrix = GB_dist, group_df = Language_meta_data, group = "AUTOTYP_area", title = "AUTOTYP_area", fn = file.path(OUTPUTDIR, "heatmap_AUTOTYP_area.png")) 
 
-GB_dist_list_sided$group_var1 <- fct_reorder(GB_dist_list_sided$group_var1, GB_dist_list_sided$mean_value)
+dists_ridgeplot(dist_matrix = GB_dist, group_df = Language_meta_data, group = "Macroarea", title = "Macroarea", fn = file.path(OUTPUTDIR, "ridgeplot_Macroarea.png")) 
 
-mean_labels <- GB_dist_list_sided %>% 
-  distinct(group_var1, mean_value)
+dists_heatmap(dist_matrix = GB_dist, group_df = Language_meta_data, group = "Macroarea", title = "Macroarea", fn = file.path(OUTPUTDIR, "heatmap_Macroarea.png")) 
 
-GB_dist_list_sided %>% 
-  ggplot() +
-  geom_density_ridges(aes(x = value, y =group_var1, fill = group_var1), quantile_lines = T, quantile_fun = mean, jittered_points = TRUE, point_size = 2, point_shape = 21  ,  position = position_points_jitter(height = 0))  +
-  geom_label(data = mean_labels, aes(x = mean_value, y = group_var1,
-                                     label = round(mean_value, 2)), size = 2, nudge_x = 0.01, nudge_y = 0.2, alpha = 0.7, label.padding = unit(0.1, "lines")) +
-  theme_classic() +
-  theme(axis.title = element_blank(), 
-        legend.position = "None") 
+dists_ridgeplot(dist_matrix = GB_dist, group_df = Language_meta_data, group = "Macroarea", title = "Macroarea", fn = file.path(OUTPUTDIR, "ridgeplot_Macroarea.png")) 
 
-ggsave("output/ridgeplot_AUTOTYP_area.png")
+dists_heatmap(dist_matrix = GB_dist, group_df = Language_meta_data, group = "Macroarea", title = "Macroarea", fn = file.path(OUTPUTDIR, "heatmap_Macroarea.png")) 
+
+
