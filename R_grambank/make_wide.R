@@ -46,6 +46,15 @@ cat("There were", nrow(GB_wide_strict), "languages and dialects read in. There w
 GB_wide_strict$na_prop <- apply(GB_wide_strict, 1, function(x) mean(is.na(x)))
 GB_wide_with_question$na_prop <- apply(GB_wide_with_question, 1, function(x) mean(is.na(x)))
 
+#for when people want a table with some meta data and data coverage status.
+#languages_df <- read_csv(GRAMBANK_LANGUAGES, col_types = LANGUAGES_COLSPEC) %>% 
+#  dplyr::select(Language_ID =ID, Language_level_ID, level, Longitude, Latitude, Macroarea, Family_name, Family_level_ID, level) 
+
+#GB_wide_strict %>% 
+#rownames_to_column("Language_ID") %>% 
+#  dplyr::select(Language_ID, na_prop) %>% 
+#  left_join(languages_df) %>% write_tsv("output/GB_wide/GB_languages.tsv", na = "")
+
 GB_wide_strict %>% 
   rownames_to_column("Language_ID") %>%
   arrange(na_prop) %>% 
