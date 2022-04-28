@@ -55,9 +55,10 @@ p <-  dist_list_ridgeplot%>%
                           point_shape = 21  ,  
                           position = position_points_jitter(height = 0))  +
       geom_label(data = mean_labels, aes(x = mean_value, y = group_var1,
-                                         label = round(mean_value, 2)), size = 2, nudge_x = 0.01, nudge_y = 0.2, alpha = 0.7, label.padding = unit(0.1, "lines")) +
+                                         label = round(mean_value, 2)), size = 8, nudge_x = 0.01, nudge_y = 0.2, alpha = 0.7, label.padding = unit(0.1, "lines")) +
       theme_classic() +
-      theme(axis.title = element_blank(), 
+      theme(axis.title = element_blank(),
+            text = element_text(size = 20),
             legend.position = "None") +
       ggtitle(label = title)
 
