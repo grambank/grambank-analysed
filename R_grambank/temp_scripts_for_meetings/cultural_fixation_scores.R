@@ -1,8 +1,7 @@
 source("requirements.R")
 
-p_load(haplotypes, 
-       optparse, 
-       phangorn)
+OUTPUTDIR <- "output/dist_fixation_scores/"
+if (!dir.exists(OUTPUTDIR)) {dir.create(OUTPUTDIR)}
 
 #reading in GB
 GB <- read.delim(file.path("output", "GB_wide", "GB_cropped_for_missing.tsv"), sep ="\t") 
@@ -34,13 +33,14 @@ Language_meta_data <- GB %>%
 
 source("temp_scripts_for_meetings/Muthukrishna_2020_CultureFst.r")
 
+#by macroarea
 group_df <- Language_meta_data %>% 
-  dplyr::select(Language_ID, Macroarea)
+  dplyr::select(Language_ID, group = Macroarea)
 
 GB_cropped <- GB %>% 
   left_join(group_df, by = "Language_ID") %>% 
   dplyr::select(-Language_ID) %>% 
-  dplyr::select(Macroarea, everything())
+  dplyr::select(group, everything())
 
 features <- GB_cropped[,-1] %>% colnames()
 types <- rep(0, length(features))
@@ -57,16 +57,107 @@ cfx_macroarea_list <-cfx_macroarea_matrix %>%
   unite(Var1, Var2, col = "Vars", sep = " - ") %>% 
   rename(Value_cfx = value)
 
+cfx_macroarea_list$Vars <- fct_reorder(cfx_macroarea_list$Vars, cfx_macroarea_list$Value_cfx)
 
-joined <- phist_macroarea_list %>% 
-  rename(Value_PHiST = value) %>% 
-  full_join(cfx_macroarea_list)
+cfx_macroarea_list %>% 
+  ggplot(aes(x = Vars, y = Value_cfx)) +
+  geom_bar(aes(fill = 1 - Value_cfx), stat = "identity") +
+  theme_classic() +
+  theme(text = element_text(angle = 70, hjust = 1, size = 20), 
+        legend.position = "None", 
+        axis.title.x = element_blank())
 
-joined %>% 
-  ggplot() +
-  geom_point(aes(x = Value_PHiST, y = Value_cfx)) +
-  theme_minimal()
+mean(cfx_macroarea_list$Value_cfx)
+  
+ggsave(filename = file.path(OUTPUTDIR, "cfx_barplot_macroarea.png"))
 
-ggsave("comparison_phist_cfx.png")
+cfx_macroarea_list %>% 
+  write_tsv(file = file.path(OUTPUTDIR, "cfx_AUTOTYP_macroarea_list.tsv"))
 
-cor.test(joined$Value_PHiST, joined$Value_cfx)
+#by autotyp area
+group_df <- Language_meta_data %>% 
+  dplyr::select(Language_ID, group = AUTOTYP_area)
+
+GB_cropped <- GB %>% 
+  left_join(group_df, by = "Language_ID") %>% 
+  dplyr::select(-Language_ID) %>% 
+  dplyr::select(group, everything())
+
+features <- GB_cropped[,-1] %>% colnames()
+types <- rep(0, length(features))
+names(types) <- features
+
+cfx_object <- CultureFst(d = GB_cropped, loci = features, type = types, bootstrap = F, no.samples = 100, label = "output/CFx_test") 
+
+cfx_AUTOTYP_area_matrix <- cfx_object$mean.fst %>% as.matrix()
+cfx_AUTOTYP_area_matrix[upper.tri(x = cfx_AUTOTYP_area_matrix, diag = T)] <- NA
+
+cfx_AUTOTYP_area_list <-cfx_AUTOTYP_area_matrix %>% 
+  reshape2::melt() %>% 
+  filter(!is.na(value)) %>% 
+  unite(Var1, Var2, col = "Vars", sep = " - ") %>% 
+  rename(Value_cfx = value)
+
+cfx_AUTOTYP_area_list$Vars <- fct_reorder(cfx_AUTOTYP_area_list$Vars, cfx_AUTOTYP_area_list$Value_cfx)
+
+cfx_AUTOTYP_area_list %>% 
+  ggplot(aes(x = Vars, y = Value_cfx)) +
+  geom_bar(aes(fill = 1 - Value_cfx), stat = "identity") +
+  theme_classic() +
+  theme(text = element_text(angle = 70, hjust = 1, size = 20), 
+        legend.position = "None", 
+        axis.title.x = element_blank())
+
+mean(cfx_AUTOTYP_area_list$Value_cfx)
+
+ggsave(filename = file.path(OUTPUTDIR, "cfx_barplot_AUTOTYP_area.png"))
+
+cfx_AUTOTYP_area_list %>% 
+  write_tsv(file = file.path(OUTPUTDIR, "cfx_AUTOTYP_area_list.tsv"))
+
+
+
+group_df <- Language_meta_data %>% 
+  dplyr::select(Language_ID, group = Family_ID) %>% 
+  group_by(group) %>% 
+  mutate(n = n()) %>% 
+  filter(n > 1) %>% 
+  dplyr::select(-n)
+
+GB_cropped <- GB %>% 
+  inner_join(group_df, by = "Language_ID") %>% 
+  dplyr::select(-Language_ID) %>% 
+  dplyr::select(group, everything())
+
+features <- GB_cropped[,-1] %>% colnames()
+types <- rep(0, length(features))
+names(types) <- features
+
+cfx_object <- CultureFst(d = GB_cropped, loci = features, type = types, bootstrap = T, no.samples = 100, label = "output/CFx_test") 
+
+cfx_Family_ID_matrix <- cfx_object$mean.fst %>% as.matrix()
+cfx_Family_ID_matrix[upper.tri(x = cfx_Family_ID_matrix, diag = T)] <- NA
+
+cfx_Family_ID_list <-cfx_Family_ID_matrix %>% 
+  reshape2::melt() %>% 
+  filter(!is.na(value)) %>% 
+  unite(Var1, Var2, col = "Vars", sep = " - ") %>% 
+  rename(Value_cfx = value)
+
+cfx_Family_ID_list$Vars <- fct_reorder(cfx_Family_ID_list$Vars, cfx_Family_ID_list$Value_cfx)
+
+cfx_Family_ID_list %>% 
+  ggplot(aes(x = Vars, y = Value_cfx)) +
+  geom_bar(aes(fill = 1 - Value_cfx), stat = "identity") +
+  theme_classic() +
+  theme(text = element_text(angle = 70, hjust = 1, size = 20), 
+        legend.position = "None", 
+        axis.title.x = element_blank())
+
+mean(cfx_Family_ID_list$Value_cfx)
+
+ggsave(filename = file.path(OUTPUTDIR, "cfx_barplot_Family_ID.png"))
+
+cfx_Family_ID_list %>% 
+  write_tsv(file = file.path(OUTPUTDIR, "cfx_Family_ID_list.tsv"))
+
