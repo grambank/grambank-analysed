@@ -74,7 +74,7 @@ phist_macroarea_list %>%
 ggsave("output/dist_fixation_scores/phist_macroareas.png",  width = 7.87 , height =  8.26)
 
 phist_macroarea %>% 
-  saveRDS("temp_scripts_for_meetings/phist_macroarea.rdata")
+  saveRDS("output/dist_fixation_scores/phist_macroarea.rdata")
 
 
 #AUTOTYP_area
@@ -112,7 +112,7 @@ phist_AUTOTYP_area_list %>%
 ggsave("output/dist_fixation_scores/phist_AUTOTYP_areas.png",  width = 7.87 , height =  8.26)
 
 phist_AUTOTYP_area %>% 
-  saveRDS("temp_scripts_for_meetings/phist_AUTOTYP_area.rdata")
+  saveRDS("output/dist_fixation_scores/phist_AUTOTYP_area.rdata")
 
 
 #Family_ID
