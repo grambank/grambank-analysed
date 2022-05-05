@@ -23,7 +23,7 @@ glottolog_df <-  read_tsv("output/non_GB_datasets/glottolog-cldf_wide_df.tsv", c
   dplyr::select(-Language_ID) %>% 
   dplyr::select(Language_ID  = Language_level_ID, Family_ID, Name, Macroarea) %>% 
   distinct(Language_ID, .keep_all = T) %>% 
-  mutate(Family_ID = ifelse(is.na(Family_ID), "Isolate", Family_ID))
+  mutate(Family_ID = ifelse(is.na(Family_ID), Language_ID, Family_ID))
 
 #join to ensure exact same order
 Language_meta_data <- GB %>% 
@@ -35,9 +35,8 @@ GB_dist <- GB_matrix %>%
   cluster::daisy(metric = "gower", warnBin = F) %>% 
   as.matrix()
 
-rownames(GB_dist) <- rownames(GB)
-colnames(GB_dist) <- rownames(GB)
-
+rownames(GB_dist) <- GB$Language_ID
+colnames(GB_dist) <- GB$Language_ID
 
 #macroarea
 
@@ -116,9 +115,25 @@ phist_AUTOTYP_area %>%
 
 
 #Family_ID
+cut_off_vec <- c(0, 1, 3, 5, 10, 20, 50)
 
-phist_Family_ID = haplotypes::pairPhiST(x = GB_dist,
-                                           Language_meta_data$Family_ID,
+for(i in cut_off_vec) {
+cat("Running the pairPHiST for families with a cut-off at ", i, ".\n")
+  cut_off <- i
+GB_pruned_families <- Language_meta_data %>% 
+  dplyr::select(Language_ID, Family_ID) %>% 
+  group_by(Family_ID) %>% 
+  mutate(sum = n()) %>% 
+  filter(sum > cut_off) 
+
+GB_dist_families <- GB_dist[GB_pruned_families$Language_ID, GB_pruned_families$Language_ID]
+
+#ensure order
+GB_pruned_families <- GB_pruned_families %>% 
+  right_join(as.data.frame(colnames(GB_dist_families)) %>% rename(Language_ID = 1), by = "Language_ID")
+
+phist_Family_ID = haplotypes::pairPhiST(x = GB_dist_families,
+                                        GB_pruned_families$Family_ID,
                                            nperm = 99,
                                            showprogbar = TRUE
 )
@@ -135,8 +150,11 @@ mean(phist_Family_ID_list$value)
 
 phist_Family_ID_list$Vars <- fct_reorder(phist_Family_ID_list$Vars, phist_Family_ID_list$value)
 
+table_fn <- paste0("output/dist_fixation_scores/PHiST_Family_ID_cut_off_", cut_off, ".tsv")
+plot_fn <- paste0("output/dist_fixation_scores/PHiST_Family_ID_cut_off_", cut_off, ".png")
+
 phist_Family_ID_list %>% 
-  write_tsv("output/dist_fixation_scores/PHiST_Family_ID.tsv")
+  write_tsv(table_fn)
 
 phist_Family_ID_list %>% 
   ggplot() +
@@ -147,7 +165,6 @@ phist_Family_ID_list %>%
         text = element_text(size = 20), 
         axis.title = element_blank())
 
-ggsave("output/dist_fixation_scores/phist_Family_IDs.png",  width = 7.87 , height =  8.26)
+ggsave(filename = plot_fn,  width = 7.87 , height =  8.26)
 
-phist_Family_ID %>% 
-  saveRDS("temp_scripts_for_meetings/phist_Family_ID.rdata")
+}
