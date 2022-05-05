@@ -1,7 +1,6 @@
 ## Single INLA test
 ## Binomial INLA test
 source("requirements.R")
-source("varcov_spatial.R")
 
 #source("spatiophylogenetic_modelling/simulations/set_up.R")
 

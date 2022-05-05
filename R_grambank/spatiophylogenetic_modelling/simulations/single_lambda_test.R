@@ -2,9 +2,6 @@
 ## Binomial INLA test
 source("requirements.R")
 
-# load variational covariance matrix function taken from geoR::varcov_spatial
-source("varcov_spatial.R")
-
 ## Parameters
 if(CLI == "Yes") {
   args = commandArgs(trailingOnly=TRUE)

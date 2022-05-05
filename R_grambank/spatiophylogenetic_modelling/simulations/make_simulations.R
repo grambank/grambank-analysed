@@ -43,7 +43,7 @@ if(CLI == "Yes") {
   
   source("spatiophylogenetic_modelling/simulations/set_up.R")
   
-  sink(file = "output/log_file_spatiophylogenetic_modelling/simulations.txt", split = T)
+  sink(file = "output/spatiophylogenetic_modelling/simulation/simulations.txt", split = T)
   lambda <- lambda_strong
   
   start_segment <- Sys.time()

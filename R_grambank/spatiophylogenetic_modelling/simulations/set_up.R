@@ -42,7 +42,7 @@ grambank_metadata = GB_imputed %>%
 
 # jager tree
 tree_fn <- "output/spatiophylogenetic_modelling/processed_data/jaeger_pruned.tree"
-if(!file.exists(tree_filename)) {
+if(!file.exists(tree_fn)) {
 source("spatiophylogenetic_modelling/processing/pruning_jagertree.R")}
 tree <- read.tree(tree_fn)
 
