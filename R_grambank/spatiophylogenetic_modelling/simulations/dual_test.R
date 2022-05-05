@@ -38,7 +38,7 @@ for(i in 1:iter){
             lambda,
             model = "lambda"),
     k = 2,
-    freq = 0.5,
+    freq = GB_freq,
     states = 0:1
   )
   
