@@ -23,6 +23,9 @@ model_data = data.frame(longitude = longitude,
 
 cat("Simulation for Lambda only model with Lambda =", lambda, "...\n")
 
+# rates matrix
+q = matrix(c(-0.5, 0.5, 0.5, -0.5), 2)
+
 output_list = list()
 iter = 20
 for(i in 1:iter){
@@ -35,14 +38,11 @@ for(i in 1:iter){
       lambda, "\n."
       )
   
-  y = rTraitDisc(
-    geiger::rescale(tree,
-            lambda,
-            model = "lambda"),
-    k = 2,
-    freq = GB_freq,
-    states = 0:1
-  )
+  y = geiger::sim.char(geiger::rescale(tree,
+                                       lambda,
+                                       model = "lambda"), 
+                       q, 
+                       model="discrete")[,1,]
   
   model_data$y = as.numeric(y) - 1
   

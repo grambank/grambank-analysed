@@ -9,12 +9,12 @@ if(CLI == "Yes") {
 }
 cat("Simulation for a geography only model with Lambda =", lambda, "...\n")
 
-#source("spatiophylogenetic_modelling/simulations/set_up.R")
+source("spatiophylogenetic_modelling/simulations/set_up.R")
 
 model_data = data.frame(longitude = longitude,
                         latitude = latitude,
                         spat_id_int = 1:nrow(grambank_metadata),
-                        spat_id2_int = 1:nrow(grambank_metadata),
+                        error_int = 1:nrow(grambank_metadata),
                         glottocodes = grambank_metadata$Language_ID,
                         glottocodes2 = grambank_metadata$Language_ID)
 
@@ -27,6 +27,9 @@ spatial_covar_mat = varcov.spatial(model_data[,c("longitude", "latitude")],
 dimnames(spatial_covar_mat) = list(model_data$glottocodes, model_data$glottocodes)
 spatial_prec_mat = cov2precision(spatial_covar_mat)
 
+# rates matrix
+q = matrix(c(-0.5, 0.5, 0.5, -0.5), 2)
+
 output_list = list()
 iter = 20
 for(i in 1:iter){
@@ -37,14 +40,12 @@ for(i in 1:iter){
       ". This is with lambda =", 
       lambda, "\n.")
   
-  y = rTraitDisc(
-    geiger::rescale(tree,
-            lambda,
-            model = "lambda"),
-    k = 2,
-    freq = GB_freq,
-    states = 0:1
-  )
+  y = geiger::sim.char(geiger::rescale(tree,
+                                       lambda,
+                                       model = "lambda"), 
+                   q, 
+                   model="discrete")[,1,]
+  
   
   model_data$y = as.numeric(y) - 1
   
@@ -60,11 +61,10 @@ for(i in 1:iter){
                              Cmatrix = spatial_prec_mat,
                              constr = TRUE,
                              hyper = pcprior_phy) +
-                           f(spat_id2_int,
+                           f(error_int,
                              model = "iid",
                              hyper = pcprior_phy,
-                             constr = TRUE) + 
-                        ,
+                             constr = TRUE),
                          family = "binomial",
                          control.compute = list(waic=TRUE),
                          control.inla =
