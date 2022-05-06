@@ -8,7 +8,7 @@ source("impute_missing_values.R")
 }
 
 if(!dir.exists("output/unusualness/")){
-  dir.create("unusualness/")
+  dir.create("output/unusualness/")
 }
 if(!dir.exists("output/unusualness/plots")){
   dir.create("output/unusualness/plots")
