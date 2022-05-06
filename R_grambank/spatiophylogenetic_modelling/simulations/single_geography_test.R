@@ -30,6 +30,8 @@ spatial_prec_mat = cov2precision(spatial_covar_mat)
 output_list = list()
 iter = 20
 for(i in 1:iter){
+  
+#  i <- 1
   cat("I'm on iteration", 
       i, 
       "out of", 
@@ -63,8 +65,7 @@ for(i in 1:iter){
                            f(spat_id2_int,
                              model = "iid",
                              hyper = pcprior_phy,
-                             constr = TRUE) + 
-                        ,
+                             constr = TRUE)  ,
                          family = "binomial",
                          control.compute = list(waic=TRUE),
                          control.inla =
