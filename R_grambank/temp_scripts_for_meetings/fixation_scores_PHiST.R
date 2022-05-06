@@ -146,7 +146,7 @@ phist_Family_ID_list <-phist_Family_ID_matrix %>%
   filter(!is.na(value)) %>% 
   unite(Var1, Var2, col = "Vars", sep = " - ") 
 
-mean(phist_Family_ID_list$value)
+cat("The mean for the pairPHiST distances between lg families is", mean(phist_Family_ID_list$value), "when the cut-off for inclusion is ", cut_off, ".\n")
 
 phist_Family_ID_list$Vars <- fct_reorder(phist_Family_ID_list$Vars, phist_Family_ID_list$value)
 

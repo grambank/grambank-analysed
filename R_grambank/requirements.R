@@ -72,6 +72,8 @@ pacman::p_load(
 	phytools,
 	caper, 
   synchrony,
+  geiger,
+  synchrony,
 
 	# testing
 	assertthat,
