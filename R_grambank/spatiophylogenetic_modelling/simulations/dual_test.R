@@ -103,13 +103,13 @@ for(i in 1:iter){
   if(brms != "no"){
     output_list[[i]] = list(y = y,
                             pagels_lambda = pagels_lambda,
-                            inla_model = lambda_model,
+                            inla_model = inla_model,
                             brms_model = brms_model,
                             phylo_d = phylo_d_results)
   }else{
     output_list[[i]] = list(y = y,
                             pagels_lambda = pagels_lambda,
-                            inla_model = lambda_model,
+                            inla_model = inla_model,
                             phylo_d = phylo_d_results)
   }
 }
