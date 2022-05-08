@@ -21,7 +21,13 @@ model_data = data.frame(longitude = longitude,
                         glottocodes2 = grambank_metadata$Language_ID,
                         glottocodes3 = grambank_metadata$Language_ID)
 
-
+#### Spatial matrix
+cat("Calculating the spatial variance covariance matrix.\n")
+## Ensure the order of languages matches the order within the phylogeny
+spatial_covar_mat = varcov.spatial(model_data[,c("longitude", "latitude")], 
+                                   cov.pars = sigma, kappa = kappa)$varcov
+dimnames(spatial_covar_mat) = list(model_data$glottocodes, model_data$glottocodes)
+spatial_prec_mat = cov2precision(spatial_covar_mat)
 
 # rates matrix
 q = matrix(c(-0.5, 0.5, 0.5, -0.5), 2)
