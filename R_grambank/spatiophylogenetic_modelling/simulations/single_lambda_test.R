@@ -105,9 +105,11 @@ for(i in 1:iter){
                             phylo_d = phylo_d_results)
     }
 }
-
+suppressWarnings(
+  
 saveRDS(output_list, file = 
           paste0(
               OUTPUTDIR, "/lambda_",
             lambda,
-            "_simulation.RDS"))
+            "_simulation.RDS")) 
+)

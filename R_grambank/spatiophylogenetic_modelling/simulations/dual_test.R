@@ -108,7 +108,9 @@ for(i in 1:iter){
   }
 }
 
+
+suppressWarnings(
 saveRDS(output_list, file = 
           paste0(OUTPUTDIR, "dual_",
             lambda,
-            "_simulation.RDS"))
+            "_simulation.RDS")) )

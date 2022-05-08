@@ -106,8 +106,11 @@ for(i in 1:iter){
   }
 }
 
+suppressWarnings(
+  
 saveRDS(output_list, file = 
           paste0(
             OUTPUTDIR, "/spatial_",
             lambda,
             "_simulation.RDS"))
+)
