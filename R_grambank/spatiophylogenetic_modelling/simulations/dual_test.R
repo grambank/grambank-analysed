@@ -35,7 +35,7 @@ for(i in 1:iter){
       "out of", 
       iter, 
       ". This is with lambda =", 
-      lambda, "\n."
+      lambda, "and dual process.\n"
   )
   
   y = geiger::sim.char(geiger::rescale(tree,

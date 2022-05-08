@@ -38,7 +38,7 @@ for(i in 1:iter){
       "out of", 
       iter, 
       ". This is with lambda =", 
-      lambda, "\n.")
+      lambda, "and single only geo.\n")
   
   y = geiger::sim.char(geiger::rescale(tree,
                                        lambda,
