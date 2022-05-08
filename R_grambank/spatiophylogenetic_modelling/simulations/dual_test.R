@@ -90,7 +90,7 @@ for(i in 1:iter){
   
   print("Phylo D...")
   phylo_d_results = phylo.d(data = model_data,
-                              names.col = glottocodes, 
+                              names.col = glottocodes1, 
                               phy = tree,
                               binvar = y)
   
