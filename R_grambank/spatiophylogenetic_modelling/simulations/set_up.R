@@ -71,6 +71,7 @@ phylo_prec_mat = cov2precision(phylo_covar_mat)
 
 x = assert_that(nrow(grambank_metadata) == nrow(phylo_prec_mat))
 
+#priors
 pcprior_phy = list(prec = list(
   prior="pc.prec",
   param = c(1, 0.1)) # probability that lambda is 0.1 is 10%

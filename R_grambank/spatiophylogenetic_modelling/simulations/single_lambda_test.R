@@ -21,7 +21,7 @@ model_data = data.frame(longitude = longitude,
 
 
 
-cat("Simulation for Lambda only model with Lambda =", lambda, "...\n")
+cat("Simulation for Lambda only model phylo with Lambda =", lambda, "...\n")
 
 # rates matrix
 q = matrix(c(-0.5, 0.5, 0.5, -0.5), 2)
@@ -35,7 +35,7 @@ for(i in 1:iter){
       "out of", 
       iter, 
       ". This is with lambda =", 
-      lambda, "\n."
+      lambda, "and single model phylo.\n"
       )
   
   y = geiger::sim.char(geiger::rescale(tree,
@@ -105,9 +105,11 @@ for(i in 1:iter){
                             phylo_d = phylo_d_results)
     }
 }
-
+suppressWarnings(
+  
 saveRDS(output_list, file = 
           paste0(
               OUTPUTDIR, "/lambda_",
             lambda,
-            "_simulation.RDS"))
+            "_simulation.RDS")) 
+)

@@ -21,7 +21,13 @@ model_data = data.frame(longitude = longitude,
                         glottocodes2 = grambank_metadata$Language_ID,
                         glottocodes3 = grambank_metadata$Language_ID)
 
-
+#### Spatial matrix
+cat("Calculating the spatial variance covariance matrix.\n")
+## Ensure the order of languages matches the order within the phylogeny
+spatial_covar_mat = varcov.spatial(model_data[,c("longitude", "latitude")], 
+                                   cov.pars = sigma, kappa = kappa)$varcov
+dimnames(spatial_covar_mat) = list(model_data$glottocodes, model_data$glottocodes)
+spatial_prec_mat = cov2precision(spatial_covar_mat)
 
 # rates matrix
 q = matrix(c(-0.5, 0.5, 0.5, -0.5), 2)
@@ -35,7 +41,7 @@ for(i in 1:iter){
       "out of", 
       iter, 
       ". This is with lambda =", 
-      lambda, "\n."
+      lambda, "and dual process.\n"
   )
   
   y = geiger::sim.char(geiger::rescale(tree,
@@ -90,25 +96,27 @@ for(i in 1:iter){
   
   print("Phylo D...")
   phylo_d_results = phylo.d(data = model_data,
-                              names.col = glottocodes, 
+                              names.col = glottocodes1, 
                               phy = tree,
                               binvar = y)
   
   if(brms != "no"){
     output_list[[i]] = list(y = y,
                             pagels_lambda = pagels_lambda,
-                            inla_model = lambda_model,
+                            inla_model = inla_model,
                             brms_model = brms_model,
                             phylo_d = phylo_d_results)
   }else{
     output_list[[i]] = list(y = y,
                             pagels_lambda = pagels_lambda,
-                            inla_model = lambda_model,
+                            inla_model = inla_model,
                             phylo_d = phylo_d_results)
   }
 }
 
+
+suppressWarnings(
 saveRDS(output_list, file = 
           paste0(OUTPUTDIR, "dual_",
             lambda,
-            "_simulation.RDS"))
+            "_simulation.RDS")) )

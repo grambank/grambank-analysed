@@ -38,7 +38,7 @@ for(i in 1:iter){
       "out of", 
       iter, 
       ". This is with lambda =", 
-      lambda, "\n.")
+      lambda, "and single only geo.\n")
   
   y = geiger::sim.char(geiger::rescale(tree,
                                        lambda,
@@ -106,8 +106,11 @@ for(i in 1:iter){
   }
 }
 
+suppressWarnings(
+  
 saveRDS(output_list, file = 
           paste0(
             OUTPUTDIR, "/spatial_",
             lambda,
             "_simulation.RDS"))
+)
