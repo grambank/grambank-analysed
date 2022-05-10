@@ -34,7 +34,7 @@ GB_dist <- GB_matrix %>%
 rownames(GB_dist) <- rownames(GB_matrix)
 colnames(GB_dist) <- rownames(GB_matrix)
 
-source("temp_scripts_for_meetings/dist_viz_funs.R")
+source("dist_fixation_scores/dist_viz_funs.R")
 
 #AUTOTYP-area based plots
 
