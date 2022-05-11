@@ -1,6 +1,9 @@
 #from Muthukrishna, M., Bell, A. V., Henrich, J., Curtin, C. M., Gedranovich, A., McInerney, J., & Thue, B. (2020). “Beyond Western, Educated, Industrial, Rich, and Democratic (WEIRD) Psychology: Measuring and Mapping Scales of Cultural and Psychological Distance.” Psychological Science, 0956797620916782. Published, 05/21/2020.
 #https://journals.sagepub.com/doi/suppl/10.1177/0956797620916782
 
+#Hedvig Skirgård made one minor tweak to the way the function deals with NULL input for the label argument.
+
+
 source("requirements.R")
 p_load(stringi)
 
@@ -165,7 +168,10 @@ bootFst = function(){
 			colnames(ans$mean.fst.confint) = pops; rownames(ans$mean.fst.confint) = pops
 			}	
 		# save output to .rdata file	
+	
+	if(!is.null(label)){
 		save(ans, file = paste( label, "_Fst.rdata", sep = "" ) ) 
+	  }
 		if( bootstrap==TRUE ) print( ans$mean.fst.confint ) else print(ans$mean.fst)
 		ans
 	}
