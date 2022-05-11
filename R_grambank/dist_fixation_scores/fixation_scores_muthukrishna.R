@@ -31,7 +31,7 @@ Language_meta_data <- GB %>%
 
 #using Muthukrishna's et al's approach
 
-source("temp_scripts_for_meetings/Muthukrishna_2020_CultureFst.r")
+source("dist_fixation_scores/fun_def_Muthukrishna_2020_CultureFst.r")
 
 #by macroarea
 group_df <- Language_meta_data %>% 
@@ -42,11 +42,24 @@ GB_cropped <- GB %>%
   dplyr::select(-Language_ID) %>% 
   dplyr::select(group, everything())
 
+cat(paste0("Below are the number of languages per Macroarea, smallest 6 groups and then a boxplot of all.\n"))
+
+plot_df <- GB_cropped %>% 
+  group_by(group) %>% 
+  summarise(n = n())  %>% 
+  arrange(n)
+
+plot_df[1:6,]
+
+p_load("txtplot")
+
+txtplot::txtboxplot(plot_df$n, width = 50)
+
 features <- GB_cropped[,-1] %>% colnames()
 types <- rep(0, length(features))
 names(types) <- features
 
-cfx_object <- CultureFst(d = GB_cropped, loci = features, type = types, bootstrap = T, no.samples = 100, label = "output/CFx_test") 
+cfx_object <- CultureFst(d = GB_cropped, loci = features, type = types, bootstrap = T, no.samples = 100, label = NULL) 
 
 cfx_macroarea_matrix <- cfx_object$mean.fst %>% as.matrix()
 cfx_macroarea_matrix[upper.tri(x = cfx_macroarea_matrix, diag = T)] <- NA
@@ -69,7 +82,7 @@ cfx_macroarea_list %>%
 
 mean(cfx_macroarea_list$Value_cfx)
   
-ggsave(filename = file.path(OUTPUTDIR, "cfx_barplot_macroarea.png"))
+ggsave(filename = file.path(OUTPUTDIR, "cfx_barplot_macroarea.png"), height =  7.89, width =  8.61)
 
 cfx_macroarea_list %>% 
   write_tsv(file = file.path(OUTPUTDIR, "cfx_AUTOTYP_macroarea_list.tsv"))
@@ -83,11 +96,22 @@ GB_cropped <- GB %>%
   dplyr::select(-Language_ID) %>% 
   dplyr::select(group, everything())
 
+cat(paste0("Below are the number of languages per AUTOTYP_area, smallest 6 groups and then a boxplot of all.\n"))
+
+plot_df <- GB_cropped %>% 
+  group_by(group) %>% 
+  summarise(n = n())  %>% 
+  arrange(n)
+
+plot_df[1:6,]
+
+txtplot::txtboxplot(plot_df$n, width = 50)
+
 features <- GB_cropped[,-1] %>% colnames()
 types <- rep(0, length(features))
 names(types) <- features
 
-cfx_object <- CultureFst(d = GB_cropped, loci = features, type = types, bootstrap = F, no.samples = 100, label = "output/CFx_test") 
+cfx_object <- CultureFst(d = GB_cropped, loci = features, type = types, bootstrap = T, no.samples = 100, label = NULL) 
 
 cfx_AUTOTYP_area_matrix <- cfx_object$mean.fst %>% as.matrix()
 cfx_AUTOTYP_area_matrix[upper.tri(x = cfx_AUTOTYP_area_matrix, diag = T)] <- NA
@@ -110,30 +134,37 @@ cfx_AUTOTYP_area_list %>%
 
 mean(cfx_AUTOTYP_area_list$Value_cfx)
 
-ggsave(filename = file.path(OUTPUTDIR, "cfx_barplot_AUTOTYP_area.png"))
+ggsave(filename = file.path(OUTPUTDIR, "cfx_barplot_AUTOTYP_area.png"), height =  7.89, width =  8.61)
 
 cfx_AUTOTYP_area_list %>% 
   write_tsv(file = file.path(OUTPUTDIR, "cfx_AUTOTYP_area_list.tsv"))
 
+#families
 
+cut_off_vec <- c(1, 3, 5, 10, 20, 50)
+
+for(i in cut_off_vec) {
+  cat("Running the Muthukrishna Cfst for families with a cut-off at ", i, ".\n")
+#i <- cut_off_vec[2]
+    cut_off <- i
 
 group_df <- Language_meta_data %>% 
   dplyr::select(Language_ID, group = Family_ID) %>% 
   group_by(group) %>% 
   mutate(n = n()) %>% 
-  filter(n > 1) %>% 
+  filter(n > cut_off) %>% 
   dplyr::select(-n)
 
 GB_cropped <- GB %>% 
   inner_join(group_df, by = "Language_ID") %>% 
   dplyr::select(-Language_ID) %>% 
   dplyr::select(group, everything())
-
+ 
 features <- GB_cropped[,-1] %>% colnames()
 types <- rep(0, length(features))
 names(types) <- features
 
-cfx_object <- CultureFst(d = GB_cropped, loci = features, type = types, bootstrap = T, no.samples = 100, label = "output/CFx_test") 
+cfx_object <- CultureFst(d = GB_cropped, loci = features, type = types, bootstrap = T, no.samples = 100, label = NULL) 
 
 cfx_Family_ID_matrix <- cfx_object$mean.fst %>% as.matrix()
 cfx_Family_ID_matrix[upper.tri(x = cfx_Family_ID_matrix, diag = T)] <- NA
@@ -156,8 +187,8 @@ cfx_Family_ID_list %>%
 
 mean(cfx_Family_ID_list$Value_cfx)
 
-ggsave(filename = file.path(OUTPUTDIR, "cfx_barplot_Family_ID.png"))
+ggsave(filename = file.path(OUTPUTDIR, "cfx_barplot_Family_ID_cut_off_", cut_off, ".png"), height =  7.89, width =  8.61)
 
 cfx_Family_ID_list %>% 
-  write_tsv(file = file.path(OUTPUTDIR, "cfx_Family_ID_list.tsv"))
-
+  write_tsv(file = file.path(OUTPUTDIR, "cfx_Family_ID_list_cut_off_", cut_off, ".tsv"))
+}
