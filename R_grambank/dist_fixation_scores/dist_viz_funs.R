@@ -91,7 +91,7 @@ dists_heatmap <- function(dist_matrix, group_df, group, title, fn = "") {
     left_join(left, by = "Var1") %>% 
     left_join(right, by = "Var2")  %>%
     group_by(group_var1, group_var2) %>% 
-    summarise(mean = mean(value, na.rm = T)) %>% 
+    summarise(mean = mean(value, na.rm = T), .groups = "drop") %>% 
     ungroup() %>% 
     reshape2::dcast(group_var1 ~ group_var2, value.var = "mean") %>% 
     column_to_rownames("group_var1") %>% 
