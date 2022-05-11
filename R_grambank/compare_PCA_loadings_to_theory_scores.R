@@ -110,6 +110,9 @@ lg_df_all_scores <- lg_df_for_OV_VO_count %>%
   full_join(GB_morph_counts, by = "Language_ID") %>% 
   full_join(lg_df_informativity_score, by = "Language_ID") %>% 
   full_join(PCA_df, by = "Language_ID")  
+
+lg_df_all_scores %>% 
+  write_tsv("output/PCA/theo_scores.tsv", na = "")
     
 ##SPLOM for overview
 tiff("output/PCA/splom_all_scores.tiff", height =30, width = 30, units = "cm", res = 400)
