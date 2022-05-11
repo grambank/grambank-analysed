@@ -7,6 +7,7 @@ source("requirements.R")
 p_load(stringi)
 
 CultureFst = function( d, loci, type, bootstrap, no.samples, label ){
+  cat(paste0("I've started and there are ", no.samples, " samples to go through.\n"))
 	# returns a matrix of pairwise fst values in the lower diagonal
 	# and bootstrapped confidence intervals in the upper-diagonal (optional)
 	
