@@ -1,8 +1,7 @@
 #from Muthukrishna, M., Bell, A. V., Henrich, J., Curtin, C. M., Gedranovich, A., McInerney, J., & Thue, B. (2020). “Beyond Western, Educated, Industrial, Rich, and Democratic (WEIRD) Psychology: Measuring and Mapping Scales of Cultural and Psychological Distance.” Psychological Science, 0956797620916782. Published, 05/21/2020.
 #https://journals.sagepub.com/doi/suppl/10.1177/0956797620916782
 
-#Hedvig Skirgård made one minor tweak to the way the function deals with NULL input for the label argument.
-
+#Hedvig Skirgård made one minor tweak to the way the function deals with NULL input for the label argument and changed a loop message.
 
 source("requirements.R")
 p_load(stringi)
@@ -108,14 +107,18 @@ if( length(loci)>1 ){
 # ----------------------------------------------------------
 # Bootstrap function for confidence intervals
 bootFst = function(){
-	# function to generate a mean Fst for each sample
+
+  	# function to generate a mean Fst for each sample
 	sampleFst = function( i ){
-		print(i)
+
+	  cat(paste0("I'm on ", i, " out of ", no.samples, " samples.\n"))
+	  
 		subpops = subset( pops, sapply( 1:length(pops), function(z) any(pops[z]==pair) ) )
 		index.sample = sapply( subpops, function(z){ set = which(d[,1]== z); sample( set, length(set), replace = TRUE ) } )
 		index.sample = unlist( index.sample )
 		ans = Fst.gen( d[index.sample,] )
 		res = ans$mean.fst
+
 		res }
 	# resample
 	btfst = lapply( 1:no.samples, sampleFst )	
