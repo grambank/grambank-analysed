@@ -14,7 +14,11 @@ if (!file.exists("output/spatiophylogenetic_modelling/processed_data/jaeger_prun
 source('spatiophylogenetic_modelling/analysis/varcov_spatial.R')
 
 # Check that INLA is installed
-#source(file.path("spatiophylogenetic_modelling", "install_inla.R")) 
+
+if (!is_installed("INLA")) { 
+  cat("INLA wasn't installed, installing now.\n") 
+  source(file.path("spatiophylogenetic_modelling", "install_inla.R")) 
+}
 
 #make output dirs
 if (!dir.exists("output/spatiophylogenetic_modelling/")) {
