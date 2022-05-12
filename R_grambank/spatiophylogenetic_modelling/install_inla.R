@@ -1,32 +1,42 @@
 source("requirements.R")
 
-# Check that INLA is installed
-if (!is_installed("INLA")) { 
-  cat("INLA wasn't installed, installing now.\n") 
-  # 1. Install BiocManager using: 
-  pacman::p_load("BiocManager")
+R_version <- 4.2
+testing <- "yes"
+experimental <- "yes"
   
-  # 2. Install INLA dependencies with BiocManager using: 
+
+h_load("BiocManager")
+
+  # Install INLA dependencies with BiocManager using: 
   BiocManager::install(c("graph","Rgraphviz",
                          "rgdal",
                          "rgl",
                          "spdep"))
   
-  # 3. Update foreach (although it unclear how vital this step was) using: 
-  #install.packages("foreach")
+  # Update foreach (although it unclear how vital this step was) using: 
+  h_load("foreach")
   
   # 4. Install INLA using: 
   # NOTE: This is a big download
-  install.packages("INLA", repos=c(getOption("repos"), 
+
+    if(testing != "yes"){
+    
+      if (!is_installed("INLA")) { 
+      cat("INLA wasn't installed, installing now.\n") 
+    
+      install.packages("INLA", repos=c(getOption("repos"), 
                                    INLA="https://inla.r-inla-download.org/R/stable"), 
                    dep=TRUE)
-  } else {
-  cat("Great, INLA was already installed, loading now.\n") 
-}
+  }}else{
+  
+  install.packages("INLA",repos=c(getOption("repos"),INLA="https://inla.r-inla-download.org/R/testing"), dep=TRUE)
+  }
+  
+
 suppressPackageStartupMessages(
   library(INLA, quietly = T, warn.conflicts = F, verbose = F)
-)
+  )
 
-
-
-
+if(experimental== "yes"){
+inla.setOption(inla.mode="experimental")
+}
