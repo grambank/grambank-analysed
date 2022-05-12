@@ -141,7 +141,7 @@ cfx_AUTOTYP_area_list %>%
 
 #families
 
-cut_off_vec <- c(1, 3, 5, 10, 20, 50)
+cut_off_vec <- c(3, 5, 10, 20, 50)
 
 for(i in cut_off_vec) {
   cat("Running the Muthukrishna Cfst for families with a cut-off at ", i, ".\n")
@@ -177,18 +177,22 @@ cfx_Family_ID_list <-cfx_Family_ID_matrix %>%
 
 cfx_Family_ID_list$Vars <- fct_reorder(cfx_Family_ID_list$Vars, cfx_Family_ID_list$Value_cfx)
 
+plot_title <- paste0("muthukrishan_cfx_family_id_cut_off_", cut_off)
+
 cfx_Family_ID_list %>% 
   ggplot(aes(x = Vars, y = Value_cfx)) +
   geom_bar(aes(fill = 1 - Value_cfx), stat = "identity") +
   theme_classic() +
-  theme(text = element_text(angle = 70, hjust = 1, size = 20), 
-        legend.position = "None", 
-        axis.title.x = element_blank())
+  theme(legend.position = "None", 
+        axis.title.x = element_blank(), 
+        axis.ticks.x = element_blank(), 
+        axis.text.x = element_blank()) +
+  ggtitle(plot_title) 
 
 mean(cfx_Family_ID_list$Value_cfx)
 
-ggsave(filename = file.path(OUTPUTDIR, "cfx_barplot_Family_ID_cut_off_", cut_off, ".png"), height =  7.89, width =  8.61)
+ggsave(filename = paste0(OUTPUTDIR, "cfx_barplot_Family_ID_cut_off_", cut_off, ".png"), height =  7.89, width =  8.61)
 
 cfx_Family_ID_list %>% 
-  write_tsv(file = file.path(OUTPUTDIR, "cfx_Family_ID_list_cut_off_", cut_off, ".tsv"))
+  write_tsv(file = paste0(OUTPUTDIR, "cfx_Family_ID_list_cut_off_", cut_off, ".tsv"))
 }
