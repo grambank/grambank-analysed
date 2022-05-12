@@ -1,4 +1,7 @@
 
+#function to check if a pkg is installed or not, if not it installs it and either way it's loaded.
+#inspired by pacman::p_load()
+
 h_load <- function(pkg, verbose = T){
 #  p <- "ggpubr"
 #  pkg <- (geiger, ape)
