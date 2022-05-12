@@ -14,7 +14,7 @@ if (!file.exists("output/spatiophylogenetic_modelling/processed_data/jaeger_prun
 source('spatiophylogenetic_modelling/analysis/varcov_spatial.R')
 
 # Check that INLA is installed
-source(file.path("spatiophylogenetic_modelling", "install_inla.R")) 
+#source(file.path("spatiophylogenetic_modelling", "install_inla.R")) 
 
 #make output dirs
 if (!dir.exists("output/spatiophylogenetic_modelling/")) {
@@ -55,11 +55,6 @@ cov2precision = function(spatial_covar_mat){
   spatial_prec_mat = solve(spatial_covar_mat)
   spatial_prec_mat
 }
-
-# useful objects
-join_columns = c("2.5%", "50%", "97.5%", "Feature_ID", 
-                 "effect", "waic", "model")
-
 
 #### Main Analyses ####
 
@@ -239,7 +234,6 @@ cat(paste0("# Running the phylo-only model on feature ",
                                  control.family = list(control.link=list(model="logit")),   
                                  data = grambank_df,family = "binomial")
                             })
-
 
   if (class(output) != "try-error") {
   
