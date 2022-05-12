@@ -3,13 +3,21 @@ source("requirements.R")
 #Glottolog df for language level merging and codes
 glottolog_df<- read_tsv("output/non_GB_datasets/glottolog-cldf_wide_df.tsv", col_types = cols()) %>% 
   mutate(Language_level_ID = ifelse(is.na(Language_level_ID), Language_ID, Language_level_ID)) %>% 
+<<<<<<< HEAD
   mutate(Family_ID = ifelse(is.na(Family_ID), Language_level_ID, Family_ID)) %>% 
+=======
+    mutate(Family_ID = ifelse(is.na(Family_ID), Language_level_ID, Family_ID)) %>% 
+>>>>>>> parent of f630ffa (move old rarity script to old_scripts dir)
   dplyr::select(Glottocode, "ISO_639"= ISO639P3code, Language_level_ID, level, Family_ID,Longitude, Latitude) 
 
 e24 <- read_tsv("ethnologue_data/Table_of_Languages.tab", show_col_types = F) %>% 
   dplyr::select("ISO_639", L1_Users, All_Users, EGIDS, Is_Written, Institutional) %>% 
   left_join(glottolog_df)
+<<<<<<< HEAD
 
+=======
+  
+>>>>>>> parent of f630ffa (move old rarity script to old_scripts dir)
 #reading in unusualness scores.
 # a low number (-86 compared to -40) makes you RARER
 unusualness_score <- read_tsv("output/unusualness/tables/scores.tsv") %>% 
@@ -24,16 +32,26 @@ data <- e24 %>%
   mutate(L2_log10 = log10(L2+1)) %>% 
   dplyr::select(Glottocode, unusualness_score, L1, All_Users, L2, L2_prop, L1_log10 ,L2_log10, EGIDS, Is_Written, Institutional, Longitude, Latitude, Family_ID) %>% 
   mutate(Official = if_else(str_detect(EGIDS, "0") | #making a new variable for every language that has EGIDS of 0, 1 or 2
+<<<<<<< HEAD
                               str_detect(EGIDS, "1") |  
                               str_detect(EGIDS, "2"), "Official", "Not Official" )) %>% 
+=======
+                            str_detect(EGIDS, "1") |  
+                            str_detect(EGIDS, "2"), "Official", "Not Official" )) %>% 
+>>>>>>> parent of f630ffa (move old rarity script to old_scripts dir)
   mutate(Official = if_else(str_detect(EGIDS, "10"), "Not Official", Official)) %>%  #making it so that cases where EGIDS is 10 are set to "Not Official"
   filter(!is.na(unusualness_score)) %>% 
   mutate(EGIDS = str_replace_all(EGIDS, "a", "" )) %>% 
   mutate(EGIDS = str_replace_all(EGIDS, "b", "" )) %>% 
   mutate(EGIDS = str_replace_all(EGIDS, "x", "" )) %>% 
   mutate(EGIDS = as.numeric(EGIDS))
+<<<<<<< HEAD
 
 
+=======
+  
+   
+>>>>>>> parent of f630ffa (move old rarity script to old_scripts dir)
 #Having a look at the data overall in a scatter plot matrix
 pairs.panels(data[, 2:12], 
              method = "pearson", # correlation method
@@ -67,6 +85,7 @@ vcv_tree <- vcv.phylo(phylogenetic_tree)
 ###BRMS
 
 formula_for_brms <- unusualness_score ~ L1_log10 + L2_log10 + Is_Written + Official +
+<<<<<<< HEAD
   (1 | gr(Glottocode, cov = vcv_tree)) +
   (L1_log10 + L2_log10 + Is_Written + Official | Family_ID)
 
@@ -77,10 +96,23 @@ full_model <- brms::brm(formula = formula_for_brms,
                         iter = 10000,
                         cores = 4,
                         control = list(adapt_delta =0.99, max_treedepth=15)
+=======
+                                           (1 | gr(Glottocode, cov = vcv_tree)) +
+                                           (L1_log10 + L2_log10 + Is_Written + Official | Family_ID)
+
+full_model <- brms::brm(formula = formula_for_brms,
+                    data = filter(inner_joined_df, !is.na(L1), !is.na(L2)),
+                    data2 = list(vcv_tree= vcv_tree),
+                    iter = 7500,
+                    iter = 10000,
+                    cores = 4,
+                    control = list(adapt_delta =0.99, max_treedepth=15)
+>>>>>>> parent of f630ffa (move old rarity script to old_scripts dir)
 ) %>% add_criterion("waic")
 full_model %>% broom.mixed::tidy() %>% write_csv("output/unusualness/analysis/full_model.csv")
 
 simplified_model <- brms::brm(unusualness_score ~ 1 + (1 | gr(Glottocode, cov = vcv_tree)),
+<<<<<<< HEAD
                               data = filter(inner_joined_df, !is.na(L1), !is.na(L2)),
                               data2 = list(vcv_tree= vcv_tree),
                               iter = 7500,
@@ -90,3 +122,14 @@ simplified_model <- brms::brm(unusualness_score ~ 1 + (1 | gr(Glottocode, cov = 
 simplified_model %>% broom.mixed::tidy() %>% write_csv("output/unusualness/analysis/simplified_model.csv")
 
 loo_compare(full_model, simplified_model, criterion="waic") %>% as.tibble() %>% write_csv("output/unusualness/analysis/model_comparison.csv")
+=======
+                    data = filter(inner_joined_df, !is.na(L1), !is.na(L2)),
+                    data2 = list(vcv_tree= vcv_tree),
+                    iter = 7500,
+                    iter = 25000,
+                    control = list(adapt_delta =0.99, max_treedepth=15)
+) %>% add_criterion("waic")
+simplified_model %>% broom.mixed::tidy() %>% write_csv("output/unusualness/analysis/simplified_model.csv")
+
+loo_compare(full_model, simplified_model, criterion="waic") %>% as.tibble() %>% write_csv("output/unusualness/analysis/model_comparison.csv")
+>>>>>>> parent of f630ffa (move old rarity script to old_scripts dir)
