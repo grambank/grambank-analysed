@@ -6,79 +6,80 @@ n_total <- 2467
 n_imputed <- 1509
 n_overlap_imputed_and_jaeger_tree <- 1265
 
-
 #installing packages
-if (!suppressPackageStartupMessages(require("pacman"))) { install.packages("pacman") }
+#if (!suppressPackageStartupMessages(require("pacman"))) { install.packages("pacman") }
+source("fun_def_h_load.R")
 
-pacman::p_load(
-	tidyverse,
-	readr,
-	fields,
-	reshape2,
-	broom,
-#	plyr,
-	broom.mixed, 
-	naniar, 
-	glue,
-	forcats,
-	magrittr,
-	stringr,
-	brms,
-	purrr,
-	rcompanion, 
+h_load(verbose = F, pkg = c(
+	"tidyverse",
+	"readr",
+	"fields",
+	"reshape2",
+	"broom",
+#	"plyr",
+	"broom.mixed", 
+	"naniar", 
+	"glue",
+	"forcats",
+	"magrittr",
+	"stringr",
+	"brms",
+	"purrr",
+	"rcompanion", 
 
-	MASS,
-	matrixStats,
-	cluster, 
+	"MASS",
+	"matrixStats",
+	"cluster", 
 
-	# imputation
-	missForest,
+	# "imputation
+	"missForest",
 	
 	#plotting graphs
-	scales,
-	RColorBrewer,
-	ggpubr,
-	ggplot2,
-#	cowplot,
-	ggrepel,
-	gplots,
-	ggridges,
-	grid,
-	gridExtra,
-	scales,
-	ggmap,
-	nFactors,
-	psych, #for scatterplot matrix
-	viridis,
-	rlang,
-	devtools,
-	patchwork,
-	
+	"scales",
+	"RColorBrewer",
+  "car",
+	"ggpubr",
+	"ggplot2",
+#	cowplot",
+	"ggrepel",
+	"gplots",
+	"ggridges",
+	"grid",
+	"gridExtra",
+	"scales",
+	"ggmap",
+	"nFactors",
+	"psych", #for scatterplot matrix
+	"viridis",
+	"rlang",
+	"devtools",
+	"patchwork",
+		
 	#making maps
-	mapdata,
-	maptools,
-	mapproj,
-	maps,
+	"mapdata",
+	"maptools",
+	"mapproj",
+	"maps",
 	
 	#sensitivity testing spatial
-#	rnaturalearth,
-#	rnaturalearthdata,
-	ggforce, 
-	geosphere,
-  sf,
+#	rnaturalearth",
+#	rnaturalearthdata",
+"ggforce", 
+	"geosphere",
+"sf",
 	
 	# phylogenetic packages
-	ape,
-	phytools,
-	caper, 
-  synchrony,
-  geiger,
-  synchrony,
+"ape",
+"phytools",
+	"caper", 
+"synchrony",
+  "geiger",
+"synchrony",
 
 	# testing
-	assertthat,
-	testthat
-)
+	"assertthat",
+"testthat"
+))
 
 # quiet down, tidyverse:
 options(tidyverse.quiet = TRUE)
