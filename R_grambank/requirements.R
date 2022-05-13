@@ -60,6 +60,9 @@ h_load(verbose = F, pkg = c(
 	"maptools",
 	"mapproj",
 	"maps",
+
+#unsualness
+"BayesLCA",
 	
 	#sensitivity testing spatial
 #	rnaturalearth",

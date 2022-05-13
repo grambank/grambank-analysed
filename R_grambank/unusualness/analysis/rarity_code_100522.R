@@ -5,9 +5,8 @@
 ## (1) Setup
 #########################################
 
-# Load general purpose libraries
-require(tidyverse)
-require(ggplot2)
+# Load pkgs
+source("requirements.R")
 
 # Load imputed binarized GB data
 gb<-read_tsv("/Users/damian/Documents/GitHub/grambank-analysed/R_grambank/GB_wide/GB_wide_imputed_binarized.tsv")
