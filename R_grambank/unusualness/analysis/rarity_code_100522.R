@@ -146,9 +146,6 @@ ggplot(rarity_df,aes(x=surprisal,y=..density..))+
 ## (5) Model rarity in terms of genealogical and areal covariates
 #########################################
 
-# Load libraries
-require(brms)
-
 # Enrich GB 
 rarity_ext<-rarity_df %>%
   left_join(gb_ext)
@@ -193,7 +190,7 @@ rarity_ext %>%
   arrange(desc(surprisal_z))
 
 # Plot outliers
-require(ggrepel)
+
 rarity_ext %>%
   filter(abs(rarity_ext$surprisal_z)>2.3) %>%
   ggplot(aes(x=1,y=surprisal_z,label=Name,color=surprisal_z))+
