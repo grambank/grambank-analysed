@@ -50,7 +50,7 @@ cat(paste0(
 # II. reasonably independent from features in other bundles
 
 # Produce a hierarchical clustering of the features
-gower_gb<-cluster::daisy(t(gb[,-1]), metric = "gower")
+gower_gb<-cluster::daisy(t(gb[,-1]), metric = "gower", warnBin = F)
 hier_gb<-hclust(gower_gb, method = "complete")
 
 # Plot the resulting clusters and highlight the four largest clusters
