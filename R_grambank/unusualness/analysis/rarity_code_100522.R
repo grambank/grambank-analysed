@@ -9,13 +9,17 @@
 source("requirements.R")
 
 # Load imputed binarized GB data
-gb<-read_tsv("/Users/damian/Documents/GitHub/grambank-analysed/R_grambank/GB_wide/GB_wide_imputed_binarized.tsv")
+gb<-read_tsv("output/GB_wide/GB_wide_imputed_binarized.tsv", col_types = cols())
 
 # Load Glottolog families, AUTOTYP areas, and AES endangerment
-gb_ext<-read_tsv("/Users/damian/Documents/GitHub/grambank-analysed/R_grambank/non_GB_datasets/glottolog-cldf_wide_df.tsv") %>%
-  select(Language_ID,Macroarea,Family_ID,aes,level,Name) %>%
-  full_join(read_tsv("/Users/damian/Documents/GitHub/grambank-analysed/R_grambank/non_GB_datasets/glottolog_AUTOTYP_areas.tsv")) %>%
-  right_join(gb[,"Language_ID"])
+# Add autotyp areas to language tibble
+autotyp_areas <- read_tsv(file.path("output", "non_GB_datasets", "glottolog_AUTOTYP_areas.tsv"), col_types = cols()) %>%
+  dplyr::select(Language_ID, AUTOTYP_area) 
+
+gb_ext<-read_tsv("output/non_GB_datasets/glottolog-cldf_wide_df.tsv", col_types = cols()) %>%
+  dplyr::select(Language_ID,Macroarea,Family_ID,aes,level,Name) %>%
+  full_join(autotyp_areas, by = "Language_ID"  ) %>% 
+  right_join(gb[,"Language_ID"], by = "Language_ID"  )
 
 # If no language family is assigned to a language then it's an isolate - in which case, use the name of the language as that of the family
 gb_ext<-gb_ext %>%
