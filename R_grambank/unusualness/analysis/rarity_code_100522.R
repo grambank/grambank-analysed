@@ -24,13 +24,22 @@ gb_ext<-read_tsv("output/non_GB_datasets/glottolog-cldf_wide_df.tsv", col_types 
 # If no language family is assigned to a language then it's an isolate - in which case, use the name of the language as that of the family
 gb_ext<-gb_ext %>%
   mutate(Family=ifelse(is.na(Family_ID)&level=="language",Language_ID,Family_ID)) %>%
-  select(-Family_ID)
+  dplyr::select(-Family_ID)
 
 # Check the coverage of the covariates
-sum(!is.na(gb_ext$Macroarea))/nrow(gb_ext)
-sum(!is.na(gb_ext$AUTOTYP_area))/nrow(gb_ext)
-sum(!is.na(gb_ext$Family))/nrow(gb_ext)
-sum(!is.na(gb_ext$aes))/nrow(gb_ext)
+na_macroarea <- sum(!is.na(gb_ext$Macroarea))/nrow(gb_ext)
+na_autotyp_area <- sum(!is.na(gb_ext$AUTOTYP_area))/nrow(gb_ext)
+na_family <- sum(!is.na(gb_ext$Family))/nrow(gb_ext)
+na_aes <-sum(!is.na(gb_ext$aes))/nrow(gb_ext) 
+
+cat(paste0(
+  "There is \n",
+  100 - (na_macroarea*100), "% missing data for macroarea\n",
+  100 - (na_autotyp_area*100), "% missing data for AUTOTYP-area\n",
+  100 - (na_family*100), "% missing data for Family memberhsip\n",
+  round(100 - (na_aes*100), 2), "% missing data for aes-status.\n"
+  ))
+
 
 #########################################
 ## (2) Determine clusters 
