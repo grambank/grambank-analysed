@@ -51,7 +51,7 @@ plot_df <- GB_cropped %>%
 
 plot_df[1:6,]
 
-p_load("txtplot")
+h_load("txtplot")
 
 txtplot::txtboxplot(plot_df$n, width = 50)
 
@@ -141,7 +141,7 @@ cfx_AUTOTYP_area_list %>%
 
 #families
 
-cut_off_vec <- c(3, 5, 10, 20, 50)
+cut_off_vec <- c(0, 1, 3, 5, 10, 20, 50)
 
 for(i in cut_off_vec) {
   cat("Running the Muthukrishna Cfst for families with a cut-off at ", i, ".\n")
