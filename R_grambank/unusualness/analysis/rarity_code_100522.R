@@ -5,6 +5,16 @@
 ## (1) Setup
 #########################################
 
+#setup outpur dirs
+OUTPUTDIR <- file.path("output/unusualness/")
+if (!dir.exists(OUTPUTDIR)) { dir.create(OUTPUTDIR) }		
+
+OUTPUTDIR_tables <- file.path("output/unusualness/tables")
+if (!dir.exists(OUTPUTDIR_tables)) { dir.create(OUTPUTDIR_tables) }		
+
+OUTPUTDIR_plots <- file.path("output/unusualness/plots")
+if (!dir.exists(OUTPUTDIR_plots)) { dir.create(OUTPUTDIR_plots) }		
+
 # Load pkgs
 source("requirements.R")
 
@@ -134,6 +144,8 @@ rarity_df<-plyr::ldply(cluster_list,
 rarity_df$Language_ID<-gb$Language_ID
 rarity_df<-rarity_df %>%
   select(-lg)
+
+rarity_df %>% write_tsv(file = paste0(OUTPUTDIR_tables, "DB_rarity.tsv"))
   
 # Plot
 ggplot(rarity_df,aes(x=surprisal,y=..density..))+
@@ -181,7 +193,7 @@ rarity_ext %>%
   theme(legend.position="none")+
   theme(plot.background = element_rect(fill="white"))
 
-ggsave("unexpected_surprisal.png",height=4,width=7)
+ggsave(filename = paste0(OUTPUTDIR_plots, "unexpected_surprisal.png"),height=4,width=7)
 
 # Check outliers
 rarity_ext %>%
@@ -203,7 +215,7 @@ rarity_ext %>%
   scale_color_gradient2()
 
 
-ggsave("unexpected_surprisal_lgs.png",height=7,width=6)
+ggsave(filename = paste0(OUTPUTDIR_plots, "unexpected_surprisal_lgs.png"),height=7,width=6)
 
 
 #########################################
