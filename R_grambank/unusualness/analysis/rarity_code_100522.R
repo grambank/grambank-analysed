@@ -69,9 +69,6 @@ hier_classes <- cutree(hier_gb,
 # Here we take the clusters from the previous section, and within each we induce an optimal number of latent classes using
 # a Bayesian implementation of LCA
 
-# Load library
-require(BayesLCA)
-
 # Set a range of latent clusters to explore for each cluster
 k_range<-c(2:4)
 
