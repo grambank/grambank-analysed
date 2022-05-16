@@ -104,6 +104,12 @@ x <- assert_that(all(dim(phylo_prec_mat) == c(n_overlap_imputed_and_jaeger_tree,
                 n_overlap_imputed_and_jaeger_tree)), 
                 msg = "The phylogeny has changed and will not match the data")
 
+phylo_covar_mat %>% 
+  as.data.frame() %>% 
+  rownames_to_column("Language_ID") %>% 
+  write_tsv(file = paste0(OUTPUTDIR, "/phylo_covar_mat.tsv"))
+
+
 phylo_prec_mat  %>% 
   as.data.frame() %>% 
   rownames_to_column("Language_ID") %>% 
@@ -130,4 +136,10 @@ spatial_prec_mat %>%
   as.data.frame() %>% 
   rownames_to_column("Language_ID") %>% 
   write_tsv(file = paste0(OUTPUTDIR, "/spatial_prec_mat.tsv"))
+
+
+spatial_covar_mat %>% 
+  as.data.frame() %>% 
+  rownames_to_column("Language_ID") %>% 
+  write_tsv(file = paste0(OUTPUTDIR, "/spatial_covar_mat.tsv"))
 
