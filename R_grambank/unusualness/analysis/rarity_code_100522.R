@@ -142,8 +142,8 @@ rarity_df<-plyr::ldply(cluster_list,
 
 # Reattach glottocodes
 rarity_df$Language_ID<-gb$Language_ID
-rarity_df<-rarity_df %>%
-  select(-lg)
+rarity_df<-rarity_df %>% 
+  dplyr::select(-lg)
 
 rarity_df %>% write_tsv(file = paste0(OUTPUTDIR_tables, "DB_rarity.tsv"))
   
@@ -182,6 +182,8 @@ rarity_ext$surprisal_pred<-predicted_surprisal$Estimate
 rarity_ext$surprisal_er<-predicted_surprisal$'Est.Error'
 rarity_ext<-rarity_ext %>%
   mutate(surprisal_z=(surprisal-surprisal_pred)/surprisal_er)
+
+rarity_ext %>% write_tsv(file = paste0(OUTPUTDIR_tables, "DB_rarity_surprisal.tsv"))
 
 # Plot this
 rarity_ext %>%
