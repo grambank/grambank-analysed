@@ -1,4 +1,4 @@
-#This script requires both get_unsualness_bayesLCA and predict surprisal to have be run prior.
+#This script requires both get_unusualness_bayesLCA and predict surprisal to have be run prior.
 
 # Set working directory for output
 #setup outpur dirs
@@ -16,7 +16,7 @@ source("requirements.R")
 
 surprisal_fn <- paste0(OUTPUTDIR_tables, "surprisal.tsv")
 if(!file.exists(surprisal_fn)){
-  source("unusualness/analysis/get_unsualness_bayesLCA.R")
+  source("unusualness/analysis/get_unusualness_bayesLCA.R")
 }
 gb <- read_tsv(file = surprisal_fn)
 
@@ -137,8 +137,8 @@ gb_lca %>%
 
 # Plot outliers
 require(ggrepel)
-unsualness_ext %>%
-  filter(abs(unsualness_ext$surprisal_z)>2.3) %>%
+unusualness_ext %>%
+  filter(abs(unusualness_ext$surprisal_z)>2.3) %>%
   ggplot(aes(x=1,y=surprisal_z,label=Name,color=surprisal_z))+
   geom_text_repel(max.overlaps = 400,force_pull = 0.5)+
   theme_minimal()+
@@ -176,10 +176,10 @@ plyr::ddply(gb[gb$Estimator=="prob_lca"&!is.na(gb$aes),],"Macroarea",function(x)
   theme(legend.position = "none")
 
 #########################################
-## (6) unsualness and endangerment
+## (6) unusualness and endangerment
 #########################################
 
-# Plot unsualness
+# Plot unusualness
 gb %>%
   filter(Estimator=="prob_lca") %>%
   mutate(Endagerement=fct_reorder(aes,Surprisal)) %>%
@@ -191,8 +191,8 @@ gb %>%
   theme(legend.position="none")+
   coord_flip()
 
-# Plot z-unsualness
-unsualness_ext %>%
+# Plot z-unusualness
+unusualness_ext %>%
   mutate(Endagerement=fct_reorder(aes,surprisal_z)) %>%
   ggplot(aes(y=surprisal_z,x=Endagerement))+
   geom_boxplot()+

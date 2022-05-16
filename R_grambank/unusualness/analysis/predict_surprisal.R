@@ -15,14 +15,14 @@ source("requirements.R")
 
 surprisal_fn <- paste0(OUTPUTDIR_tables, "surprisal.tsv")
 if(!file.exists(surprisal_fn)){
-  source("unusualness/analysis/get_unsualness_bayesLCA.R")
+  source("unusualness/analysis/get_unusualness_bayesLCA.R")
 }
 gb <- read_tsv(file = surprisal_fn)
 
 ### NEXT PART REQUIRES MATRICES ETC
 
 #########################################
-## (5) Model unsualness in terms of genealogical, areal covariates, and endangerement status
+## (5) Model unusualness in terms of genealogical, areal covariates, and endangerement status
 #########################################
 
 # Recode endangerment
