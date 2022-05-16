@@ -156,7 +156,7 @@ LCA_clusters<-lapply(c(1:n_clusters),function(x) k_choose(x))
 # Finally, and based on the latent classes obtained before, attach rarities to each observation given a cluster
 
 # Function that attaches probabilities and surprisals according to this model *within each cluster*
-estimate_unsualness_LCA<-function(lca,df) {
+estimate_unusualness_LCA<-function(lca,df) {
   
   p_item<-lca$itemprob # Get the latent probabilities
   
@@ -184,16 +184,16 @@ estimate_prob_LCA<-function(obs,p){
 cluster_list<-c(1:n_clusters)
 names(cluster_list)<-cluster_list
   
-unsualness_df<-plyr::ldply(cluster_list,
-                       function(x) estimate_unsualness_LCA(LCA_clusters[[x]],gb[,names(hier_classes[hier_classes==x])]),
+unusualness_df<-plyr::ldply(cluster_list,
+                       function(x) estimate_unusualness_LCA(LCA_clusters[[x]],gb[,names(hier_classes[hier_classes==x])]),
                        .id="Cluster") %>%
   plyr::ddply("lg",function(x) data.frame(prob_lca=prod(x$prob)))
 
 
-unsualness_df %>% write_tsv(file = paste0(OUTPUTDIR_tables, "unsualness.tsv"))
+unusualness_df %>% write_tsv(file = paste0(OUTPUTDIR_tables, "unusualness.tsv"))
 
 # Enrich GB data
-gb$prob_lca<-unsualness_df$prob_lca
+gb$prob_lca<-unusualness_df$prob_lca
 
 #########################################
 ## (4) Compare and visualize probabilities and surprisals
