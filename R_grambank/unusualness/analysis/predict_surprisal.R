@@ -30,38 +30,33 @@ gb<-gb %>%
   mutate(Endangerement=ifelse(aes %in% c("threatened","moribund","nearly_extinct"),"endangered",aes))
 
 
-spatial_prec_mat_fn <- "output/spatiophylogenetic_modelling/spatial_prec_mat.tsv"
-if(!file.exists(spatial_prec_mat_fn)){
+spatial_covar_mat_fn <- "output/spatiophylogenetic_modelling/spatial_covar_mat.tsv"
+if(!file.exists(spatial_covar_mat_fn)){
   source("spatiophylogenetic_modelling/analysis/make_vcvs.R")
 }
 
-spatial_prec_mat <- read_tsv(spatial_prec_mat_fn, show_col_types = F) %>% 
+spatial_covar_mat <- read_tsv(spatial_covar_mat_fn, show_col_types = F) %>% 
   column_to_rownames("Language_ID") %>% 
   as.matrix()
 
-phylo_prec_mat_fn <- "output/spatiophylogenetic_modelling/phylo_prec_mat.tsv"
-if(!file.exists(phylo_prec_mat_fn)){
+phylo_covar_mat_fn <- "output/spatiophylogenetic_modelling/phylo_covar_mat.tsv"
+if(!file.exists(phylo_covar_mat_fn)){
   source("spatiophylogenetic_modelling/analysis/make_vcvs.R")
 }
 
-phylo_prec_mat <- read_tsv(phylo_prec_mat_fn, show_col_types = F) %>% 
+phylo_covar_mat <- read_tsv(phylo_covar_mat_fn, show_col_types = F) %>% 
   column_to_rownames("Language_ID") %>% 
   as.matrix()
 
 
-
-
-
-
-
+formula <- Surprisal~
+  (1 | gr(Glottocode, cov = spatial_covar_mat)) +
+  (1 | gr(Glottocode, cov = phylo_covar_mat))  (1|Family)+
+  Endangerement
 
 # Function that obtains a predictive model of surprisal
 model_surprisal<-function(df) {
-  m<-brm(Surprisal~
-           (1|Macroarea)+
-           (1|AUTOTYP_area)+
-           (1|Family)+
-           Endangerement,
+  m<-brm(formula = formula,
          data=df,
          chains = 4,
          iter = 12000,
