@@ -103,7 +103,6 @@ gb<-gb %>%
   add_kernel_probabilities(gb_dists,40)
   
 
-
 #########################################
 ## (3) Density estimation - Bayesian LCA
 #########################################
@@ -115,11 +114,10 @@ gb<-gb %>%
 # I. they are highly correlated within them and 
 # II. reasonably independent from features in other bundles
 
-# Load libraries
-require(factoextra)
-
 # Get gap statistic for each number of clusters
-fviz_nbclust(t(gb[,gb_features]), FUN = hcut, method = "gap_stat")
+#test <- factoextra::fviz_nbclust(t(gb[,gb_features]), FUN = hcut, method = "gap_stat")
+
+#test2 <- cluster::clusGap(t(gb[,gb_features]), FUN = hcut, method = "gap_stat", K.max = 30)
 
 # 9 clusters selected as optimal according to this criterion
 n_clusters<-9
@@ -133,9 +131,6 @@ hier_classes<-hier_gb$cluster
 
 # Here we take the clusters from the previous section, and within each we induce an optimal 
 # number of latent classes using a Bayesian implementation of LCA
-
-# Load library
-require(BayesLCA)
 
 # Set a range of latent clusters to explore for each cluster
 k_range<-c(1:6)

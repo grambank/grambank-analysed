@@ -63,6 +63,8 @@ h_load(verbose = F, pkg = c(
 
 #unsualness
 "BayesLCA",
+"factoextra",
+"GGally",
 	
 	#sensitivity testing spatial
 #	rnaturalearth",
