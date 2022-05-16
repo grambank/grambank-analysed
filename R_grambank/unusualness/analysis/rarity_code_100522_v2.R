@@ -6,28 +6,65 @@
 #########################################
 
 # Set working directory for output
-setwd("/Users/damian/Documents/GitHub/grambank-analysed/R_grambank/rarity")
+#setup outpur dirs
+OUTPUTDIR <- file.path("output/unusualness/")
+if (!dir.exists(OUTPUTDIR)) { dir.create(OUTPUTDIR) }		
 
-# Load general purpose libraries
-require(tidyverse)
-require(ggplot2)
+OUTPUTDIR_tables <- file.path("output/unusualness/tables")
+if (!dir.exists(OUTPUTDIR_tables)) { dir.create(OUTPUTDIR_tables) }		
+
+OUTPUTDIR_plots <- file.path("output/unusualness/plots")
+if (!dir.exists(OUTPUTDIR_plots)) { dir.create(OUTPUTDIR_plots) }		
+
+# Load pkgs
+source("requirements.R")
 
 # Load imputed binarized GB data, Glottolog families, AUTOTYP areas, and AES endangerment
-gb<-read_tsv("/Users/damian/Documents/GitHub/grambank-analysed/R_grambank/non_GB_datasets/glottolog-cldf_wide_df.tsv") %>%
-  select(Language_ID,Macroarea,Family_ID,aes,level,Name) %>%
-  full_join(read_tsv("/Users/damian/Documents/GitHub/grambank-analysed/R_grambank/non_GB_datasets/glottolog_AUTOTYP_areas.tsv")) %>%
-  right_join(read_tsv("/Users/damian/Documents/GitHub/grambank-analysed/R_grambank/GB_wide/GB_wide_imputed_binarized.tsv"))
+# Load imputed binarized GB data
+if(!file.exists("output/GB_wide/GB_wide_imputed_binarized.tsv")){
+  source("make_wide.R")
+  source("make_wide_binarized.R")
+  source("impute_missing_values.R")
+}
 
-# If no language family is assigned to a language then it's an isolate - in which case, use the name of the language as that of the family
-gb<-gb %>%
-  mutate(Family=ifelse(is.na(Family_ID)&level=="language",Language_ID,Family_ID)) %>%
-  select(-Family_ID)
+gb<-read_tsv("output/GB_wide/GB_wide_imputed_binarized.tsv", col_types = cols())
 
+# Load Glottolog families, AUTOTYP areas, and AES endangerment
+# Add autotyp areas to language tibble
+AUTOTYP_area_fn <- "output/non_GB_datasets/glottolog_AUTOTYP_areas.tsv"
+if(!file.exists(AUTOTYP_area_fn)){
+  source("unusualness/processing/assigning_AUTOTYP_areas.R")
+}
+autotyp_areas <- read_tsv(AUTOTYP_area_fn, col_types = cols()) %>%
+  dplyr::select(Language_ID, AUTOTYP_area) 
+
+glottolog_fn <- "output/non_GB_datasets/glottolog-cldf_wide_df.tsv"
+if(!file.exists(glottolog_fn)) {
+  source("make_glottolog-cldf_table.R")
+}
+glottolog_df <-read_tsv(glottolog_fn, col_types = cols()) %>%
+  mutate(Language_level_ID = ifelse(is.na(Language_level_ID), Language_ID, Language_level_ID)) %>%
+  mutate(Family_ID = ifelse(is.na(Family_ID), Language_level_ID, Family_ID)) %>%  # If no language family is assigned to a language then it's an isolate - in which case, use the name of the language as that of the family
+  dplyr::select(Language_ID,Macroarea,Family_ID,aes,level,Name) 
+
+gb <- gb %>% 
+  left_join(autotyp_areas,  by = "Language_ID") %>% 
+  left_join(glottolog_df,  by = "Language_ID")
+  
 # Check the coverage of the covariates
-sum(!is.na(gb$Macroarea))/nrow(gb)
-sum(!is.na(gb$AUTOTYP_area))/nrow(gb)
-sum(!is.na(gb$Family))/nrow(gb)
-sum(!is.na(gb$aes))/nrow(gb)
+na_macroarea <- sum(!is.na(gb$Macroarea))/nrow(gb)
+na_autotyp_area <- sum(!is.na(gb$AUTOTYP_area))/nrow(gb)
+na_family <- sum(!is.na(gb$Family_ID))/nrow(gb)
+na_aes <-sum(!is.na(gb$aes))/nrow(gb) 
+
+cat(paste0(
+  "There is \n",
+  100 - (na_macroarea*100), "% missing data for macroarea\n",
+  100 - (na_autotyp_area*100), "% missing data for AUTOTYP-area\n",
+  100 - (na_family*100), "% missing data for Family memberhsip\n",
+  round(100 - (na_aes*100), 2), "% missing data for aes-status.\n"
+))
+
 
 # Set a dummy variable that is all GB features
 gb_features<-colnames(gb)[startsWith(colnames(gb),"GB")]
@@ -41,8 +78,8 @@ gb_features<-colnames(gb)[startsWith(colnames(gb),"GB")]
 # they contribute to the probability mass with an exponential weight of their distance to the grammar
 
 # Investigate the distribution of Gower distances in the data
-gb_dists<-StatMatch::gower.dist(as.data.frame(gb[,gb_features]))
-  
+gb_dists<-cluster::daisy((gb[,gb_features]), metric = "gower", warnBin = F)
+
 # Plot
 gb_dists %>%
   hist()
