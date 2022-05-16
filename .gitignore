@@ -7,6 +7,7 @@ R_grambank/.Rhistory
 .Rproj.user
 
 #output directories
+*output*
 *GB_wide*
 *non_GB_datasets*
 *coverage_plots*
