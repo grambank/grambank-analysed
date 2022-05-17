@@ -7,10 +7,12 @@ n_imputed <- 1509
 n_overlap_imputed_and_jaeger_tree <- 1265
 
 #installing packages
-#if (!suppressPackageStartupMessages(require("pacman"))) { install.packages("pacman") }
+if (!suppressPackageStartupMessages(require("pacman"))) { install.packages("pacman") }
 source("fun_def_h_load.R")
 
 h_load(verbose = F, pkg = c(
+#pacman::p_load(
+  "spam",
 	"tidyverse",
 	"readr",
 	"fields",
@@ -47,7 +49,7 @@ h_load(verbose = F, pkg = c(
 	"grid",
 	"gridExtra",
 	"scales",
-	"ggmap",
+#	"ggmap",
 	"nFactors",
 	"psych", #for scatterplot matrix
 	"viridis",
@@ -56,15 +58,18 @@ h_load(verbose = F, pkg = c(
 	"patchwork",
 		
 	#making maps
+  "maps",
 	"mapdata",
-	"maptools",
+#	"maptools",
 	"mapproj",
-	"maps",
 
 #unsualness
+"e1071",
+"mvtnorm",
 "BayesLCA",
 "factoextra",
 "GGally",
+
 	
 	#sensitivity testing spatial
 #	rnaturalearth",
