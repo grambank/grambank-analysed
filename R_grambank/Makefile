@@ -36,6 +36,7 @@ data:
 	@$(MAKE) -f $(THIS_MAKEFILE) output/coverage_plots/WALS_GB_coverage_overlay.png
 	@$(MAKE) -f $(THIS_MAKEFILE) output/coverage_plots/coverage_macroarea.png
 	@$(MAKE) -f $(THIS_MAKEFILE) output/pruning_jagertree
+	Rscript unusualness/processing/assigning_AUTOTYP_areas.R
 
 output/non_GB_datasets/glottolog-cldf_wide_df.tsv:
 	@echo Fetching Glottolog language table. Note: this script requires the git submodule glottolog-cldf.
@@ -147,6 +148,10 @@ sensitivity_testing:
 predict_unusualness: 
 	@echo "## Running BRMS-analysis of unsualness scores (cluster recommended). #"
 	Rscript unusualness/analysis/predict_unusualness.R
+	
+INLA_featurewise:
+	@echo "## Running INLA-analysis featurewise. #"
+	Rscript temp_scripts_for_meetings/INLA_featurewise.R
 
 ## Test functions
 test:
