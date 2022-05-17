@@ -17,6 +17,6 @@ If you want to run scripts in this repository on your machine, it is necessary n
 
 This command will initialise and update the git submodules appropriately. Note that this includes data from grambank-cldf, so no script will run without initalising the git submodules.
 
-Be aware that we have checked out glottolog-cldf with the tag 4.4 in particular, because this is the version of Glottolog that was used to generate grambank-cldf. Checking out later versions of glottolog will cause discontinuity errors.
+Be aware that we have checked out glottolog-cldf with the tag `v4.4` in particular, because this is the version of Glottolog that was used to generate grambank-cldf. Checking out later versions of glottolog will cause discontinuity errors.
 
 You can read more about git submodules [here](https://git-scm.com/book/en/v2/Git-Tools-Submodules#_cloning_submodules).
