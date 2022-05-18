@@ -3,7 +3,10 @@
 #set this as 1 if you're just running this script on 50 lgs over 3 features to debug. Otherwise set to 0.
 debug_run = 0
 
-source("requirements.R")
+#source("requirements.R")
+source("fun_def_h_load.R")
+
+h_load(pkg = c("tidyverse", "reshape2","ape", "rlang", "assertthat" ))
 
 #If the tree hasn't been prune yet - prune the tree :)
 if (!file.exists("output/spatiophylogenetic_modelling/processed_data/jaeger_pruned.tree")) {
