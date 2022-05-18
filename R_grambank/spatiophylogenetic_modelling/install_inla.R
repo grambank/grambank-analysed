@@ -1,7 +1,5 @@
-#source("requirements.R")
-
-R_version <- 4.2
-testing <- "yes"
+R_version <- 4.1
+testing <- "no"
 experimental <- "yes"
 
 source("fun_def_h_load.R")  
@@ -23,7 +21,7 @@ h_load("BiocManager")
 
     if(testing != "yes"){
     
-      if (!is_installed("INLA")) { 
+      if (!("INLA" %in% rownames(installed.packages()))) { 
       cat("INLA wasn't installed, installing now.\n") 
     
       install.packages("INLA", repos=c(getOption("repos"), 
@@ -42,3 +40,5 @@ suppressPackageStartupMessages(
 if(experimental== "yes"){
 inla.setOption(inla.mode="experimental")
 }
+
+cat(paste0("Loaded INLA version ", packageVersion("INLA"), ".\n"))
