@@ -57,10 +57,6 @@ jaeger_pruned$tip.label <- jaeger_pruned$tip.label %>%
   dplyr::select(Language_level_ID) %>% 
   .[,1]
 
-#scaling tree
-scale = 1
-jaeger_pruned$edge.length = jaeger_pruned$edge.length/max(nodeHeights(jaeger_pruned)[,2])*scale
-
 write.tree(jaeger_pruned, "output/spatiophylogenetic_modelling/processed_data/jaeger_pruned.tree")
 
 removed <- GB_languages %>% 
