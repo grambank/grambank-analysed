@@ -27,7 +27,8 @@ h_load(verbose = F, pkg = c(
 	"stringr",
 	"brms",
 	"purrr",
-	"rcompanion", 
+	"rcompanion",
+  "qs",
 
 	"MASS",
 	"matrixStats",
