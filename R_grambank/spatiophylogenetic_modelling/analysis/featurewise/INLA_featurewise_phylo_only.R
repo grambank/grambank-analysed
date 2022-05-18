@@ -3,9 +3,8 @@
 
 cat("#### Phylogenetic only model ####\n")
 
+source("spatiophylogenetic_modelling/analysis/featurewise/INLA_featurewise_set_up.R")
 sink(file = file.path(  OUTPUTDIR , "INLA_featurewise_phylo_only_log.txt"), split = T)
-source("temp_scripts_for_meetings/INLA_featurewise_set_up.R")
-
 
 index <- 0
 

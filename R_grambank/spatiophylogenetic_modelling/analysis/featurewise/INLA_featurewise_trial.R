@@ -1,9 +1,8 @@
 #TRIAL PROCESS
 
 cat("#### Spatial & Phylo Model + AUTOTYP area ####\n")
+source("spatiophylogenetic_modelling/analysis/featurewise/INLA_featurewise_set_up.R")
 sink(file = file.path(  OUTPUTDIR , "INLA_featurewise_trial_log.txt"), split = T)
-source("temp_scripts_for_meetings/INLA_featurewise_set_up.R")
-
 
 index <- 0
 

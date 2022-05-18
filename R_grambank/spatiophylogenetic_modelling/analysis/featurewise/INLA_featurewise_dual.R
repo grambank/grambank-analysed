@@ -1,8 +1,7 @@
 
 cat("#### Spatial & Phylo Model ####\n")
+source("spatiophylogenetic_modelling/analysis/featurewise/INLA_featurewise_set_up.R")
 sink(file = file.path(  OUTPUTDIR , "INLA_featurewise_dual_log.txt"), split = T)
-source("temp_scripts_for_meetings/INLA_featurewise_set_up.R")
-
 
 index <- 0
 

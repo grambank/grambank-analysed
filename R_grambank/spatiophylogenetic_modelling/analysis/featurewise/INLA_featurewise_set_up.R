@@ -20,7 +20,7 @@ source('spatiophylogenetic_modelling/analysis/varcov_spatial.R')
 
 # Check that INLA is installed
 
-if (!is_installed("INLA")) { 
+if (!("INLA" %in% rownames(installed.packages()))) { 
   cat("INLA wasn't installed, installing now.\n") 
   source(file.path("spatiophylogenetic_modelling", "install_inla.R")) 
 }
