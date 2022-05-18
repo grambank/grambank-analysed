@@ -122,7 +122,7 @@ endangerment_analysis:
 	Rscript diversity_endangerment.R
 
 #step 6
-## INLA
+## INLA PCA
 INLA: data pca sp_models sensitivity_testing
 
 ## Phylo-spatial modelling
@@ -151,7 +151,27 @@ predict_unusualness:
 	
 INLA_featurewise:
 	@echo "## Running INLA-analysis featurewise. #"
-	Rscript temp_scripts_for_meetings/INLA_featurewise.R
+	@$(MAKE) -f $(THIS_MAKEFILE) 	INLA_featurewise_phylo_only
+	@$(MAKE) -f $(THIS_MAKEFILE) 	INLA_featurewise_spatial_only
+	@$(MAKE) -f $(THIS_MAKEFILE) 	INLA_featurewise_autotyp_area
+	@$(MAKE) -f $(THIS_MAKEFILE) 	INLA_featurewise_dual
+	@$(MAKE) -f $(THIS_MAKEFILE) 	INLA_featurewise_trial
+
+INLA_featurewise_phylo_only:
+	Rscript spatiophylogenetic_modelling/analysis/featurewise/INLA_featurewise_phylo_only.R
+
+INLA_featurewise_spatial_only:
+	Rscript spatiophylogenetic_modelling/analysis/featurewise/INLA_featurewise_spatial_only.R
+
+INLA_featurewise_autotyp_area:
+	Rscript spatiophylogenetic_modelling/analysis/featurewise/INLA_featurewise_autotyp_area.R
+
+INLA_featurewise_dual:
+	Rscript spatiophylogenetic_modelling/analysis/featurewise/INLA_featurewise_dual.R
+
+INLA_featurewise_trial:
+	Rscript spatiophylogenetic_modelling/analysis/featurewise/INLA_featurewise_trial.R
+	
 
 ## Test functions
 test:
