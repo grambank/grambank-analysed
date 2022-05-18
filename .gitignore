@@ -24,3 +24,4 @@ R_grambank/output*
 #images
 **/*.png
 **/*.tiff
+R_grambank/Rplots.pdf
