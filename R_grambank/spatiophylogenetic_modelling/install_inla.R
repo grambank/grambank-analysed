@@ -1,5 +1,5 @@
-R_version <- 4.1
-testing <- "no"
+R_version <- 4.2
+testing <- "yes"
 experimental <- "yes"
 
 source("fun_def_h_load.R")  
@@ -19,7 +19,8 @@ h_load("BiocManager")
   # 4. Install INLA using: 
   # NOTE: This is a big download
 
-    if(testing != "yes"){
+ if(R_version >=4.2){
+     if(testing != "yes"){
     
       if (!("INLA" %in% rownames(installed.packages()))) { 
       cat("INLA wasn't installed, installing now.\n") 
@@ -31,14 +32,18 @@ h_load("BiocManager")
   
   install.packages("INLA",repos=c(getOption("repos"),INLA="https://inla.r-inla-download.org/R/testing"), dep=TRUE)
   }
-  
+ }else{
+   h_load("remotes")
+   remotes::install_version("INLA", version="22.05.03",repos=c(getOption("repos"),INLA="https://inla.r-inla-download.org/R/testing"), dep=TRUE)
+   
+ }
 
 suppressPackageStartupMessages(
   library(INLA, quietly = T, warn.conflicts = F, verbose = F)
   )
 
 if(experimental== "yes"){
-inla.setOption(inla.mode="experimental")
+INLA::inla.setOption(inla.mode="experimental")
 }
 
 cat(paste0("Loaded INLA version ", packageVersion("INLA"), ".\n"))
