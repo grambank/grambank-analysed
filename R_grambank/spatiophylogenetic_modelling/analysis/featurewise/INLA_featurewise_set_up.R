@@ -3,6 +3,9 @@
 #set this as 1 if you're just running this script on 50 lgs over 3 features to debug. Otherwise set to 0.
 debug_run = 1
 
+#should the scripts output an rds file for each output from INLA::inla() or not? Set to 0 if not, 1 if yes.
+save_RDS_featurewise <- 0
+
 kappa = 2
 sigma = c(1, 1.15)
 

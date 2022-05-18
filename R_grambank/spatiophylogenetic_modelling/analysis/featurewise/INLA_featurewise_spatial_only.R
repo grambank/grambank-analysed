@@ -38,10 +38,12 @@ for(feature in features){
                             data = grambank_df,family = "binomial") })
   
   if (class(output) != "try-error") {
-    
+  
+if(save_RDS_featurewise ==1){
+      
     suppressWarnings(  saveRDS(output, file = paste0(OUTPUTDIR, "spatial_only/spatial_only_", feature, ".rdata")) )
     #Don't be alarmed by the suppress warnings. saveRDS() is being kind and reminding us that the package stats may not be available when loading. However, this is not a necessary warning for us so we've wrapped saveRDS in suppressWarnings.
-  }
+  }}
   rm(output)  
 }
 

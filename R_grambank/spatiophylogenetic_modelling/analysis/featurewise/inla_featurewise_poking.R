@@ -1,8 +1,7 @@
 source("requirements.R")
 p_load(beepr)
 
-fns <- list.files("output/spatiophylogenetic_modelling/results_debug_2022-04-08/phylo_only/", pattern = "*.rdata", full.names = T)
-
+fns <- list.files("output/spatiophylogenetic_modelling/featurewise/results/phylo_only/", pattern = "*.rdata", full.names = T)
 
 df<- data.frame(matrix(ncol = 3, nrow = 0))
 colnames(df) <- c("Feature_ID", "Log precision for phy_id_generic", "Log precision for phy_id_iid_model") 

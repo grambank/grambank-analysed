@@ -45,10 +45,11 @@ for(feature in features){
   
   if (class(output) != "try-error") {
     
+if(save_RDS_featurewise ==1){
     suppressWarnings(  saveRDS(output, file = paste0(OUTPUTDIR, "phylo_only/phylo_only_", feature, ".rdata")) )
     #Don't be alarmed by the suppress warnings. saveRDS() is being kind and reminding us that the package stats may not be available when loading. However, this is not a necessary warning for us so we've wrapped saveRDS in suppressWarnings.
   }
-  
+}
   rm(output)  
 }
 cat("All done with the phylo only model, 100% done!")
