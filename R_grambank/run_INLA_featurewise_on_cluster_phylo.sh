@@ -26,6 +26,6 @@ export R_LIBS_USER=rlibs
 #let's not run this because we don't want to have to move over all the git submodules, let's run make data before moving to cluster.
 
 #Step 3 run INLA featurewise
-make INLA_featurewise
+make spatiophylogenetic_modelling/analysis/featurewise/INLA_featurewise_phylo_only.R
 
 
