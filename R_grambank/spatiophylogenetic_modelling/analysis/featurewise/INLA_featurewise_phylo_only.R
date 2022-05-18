@@ -1,10 +1,20 @@
-
-
-
 cat("#### Phylogenetic only model ####\n")
 
 source("spatiophylogenetic_modelling/analysis/featurewise/INLA_featurewise_set_up.R")
-sink(file = file.path(  OUTPUTDIR , "INLA_featurewise_phylo_only_log.txt"), split = T)
+sink(file = file.path(  OUTPUTDIR , "phylo_only/INLA_featurewise_phylo_only_log.txt"), split = T)
+
+#make empty df to bind to
+df_phylo_only <- data.frame(matrix(ncol = 9, nrow = 0))
+colnames(df_phylo_only) <- c("2.5%","50%", "97.5%", "Feature_ID", "effect", "model", "waic", "marginals.hyperpar.phy_id_iid_model", "marginals.hyperpar.phy_id_generic") 
+df_phylo_only$`2.5%` <- as.numeric(df_phylo_only$`2.5%`)
+df_phylo_only$`50%` <- as.numeric(df_phylo_only$`50%`)
+df_phylo_only$`97.5%` <- as.numeric(df_phylo_only$`97.5%`)
+df_phylo_only$Feature_ID <- as.character(df_phylo_only$Feature_ID)
+df_phylo_only$model <- as.character(df_phylo_only$model)
+df_phylo_only$effect <- as.character(df_phylo_only$effect)
+df_phylo_only$waic <- as.numeric(df_phylo_only$waic)
+df_phylo_only$marginals.hyperpar.phy_id_iid_model <- as.list(df_phylo_only$marginals.hyperpar.phy_id_iid_model)
+df_phylo_only$marginals.hyperpar.phy_id_generic <- as.list(df_phylo_only$marginals.hyperpar.phy_id_generic)
 
 index <- 0
 
@@ -44,14 +54,94 @@ for(feature in features){
   })
   
   if (class(output) != "try-error") {
+    #pulling out phy_id_generic effect
+    #if the hessian has negative eigenvalues, then the hyperpar will contain inf values and the extract won't work, therefore there's an if statement testing for this.
     
-if(save_RDS_featurewise ==1){
-    suppressWarnings(  saveRDS(output, file = paste0(OUTPUTDIR, "phylo_only/phylo_only_", feature, ".rdata")) )
-    #Don't be alarmed by the suppress warnings. saveRDS() is being kind and reminding us that the package stats may not be available when loading. However, this is not a necessary warning for us so we've wrapped saveRDS in suppressWarnings.
-  }
-}
-  rm(output)  
-}
-cat("All done with the phylo only model, 100% done!")
+    phylo_effect_generic = try(expr = {inla.tmarginal(function(x) 1/sqrt(x),
+                                                      output$marginals.hyperpar$`Precision for phy_id_generic`,
+                                                      method = "linear") %>%
+        inla.qmarginal(c(0.025, 0.5, 0.975), .)}
+    )
+    
+    if (class(phylo_effect_generic) != "try-error") {
+      df_phylo_only_generic  <- phylo_effect_generic %>% 
+        as.data.frame() %>% 
+        t() %>% 
+        as.data.frame() %>% 
+        rename("2.5%" = V1, "50%" = V2, "97.5%" = V3) %>% 
+        mutate(Feature_ID = feature) %>% 
+        mutate(effect = "phylo_only_generic") %>% 
+        mutate(model = "phylo_only") %>% 
+        mutate(waic = output$waic$waic)  %>% 
+        mutate(marginals.hyperpar.phy_id_generic = output$marginals.hyperpar[1])
+    } else{
+      
+      
+      cat(paste0("Couldn't extract phy generic effect from feature ", feature, ", making empty df!\n"))
+      
+      df_phylo_only_generic <- tibble(
+        "2.5%" = c(NA),
+        "50%" =c(NA),
+        "97.5%" =c(NA)) %>% 
+        mutate(Feature_ID = feature) %>% 
+        mutate(effect = "phylo_only_generic") %>% 
+        mutate(model = "phylo_only") %>% 
+        mutate(waic = output$waic$waic)  %>% 
+        mutate(marginals.hyperpar.phy_id_generic = output$marginals.hyperpar[1])
+    }
+  
+    #pulling out phy_id_iid_model effect
+    #if the hessian has negative eigenvalues, then the hyperpar will contain inf values and the extract won't work, therefore there's an if statement testing for this.
 
+    phylo_effect_iid_model = try(expr = {
+      inla.tmarginal(function(x) 1/sqrt(x),
+                     output$marginals.hyperpar$`Precision for phy_id_iid_model`,
+                     method = "linear") %>%
+        inla.qmarginal(c(0.025, 0.5, 0.975), .) }
+    )
+    
+    if (class(phylo_effect_iid_model) != "try-error") {
+      df_phylo_only_iid_model <- phylo_effect_iid_model %>% 
+        as.data.frame() %>% 
+        t() %>% 
+        as.data.frame() %>% 
+        rename("2.5%" = V1, "50%" = V2, "97.5%" = V3) %>% 
+        mutate(Feature_ID = feature) %>% 
+        mutate(effect = "phylo_only_iid_model") %>% 
+        mutate(model = "phylo_only") %>% 
+        mutate(waic = output$waic$waic)  %>% 
+        mutate(marginals.hyperpar.phy_id_iid_model = output$marginals.hyperpar[2]) } else{
+          
+          cat(paste0("Couldn't extract phy iid effect from feature ", feature, ", making empty df!\n") )
+          
+          df_phylo_only_iid_model<- tibble(
+            "2.5%" = c(NA),
+            "50%" =c(NA),
+            "97.5%" =c(NA)) %>%  
+            mutate(Feature_ID = feature) %>% 
+            mutate(effect = "phylo_only_iid_model") %>% 
+            mutate(model = "phylo_only") %>% 
+            mutate(waic = output$waic$waic)  %>% 
+            mutate(marginals.hyperpar.phy_id_iid_model = output$marginals.hyperpar[2])
+        }
+    
+    df_phylo_only <- df_phylo_only  %>% 
+      full_join(df_phylo_only_iid_model, 
+                by = c(join_columns, "marginals.hyperpar.phy_id_iid_model")) %>% 
+      full_join(df_phylo_only_generic, 
+                by = c(join_columns, "marginals.hyperpar.phy_id_generic"))
+    
+    if(save_RDS_featurewise ==1){
+    
+        output$.args$.parent.frame
+      qs:qsave(x = output, file = paste0(OUTPUTDIR, "phylo_only/phylo_only_", feature, ".rdata"), preset = "high") 
+    }
+    }
+  rm(output)
+}
+
+df_phylo_only %>% write_tsv(file = file.path(OUTPUTDIR, "phylo_only/df_phylo_only.tsv"))
+df_phylo_only %>% saveRDS(file = file.path(OUTPUTDIR, "phylo_only/df_phylo_only.Rdata"))
+
+cat("All done with the phylo only model, 100% done!")
 sink(file = NULL)

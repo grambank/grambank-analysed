@@ -4,14 +4,17 @@
 debug_run = 1
 
 #should the scripts output an rds file for each output from INLA::inla() or not? Set to 0 if not, 1 if yes.
-save_RDS_featurewise <- 0
+save_RDS_featurewise <- 1
 
 kappa = 2
 sigma = c(1, 1.15)
 
+join_columns = c("2.5%", "50%", "97.5%", "Feature_ID", 
+                 "effect", "waic", "model")
+
 source("fun_def_h_load.R")
 
-h_load(pkg = c("tidyverse", "reshape2","ape", "rlang", "assertthat" ))
+h_load(pkg = c("tidyverse", "reshape2","ape", "rlang", "assertthat" , "qs"))
 
 #If the tree hasn't been prune yet - prune the tree :)
 if (!file.exists("output/spatiophylogenetic_modelling/processed_data/jaeger_pruned.tree")) {
