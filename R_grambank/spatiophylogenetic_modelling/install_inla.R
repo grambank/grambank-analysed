@@ -1,9 +1,10 @@
-source("requirements.R")
+#source("requirements.R")
 
 R_version <- 4.2
 testing <- "yes"
 experimental <- "yes"
-  
+
+source("fun_def_h_load.R")  
 
 h_load("BiocManager")
 
@@ -14,7 +15,8 @@ h_load("BiocManager")
                          "spdep"))
   
   # Update foreach (although it unclear how vital this step was) using: 
-  h_load("foreach")
+ 
+ h_load("foreach")
   
   # 4. Install INLA using: 
   # NOTE: This is a big download
