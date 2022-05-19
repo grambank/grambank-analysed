@@ -7,8 +7,6 @@
 ##lingn01w:code skirgard$ ./run_INLA_featurewise_on_cluster.sh
 
 #Step 1
-Rscript cluster_set_up.R
-
 FILE=rlibs
 if [ -f "$FILE" ]; then
     echo "$FILE exists."
@@ -19,6 +17,8 @@ fi
 
 export R_LIBS_USER=rlibs
 
+Rscript cluster_set_up.R
+
 #Rscript requirements.R 
 
 #Step 2 prep data
@@ -26,6 +26,6 @@ export R_LIBS_USER=rlibs
 #let's not run this because we don't want to have to move over all the git submodules, let's run make data before moving to cluster.
 
 #Step 3 run INLA featurewise
-make spatiophylogenetic_modelling/analysis/featurewise/INLA_featurewise_phylo_only.R
+make INLA_featurewise_phylo_only
 
 
