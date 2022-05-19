@@ -3,8 +3,9 @@
 
 #Hedvig Skirgård made one minor tweak to the way the function deals with NULL input for the label argument and changed a loop message.
 
-source("requirements.R")
-h_load("stringi")
+#source("requirements.R")
+source("fun_def_h_load.R")
+h_load(c("stringi", "utils"))
 
 CultureFst = function( d, loci, type, bootstrap, no.samples, label ){
   cat(paste0("I've started and there are ", no.samples, " samples to go through.\n"))
