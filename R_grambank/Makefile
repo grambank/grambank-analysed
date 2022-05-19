@@ -13,7 +13,13 @@ almost_all_fast: requirements.log data pca get_unusualness phylo_signal_per_feat
 
 ## clean 
 clean:
-	rm -r output/*
+	rm -r output/non_GB_datasets*
+	rm -r output/coverage_plots*
+	rm -r output/GB_wide*
+	rm -r output/B
+	rm -r output/PCA*
+	rm -r output/unusualness*
+	rm -r output/spatiophylogenetic_modelling*
 #to do need to make excetion for output/README.md
 	
 #step 0
@@ -93,26 +99,18 @@ output/PCA/PCA_macroarea.png:
 ## Comparing PCA to theoretical scores
 theoretical:
 	@echo "# Comparing PCA to theoretical scores. #"
-	mkdir -p Bound_morph
 	Rscript bound_morph.R
 	Rscript compare_PCA_loadings_to_theory_scores.R
 
 #step 3
 ## Unusualness language analysis and generate plots.
 get_unusualness:
-	@echo "# Calculating unsualness scores and making plots. Note: these scripts requires internet access.#"
-	mkdir -p output/unusualness
-	mkdir -p output/unusualness/plots
-	mkdir -p output/unusualness/tables
-	@echo Assining each langauge to an AUTOTYP-area. Note this script requires the git submodule autotyp-data.
-	Rscript unusualness/processing/assigning_AUTOTYP_areas.R
-	Rscript unusualness/analysis/unusualness_get_lg_score.R
-	
+#	@echo "# Calculating unsualness scores and making plots. Note: these scripts requires internet access.#"
+
 #step 4
 ## Phylogenetic signal per feature.
 phylo_signal_per_feature:
 	@echo "## Running analysis of phylogenetic signal per feature. ##"
-	mkdir -p output/phylosig
 	Rscript phylo_signal_features_d_stat.R
 
 #step 5
@@ -130,8 +128,6 @@ sp_models: output/PCA/PCA_language_values.tsv
 	@echo "## Running spatiophylogenetic modelling with INLA on the first three components. ##"
 	@echo "If INLA isn't installed it will be installed. This may require input from you regarding compilation of binary files."
 	@echo Strap-in, these models take a while!
-	mkdir -p output/spatiophylogenetic_modelling/results
-	mkdir -p output/spatiophylogenetic_modelling/figures
 	Rscript spatiophylogenetic_modelling/analysis/spatiophylogenetic_jaegermodel.R
 	Rscript spatiophylogenetic_modelling/analysis/plot_spatiophylogeneticmodels.R
 
