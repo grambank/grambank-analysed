@@ -1,4 +1,8 @@
-source("requirements.R")
+#source("requirements.R")
+
+source("fun_def_h_load.R")
+
+h_load(pkg = c("tidyverse", "reshape2", "ggplot2"))
 
 OUTPUTDIR <- "output/dist_fixation_scores/"
 if (!dir.exists(OUTPUTDIR)) {dir.create(OUTPUTDIR)}
