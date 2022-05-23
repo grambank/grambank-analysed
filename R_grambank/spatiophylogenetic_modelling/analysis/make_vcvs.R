@@ -1,14 +1,7 @@
 #This is a script for running binomial INLA over 113 binary Grambank features, with phylo and spatial effects.
 
 #set this as 1 if you're just running this script on 50 lgs over 3 features to debug. Otherwise set to 0.
-
-
 source("requirements.R")
-
-#If the tree hasn't been prune yet - prune the tree :)
-if (!file.exists("output/spatiophylogenetic_modelling/processed_data/jaeger_pruned.tree")) {
-  source("spatiophylogenetic_modelling/processing/pruning_jagertree.R") 
-}		
 
 # load variational covariance matrix function taken from geoR::varcov_spatial
 source('spatiophylogenetic_modelling/analysis/varcov_spatial.R')
@@ -65,8 +58,8 @@ languages <- read.delim(glottolog_df_fn, sep = "\t") %>%
   left_join(autotyp_area, by = "Language_ID")
 
 # trees
-tree_filename = 'output/spatiophylogenetic_modelling/processed_data/jaeger_pruned.tree'
-if (!file.exists(tree_filename)) { source("spatiophylogenetic_modelling/processing/pruning_jagertree.R") }		
+tree_filename = 'output/spatiophylogenetic_modelling/processed_data/EDGE_pruned_tree.tree'
+if (!file.exists(tree_filename)) { source("spatiophylogenetic_modelling/processing/pruning_EDGE_tree.R") }		
 phylogenetic_tree = read.tree(tree_filename)
 
 # Subset GB and languages to Jaeger set
@@ -100,8 +93,8 @@ phylo_covar_mat <- phylo_covar_mat / max(phylo_covar_mat)
 phylo_prec_mat = cov2precision(phylo_covar_mat)
 
 # Phylogenetic matrix is right dims #comment out if debugging swiftly
-x <- assert_that(all(dim(phylo_prec_mat) == c(n_overlap_imputed_and_jaeger_tree,
-                n_overlap_imputed_and_jaeger_tree)), 
+x <- assert_that(all(dim(phylo_prec_mat) == c(n_overlap_imputed_and_EDGE_tree ,
+                                              n_overlap_imputed_and_EDGE_tree )), 
                 msg = "The phylogeny has changed and will not match the data")
 
 phylo_covar_mat %>% 
