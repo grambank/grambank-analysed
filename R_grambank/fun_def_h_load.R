@@ -2,7 +2,7 @@
 #function to check if a pkg is installed or not, if not it installs it and either way it's loaded.
 #inspired by pacman::p_load()
 
-h_load <- function(pkg, verbose = F, version = NULL, repos = "https://cloud.r-project.org"){
+h_load <- function(pkg, verbose = F, version = NULL){
 #  p <- "ggpubr"
 #  pkg <- c("geiger", "ape")
       for(p in pkg){
@@ -18,8 +18,9 @@ h_load <- function(pkg, verbose = F, version = NULL, repos = "https://cloud.r-pr
       if(!"devtools"%in% rownames(installed.packages())){ #install devtools if it isn't already installed
           install.packages(devtools)
       }
+        
         library(devtools, quietly = T, verbose = F, warn.conflicts = F)
-        devtools::install_version(p, version = version, repos = repos)
+        devtools::install_version(p, version = version)
         
         if(verbose == T){
           cat(paste0("Installed ", p, ", version ", version, ".\n"))}
