@@ -6,7 +6,7 @@
 #########################################
 
 # Set working directory for output
-#setup outpur dirs
+#setup output dirs
 OUTPUTDIR <- file.path("output/unusualness/")
 if (!dir.exists(OUTPUTDIR)) { dir.create(OUTPUTDIR) }		
 
@@ -133,7 +133,7 @@ hier_classes<-hier_gb$cluster
 # number of latent classes using a Bayesian implementation of LCA
 
 # Set a range of latent clusters to explore for each cluster
-k_range<-c(1:6)
+k_range<-c(1:5)
 
 # Function that yields the BIC of latent classes assignments for feature cluster i
 k_choose<-function(i) {
