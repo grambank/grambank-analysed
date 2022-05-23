@@ -25,3 +25,4 @@ R_grambank/output*
 **/*.png
 **/*.tiff
 R_grambank/Rplots.pdf
+R_grambank/spatiophylogenetic_modelling/phylogenies/EDGE6635-merged-relabelled.tree
