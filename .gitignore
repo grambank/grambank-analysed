@@ -7,21 +7,18 @@ R_grambank/.Rhistory
 .Rproj.user
 
 #output directories
-*output*
+.*spatiophylogenetic_modelling.*results.*
 *GB_wide*
 *non_GB_datasets*
 *coverage_plots*
-*processed_data*
 *R_grambank/MDS*
 *R_grambank/PCA*
 *R_grambank/UMAP*
 R_grambank/impute_missing_values.log
-*R_grambank/spatiophylogenetic_modelling/results/*
-R_grambank/temp_scripts_for_meetings/phist_macroareas.png
-R_grambank/phylosig/**
-R_grambank/output*
 
 #images
 **/*.png
 **/*.tiff
 R_grambank/Rplots.pdf
+R_grambank/spatiophylogenetic_modelling/phylogenies/EDGE6635-merged-relabelled.tree
+R_grambank/output/spatiophylogenetic_modelling/processed_data/jaeger_removed.csv

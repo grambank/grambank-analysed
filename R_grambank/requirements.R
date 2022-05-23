@@ -5,6 +5,7 @@
 n_total <- 2467
 n_imputed <- 1509
 n_overlap_imputed_and_jaeger_tree <- 1265
+n_overlap_imputed_and_EDGE_tree <- 1403
 
 #installing packages
 if (!suppressPackageStartupMessages(require("pacman"))) { install.packages("pacman") }

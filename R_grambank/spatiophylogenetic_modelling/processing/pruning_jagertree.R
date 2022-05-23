@@ -17,7 +17,7 @@ if (!dir.exists(OUTPUT_DIR)) {
 #### Inputs ####
 #Glottolog-cldf table to have a match for all dialects to their language parent. Note that the particular dialects may differ from the dialects in GB which is why we cann't use the language table from the grambank-cldf relase
 glottolog_df <- read_tsv("output/non_GB_datasets/glottolog-cldf_wide_df.tsv",col_types = cols()) %>% 
-  dplyr::select(Language_ID, Language_level_ID, level) %>% 
+  dplyr::select(Language_ID, Language_level_ID, level, aes) %>% 
   mutate(Language_level_ID = ifelse(is.na(Language_level_ID), Language_ID, Language_level_ID)) #making language-level entities their own parent, so that we can use this column for aggregation easier.
 
 taxa_pairing <- read.csv('spatiophylogenetic_modelling/phylogenies/taxa.csv') %>% 
@@ -56,6 +56,16 @@ jaeger_pruned$tip.label <- jaeger_pruned$tip.label %>%
   left_join(taxa_pairing, by = "taxon") %>%
   dplyr::select(Language_level_ID) %>% 
   .[,1]
+
+#Check the aes status of the languages that remain
+# jaeger_pruned$tip.label %>% 
+#   as.data.frame() %>% 
+#   dplyr::rename(taxon = ".") %>% 
+#   mutate(Language_ID = str_extract(taxon, "[^.]+$")) %>% 
+#   left_join(glottolog_df) %>%
+#   distinct(Language_level_ID, .keep_all = T) %>% 
+#   group_by(aes) %>% 
+#   summarise(n = n()) %>% View()
 
 write.tree(jaeger_pruned, "output/spatiophylogenetic_modelling/processed_data/jaeger_pruned.tree")
 
