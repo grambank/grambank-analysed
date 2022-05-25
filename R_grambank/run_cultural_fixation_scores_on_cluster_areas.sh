@@ -8,11 +8,11 @@ export R_LIBS_USER=../rlibs
 
 Rscript dist_fixation_scores/fixation_scores_muthukrishna_CLI.R "Macroarea" 0
 
-Rscript dist_fixation_scores/fixation_scores_muthukrishna_CLI.R "AUTOTYP-area" 0
+Rscript dist_fixation_scores/fixation_scores_muthukrishna_CLI.R "AUTOTYP_area" 0
 
-Rscript dist_fixation_scores/fixation_scores_muthukrishna_CLI.R "AUTOTYP-area" 20
+Rscript dist_fixation_scores/fixation_scores_muthukrishna_CLI.R "AUTOTYP_area" 20
 
-Rscript dist_fixation_scores/fixation_scores_muthukrishna_CLI.R "AUTOTYP-area" 50
+Rscript dist_fixation_scores/fixation_scores_muthukrishna_CLI.R "AUTOTYP_area" 50
 
-Rscript dist_fixation_scores/fixation_scores_muthukrishna_CLI.R "AUTOTYP-area" 100
+Rscript dist_fixation_scores/fixation_scores_muthukrishna_CLI.R "AUTOTYP_area" 100
 
