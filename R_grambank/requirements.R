@@ -33,6 +33,7 @@ h_load(verbose = F, pkg = c(
 	"cluster", 
 
 	# "imputation
+"randomForest",
 	"missForest",
 	
 	#plotting graphs
