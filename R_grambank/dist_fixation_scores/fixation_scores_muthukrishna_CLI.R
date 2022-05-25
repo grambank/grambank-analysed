@@ -3,9 +3,9 @@
 args <- commandArgs(trailingOnly=TRUE)
 
 group = args[[1]]
-#group = "AUTOTYP-area"
+#group = "Family_ID"
 cut_off = args[[2]]
-#cut_off = 0
+#cut_off = 50
 
 source("fun_def_h_load.R")
 
@@ -46,7 +46,7 @@ source("dist_fixation_scores/fun_def_Muthukrishna_2020_CultureFst.r")
 
 fun_cfx <- function(df = Language_meta_data, group, cut_off = 0){
 
-#  group = "AUTOTYP_area"
+#  group = "Family_ID"
 #  df <- Language_meta_data
   
   cat(paste0("Running the cultural fixation scores on groupings by ", group ,".\n"))
@@ -59,7 +59,7 @@ fun_cfx <- function(df = Language_meta_data, group, cut_off = 0){
     dplyr::select(-n)
   
     GB_cropped <- GB %>% 
-    left_join(group_df, by = "Language_ID") %>% 
+    inner_join(group_df, by = "Language_ID") %>% 
     dplyr::select(-Language_ID) %>% 
     dplyr::select(group, everything())
 
