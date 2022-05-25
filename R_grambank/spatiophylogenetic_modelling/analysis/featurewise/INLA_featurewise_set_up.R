@@ -77,3 +77,6 @@ grambank_df = GB %>%
 features <- GB %>% 
   dplyr::select(-Language_ID) %>% 
   colnames() 
+
+library(INLA, quietly = T, warn.conflicts = F, verbose = F)
+INLA::inla.setOption(inla.mode="experimental")
