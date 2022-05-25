@@ -1,4 +1,4 @@
-cat("#### Phylogenetic only model ####\n")
+cat("\n\n#### Phylogenetic only model ####\n\n")
 
 source("spatiophylogenetic_modelling/analysis/featurewise/INLA_featurewise_set_up.R")
 sink(file = file.path(  OUTPUTDIR , "phylo_only/INLA_featurewise_phylo_only_log.txt"), split = T)
@@ -143,5 +143,5 @@ for(feature in features){
 df_phylo_only %>% write_tsv(file = file.path(OUTPUTDIR, "phylo_only/df_phylo_only.tsv"))
 df_phylo_only %>% saveRDS(file = file.path(OUTPUTDIR, "phylo_only/df_phylo_only.Rdata"))
 
-cat("All done with the phylo only model, 100% done!")
+cat("All done with the phylo only model, 100% done!\n The time is ", as.character(Sys.time()), ".\n")
 sink(file = NULL)
