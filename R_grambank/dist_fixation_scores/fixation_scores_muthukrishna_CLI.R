@@ -33,7 +33,7 @@ Language_meta_data <-  read_tsv("output/non_GB_datasets/glottolog-cldf_wide_df.t
   dplyr::select(-Language_ID) %>% 
   dplyr::select(Language_ID  = Language_level_ID, Family_ID, Name, Macroarea) %>% 
   distinct(Language_ID, .keep_all = T) %>% 
-  mutate(Family_ID = ifelse(is.na(Family_ID), "Isolate", Family_ID))
+  mutate(Family_ID = ifelse(is.na(Family_ID), Language_ID, Family_ID))
 
 #join to ensure exact same order
 Language_meta_data <- GB %>% 
@@ -48,7 +48,7 @@ fun_cfx <- function(df = Language_meta_data, group, cut_off = 0){
 
 #  group = "Family_ID"
 #  df <- Language_meta_data
-  
+# cut_off <- 10  
   cat(paste0("Running the cultural fixation scores on groupings by ", group ,".\n"))
   
   group_df <- df %>%
@@ -88,7 +88,7 @@ fun_cfx <- function(df = Language_meta_data, group, cut_off = 0){
       unite(Var1, Var2, col = "Vars", sep = " - ") %>% 
       rename(Value_cfx = value)
     
-    table_fn <- paste0("cfx_",group, "cut_off_",cut_off,  "_list.tsv")
+    table_fn <- paste0("cfx_",group, "_cut_off_",cut_off,  "_list.tsv")
     
     cfx_list %>% 
       write_tsv(file = file.path(OUTPUTDIR,  table_fn))
