@@ -2,10 +2,12 @@
 
 args <- commandArgs(trailingOnly=TRUE)
 
+if(length(args) != 0){
 group = args[[1]]
 #group = "Family_ID"
 cut_off = args[[2]]
 #cut_off = 50
+}
 
 source("fun_def_h_load.R")
 
@@ -94,4 +96,16 @@ fun_cfx <- function(df = Language_meta_data, group, cut_off = 0){
       write_tsv(file = file.path(OUTPUTDIR,  table_fn))
 }
 
-fun_cfx(df = Language_meta_data, group = group, cut_off = cut_off)
+fun_cfx(df = Language_meta_data, group = "Family_ID", cut_off = 50)
+
+fun_cfx(df = Language_meta_data, group = "Family_ID", cut_off = 20)
+
+fun_cfx(df = Language_meta_data, group = "Family_ID", cut_off = 10)
+
+fun_cfx(df = Language_meta_data, group = "Family_ID", cut_off = 5)
+
+fun_cfx(df = Language_meta_data, group = "Family_ID", cut_off = 1)
+
+
+
+
