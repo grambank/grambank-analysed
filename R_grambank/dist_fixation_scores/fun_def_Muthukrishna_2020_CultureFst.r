@@ -7,7 +7,7 @@
 source("fun_def_h_load.R")
 h_load(c("stringi", "utils"))
 
-CultureFst = function( d, loci, type, bootstrap, no.samples, label ){
+CultureFst = function( d, loci, type, bootstrap, no.samples, label = NULL, message = NULL ){
   cat(paste0("I've started and there are ", no.samples, " samples to go through.\n"))
 	# returns a matrix of pairwise fst values in the lower diagonal
 	# and bootstrapped confidence intervals in the upper-diagonal (optional)
@@ -113,9 +113,9 @@ bootFst = function(){
   	# function to generate a mean Fst for each sample
 	sampleFst = function( i ){
 
-	  cat(paste0("I'm on ", i, " out of ", no.samples, " samples.\n"))
-	  
-		subpops = subset( pops, sapply( 1:length(pops), function(z) any(pops[z]==pair) ) )
+	  cat(paste0("I'm on ", i, " out of ", no.samples, " samples. ", message, "\n"))
+	 
+	  subpops = subset( pops, sapply( 1:length(pops), function(z) any(pops[z]==pair) ) )
 		index.sample = sapply( subpops, function(z){ set = which(d[,1]== z); sample( set, length(set), replace = TRUE ) } )
 		index.sample = unlist( index.sample )
 		ans = Fst.gen( d[index.sample,] )
