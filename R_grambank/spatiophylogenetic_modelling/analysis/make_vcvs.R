@@ -32,7 +32,15 @@ cov2precision = function(spatial_covar_mat){
    source("make_wide_binarized.R")
    source("impute_missing_values.R")}		
  GB <- read.delim(GB_filename, sep = "\t")
- 
+
+random_cols <- sample(1:length(GB), size = 3)
+
+if(debug_run == 1) { #if we're running to debug, pick 50 random languages and 3 random features
+   GB <- GB %>% 
+     sample_n(50) %>% 
+     .[,c(1, random_cols)]
+}
+
  # language metadata
 if (!file.exists("output/non_GB_datasets/glottolog_AUTOTYP_areas.tsv")) { source("unusualness/processing/assigning_AUTOTYP_areas.R") }		
 autotyp_area <- read.delim("output/non_GB_datasets/glottolog_AUTOTYP_areas.tsv", sep = "\t") %>%
