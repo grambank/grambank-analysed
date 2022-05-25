@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --cpus-per-task 15
 #SBATCH --mem 20G
-#SBATCH -J Hedvig_INLA_featurewise_phylo
+#SBATCH -J Hedvig_INLA_featurewise_spatial
 #SBATCH --partition=dlcegpu
 
 #set ..rlibs as r package dir
@@ -19,6 +19,6 @@ export R_LIBS_USER=../rlibs
 Rscript cluster_set_up.R
 
 #run INLA featurewise
-make INLA_featurewise_phylo_only
+make INLA_featurewise_spatial_only
 
 
