@@ -1,7 +1,7 @@
 #This is a script for running binomial INLA over 113 binary Grambank features, with phylo and spatial effects.
 
 #set this as 1 if you're just running this script on 50 lgs over 3 features to debug. Otherwise set to 0.
-debug_run = 1
+debug_run = 0
 
 #should the scripts output an rds file for each output from INLA::inla() or not? Set to 0 if not, 1 if yes.
 save_RDS_featurewise <- 0
