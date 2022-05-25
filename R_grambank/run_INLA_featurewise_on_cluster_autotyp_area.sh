@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --cpus-per-task 15
 #SBATCH --mem 20G
-#SBATCH -J Hedvig_INLA_featurewise_autotyp_area
+#SBATCH -J INLA_area
 #SBATCH --partition=dlcegpu
 
 export R_LIBS_USER=../rlibs

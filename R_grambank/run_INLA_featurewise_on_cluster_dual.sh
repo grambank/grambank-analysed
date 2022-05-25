@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --cpus-per-task 15
 #SBATCH --mem 20G
-#SBATCH -J Hedvig_INLA_featurewise_dual
+#SBATCH -J INLA_dual
 #SBATCH --partition=dlcegpu
 
 #set ..rlibs as r package dir

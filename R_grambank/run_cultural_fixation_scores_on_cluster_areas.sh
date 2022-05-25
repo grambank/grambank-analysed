@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --cpus-per-task 15
 #SBATCH --mem 20G
-#SBATCH -J Hedvig_cultural_fixation-scores_areas
+#SBATCH -J cfx_areas
 #SBATCH --partition=dlcegpu
 
 export R_LIBS_USER=../rlibs
