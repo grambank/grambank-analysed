@@ -41,9 +41,9 @@ for(feature in features){
   
   if (class(output) != "try-error") {
     
-    autotyp_area_effect = try(expr = {inla.tmarginal(function(x) 1/sqrt(x),
+    autotyp_area_effect = try(expr = {INLA::inla.tmarginal(function(x) 1/sqrt(x),
                                          output$marginals.hyperpar$`Precision for AUTOTYP_area_id_iid_model`, method = "linear") %>%
-      inla.qmarginal(c(0.025, 0.5, 0.975), .)})
+      INLA::inla.qmarginal(c(0.025, 0.5, 0.975), .)})
     
     if (class(  autotyp_area_effect) != "try-error") {
     
@@ -59,7 +59,7 @@ for(feature in features){
       mutate(marginals.hyperpar.AUTOTYP_area_id_iid_model = output$marginals.hyperpar[1])
     }else{
       
-      cat(paste0("Couldn't extract area generic effect from feature ", feature, ", making empty df!\n"))
+      cat(paste0("Couldn't extract area effect from feature ", feature, ", making empty df!\n"))
       
       df <- tibble(
         "2.5%" = c(NA),

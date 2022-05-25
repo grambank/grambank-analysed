@@ -60,13 +60,13 @@ for(feature in features){
   
   if (class(output) != "try-error") {
     
-    phylo_effect_generic = try(expr = {inla.tmarginal(function(x) 1/sqrt(x),
+    phylo_effect_generic = try(expr = {INLA::inla.tmarginal(function(x) 1/sqrt(x),
                                           output$marginals.hyperpar$`Precision for phy_id_generic`,
                                           method = "linear") %>%
-      inla.qmarginal(c(0.025, 0.5, 0.975), .)})
+      INLA::inla.qmarginal(c(0.025, 0.5, 0.975), .)})
     
     if (class(phylo_effect_generic) != "try-error") {
-      df_phylo_only_generic  <- phylo_effect_generic %>% 
+      df_phylo_generic  <- phylo_effect_generic %>% 
         as.data.frame() %>% 
         t() %>% 
         as.data.frame() %>% 
@@ -81,7 +81,7 @@ for(feature in features){
       
       cat(paste0("Couldn't extract phy generic effect from feature ", feature, ", making empty df!\n"))
       
-      df_phylo_only_generic <- tibble(
+      df_phylo_generic <- tibble(
         "2.5%" = c(NA),
         "50%" =c(NA),
         "97.5%" =c(NA)) %>% 
@@ -93,10 +93,10 @@ for(feature in features){
     }
     
 
-    phylo_effect_iid_model = try(expr = {inla.tmarginal(function(x) 1/sqrt(x),
+    phylo_effect_iid_model = try(expr = {INLA::inla.tmarginal(function(x) 1/sqrt(x),
                                             output$marginals.hyperpar$`Precision for phy_id_iid_model`,
                                             method = "linear") %>%
-      inla.qmarginal(c(0.025, 0.5, 0.975), .)})
+      INLA::inla.qmarginal(c(0.025, 0.5, 0.975), .)})
     
     
     if (class(phylo_effect_iid_model) != "try-error") {
@@ -127,10 +127,10 @@ for(feature in features){
         mutate(marginals.hyperpar.phy_id_iid_model = output$marginals.hyperpar[2])
     }
     
-    spatial_effect_generic = try(expr = {inla.tmarginal(function(x) 1/sqrt(x),
+    spatial_effect_generic = try(expr = {INLA::inla.tmarginal(function(x) 1/sqrt(x),
                                             output$marginals.hyperpar$`Precision for spatial_id_generic`,
                                             method = "linear") %>%
-      inla.qmarginal(c(0.025, 0.5, 0.975), .)})
+      INLA::inla.qmarginal(c(0.025, 0.5, 0.975), .)})
     
     if (class(spatial_effect_generic) != "try-error") {
       df_spatial_generic  <- spatial_effect_generic %>% 
@@ -142,7 +142,7 @@ for(feature in features){
         mutate(effect = "spatial_in_dual_generic") %>% 
         mutate(model = "dual") %>% 
         mutate(waic = output$waic$waic)  %>% 
-        mutate(marginals.hyperpar.phy_id_generic = output$marginals.hyperpar[3])
+        mutate(marginals.hyperpar.spatial_id_generic = output$marginals.hyperpar[3])
     } else{
       
       cat(paste0("Couldn't extract phy generic effect from feature ", feature, ", making empty df!\n"))
@@ -155,14 +155,14 @@ for(feature in features){
         mutate(effect = "spatial_in_dual_generic") %>% 
         mutate(model = "dual") %>% 
         mutate(waic = output$waic$waic)  %>% 
-        mutate(marginals.hyperpar.phy_id_generic = output$marginals.hyperpar[3])
+        mutate(marginals.hyperpar.spatial_id_generic = output$marginals.hyperpar[3])
     }
 
     
-    spatial_effect_iid_model = try(expr = {inla.tmarginal(function(x) 1/sqrt(x),
+    spatial_effect_iid_model = try(expr = {INLA::inla.tmarginal(function(x) 1/sqrt(x),
                                               output$marginals.hyperpar$`Precision for spatial_id_iid_model`,
                                               method = "linear") %>%
-      inla.qmarginal(c(0.025, 0.5, 0.975), .)})
+      INLA::inla.qmarginal(c(0.025, 0.5, 0.975), .)})
     
     if (class(spatial_effect_iid_model) != "try-error") {
       df_spatial_iid_model  <- spatial_effect_iid_model %>% 
@@ -174,7 +174,7 @@ for(feature in features){
         mutate(effect = "spatial_in_dual_iid_model") %>% 
         mutate(model = "dual") %>% 
         mutate(waic = output$waic$waic)  %>% 
-        mutate(marginals.hyperpar.phy_id_iid_model = output$marginals.hyperpar[4])
+        mutate(marginals.hyperpar.spatial_id_iid_model = output$marginals.hyperpar[4])
     } else{
       
       cat(paste0("Couldn't extract phy iid_model effect from feature ", feature, ", making empty df!\n"))
@@ -187,7 +187,7 @@ for(feature in features){
         mutate(effect = "spatial_in_dual_iid_model") %>% 
         mutate(model = "dual") %>% 
         mutate(waic = output$waic$waic)  %>% 
-        mutate(marginals.hyperpar.phy_id_iid_model = output$marginals.hyperpar[4])
+        mutate(marginals.hyperpar.spatial_id_iid_model = output$marginals.hyperpar[4])
     }
     
     df_dual_spatial_phylo <- df_dual_spatial_phylo %>%

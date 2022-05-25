@@ -52,10 +52,10 @@ for(feature in features){
     #pulling out phy_id_generic effect
     #if the hessian has negative eigenvalues, then the hyperpar will contain inf values and the extract won't work, therefore there's an if statement testing for this.
     
-    spatial_effect_generic = try(expr = {inla.tmarginal(function(x) 1/sqrt(x),
+    spatial_effect_generic = try(expr = {INLA::inla.tmarginal(function(x) 1/sqrt(x),
                                                       output$marginals.hyperpar$`Precision for spatial_id_generic`,
                                                       method = "linear") %>%
-        inla.qmarginal(c(0.025, 0.5, 0.975), .)}
+        INLA::inla.qmarginal(c(0.025, 0.5, 0.975), .)}
     )
     
     if (class(spatial_effect_generic) != "try-error") {
@@ -89,10 +89,10 @@ for(feature in features){
     #if the hessian has negative eigenvalues, then the hyperpar will contain inf values and the extract won't work, therefore there's an if statement testing for this.
     
     spatial_effect_iid_model = try(expr = {
-      inla.tmarginal(function(x) 1/sqrt(x),
+      INLA::inla.tmarginal(function(x) 1/sqrt(x),
                      output$marginals.hyperpar$`Precision for spatial_id_iid_model`,
                      method = "linear") %>%
-        inla.qmarginal(c(0.025, 0.5, 0.975), .) }
+        INLA::inla.qmarginal(c(0.025, 0.5, 0.975), .) }
     )
     
     if (class(spatial_effect_iid_model) != "try-error") {
