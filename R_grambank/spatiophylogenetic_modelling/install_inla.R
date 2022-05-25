@@ -32,7 +32,7 @@ if (!("INLA" %in% rownames(installed.packages())) & testing != "yes" & R_version
   
  #If inla isn't installed, we do want the testing version and R is of a version 4.2 or higher, do this
  if (!("INLA" %in% rownames(installed.packages())) & testing == "yes" & R_version >= 4.2){
-         install.packages("INLA",repos=c(INLA="https://inla.r-inla-download.org/R/testing"), dep=TRUE, lib = "../rlibs")
+         install.packages("INLA",repos=c(INLA="https://inla.r-inla-download.org/R/testing"), dep=TRUE)
  }
  
  #If inla isn't installed, we do want the testing version and R isn't of a version 4.2 or higher, do this 
