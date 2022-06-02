@@ -11,7 +11,7 @@ Language_meta_data <-  read_tsv("output/non_GB_datasets/glottolog-cldf_wide_df.t
   arrange(desc(n)) %>% 
   distinct(Family_ID, .keep_all = T)
   
-df_long <- read_tsv("output/dist_fixation_scores/cfx_Family_ID_cut_off_10_list.tsv", show_col_types = F) %>% 
+df_long <- read_tsv("output/dist_fixation_scores/cfx_Family_ID_cut_off_1_list.tsv", show_col_types = F) %>% 
   separate("Vars", into = c("Var1", "Var2"), sep = " - ")
 
 #recover symmetric distance matrix
