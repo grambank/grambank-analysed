@@ -11,6 +11,12 @@ if(!(file.exists(tree_fn))){
   source("spatiophylogenetic_modelling/processing/pruning_EDGE_tree.R")}
 tree = read.tree(tree_fn)
 
+tree$edge.length = tree$edge.length / 1000
+
+tree_tips_df <- tree$tip.label %>% 
+  as.data.frame() %>% 
+  rename("Language_ID"= ".")
+
 # We want the phylogenetic matrix to have a variance of about 1 to make it comparable to 
 # the spatial matrix and to compare across trees. 
 # The easiest way to scale the phylogenetic covariance matrix is to scale the branch-lengths so the root to tip 
@@ -57,7 +63,8 @@ dimnames(phy_prec_mat) = dimnames(phy_inv_nodes)
 
 #### Spatial Precison ####
 # Get the longitude and latitude data from the simulated datasets
-data = read.csv('output/spatiophylogenetic_modelling/simulated_data/Prop0.1_Lambda0.01Iter1.csv')
+data = read.delim('output/non_GB_datasets/glottolog-cldf_wide_df.tsv', sep = "\t") %>% 
+  inner_join(tree_tips_df, by = "Language_ID") #subset to matches in tree
 
 source("spatiophylogenetic_modelling/analysis/INLA_parameters.R")
 
