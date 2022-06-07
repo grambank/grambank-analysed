@@ -24,4 +24,14 @@ sigma_vec =  c(1.15, 2, 40, 10, 20)
 ### phylogenetic effect based on it’s diagonal entries, which are all equal
 ### to 2.7373648. So to get to 1, the scaling factor would have to be about 0.36
 
-pcprior = list(prec =list(prior="pc.prec", param = c(1, 0.1)))
+# we use a penalising complexity prior which are particular suited to the
+# analyses of additive models. 
+# We should test the sensitivity of priors on the full data model
+pcprior = list(prec = list(
+  prior="pc.prec",
+  param = c(1, 0.1)) # This prior suggests that the probability that variance for the random effect is greater than 1 is 10%
+)
+
+# We need to fix the residual variance to one, since it is not an identifiable quantity
+# within a binomial model. 
+obs_hyper <- list(prec = list(initial = log(1), fixed = TRUE))
