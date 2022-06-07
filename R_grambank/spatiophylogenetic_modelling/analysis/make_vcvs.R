@@ -5,7 +5,7 @@ source("fun_def_h_load.R")
 h_load(pkg = c("ape", "tidyverse", "assertthat"))
 
 # load variational covariance matrix function taken from geoR::varcov_spatial
-source('spatiophylogenetic_modelling/analysis/varcov_spatial.R')
+source('spatiophylogenetic_modelling/analysis/functions/varcov_spatial.R')
 
 #make output dirs
 if (!dir.exists("output/spatiophylogenetic_modelling/")) {
