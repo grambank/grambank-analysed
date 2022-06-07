@@ -19,7 +19,7 @@ R_grambank/impute_missing_values.log
 #images
 **/*.png
 **/*.tiff
-R_grambank/Rplots.pdf
+*Rplots.pdf
 R_grambank/spatiophylogenetic_modelling/phylogenies/EDGE6635-merged-relabelled.tree
 R_grambank/output/spatiophylogenetic_modelling/processed_data/jaeger_removed.csv
 R_grambank/output/spatiophylogenetic_modelling/featurewise/results_debug/*
@@ -33,3 +33,4 @@ R_grambank/output/spatiophylogenetic_modelling/featurewise/results/phylo_only/I
 R_grambank/output/spatiophylogenetic_modelling/simulated_data/*
 R_grambank/output/spatiophylogenetic_modelling/simulated_output/*
 R_grambank/output/spatiophylogenetic_modelling/precision_matrices.RDS
+R_grambank/output/spatiophylogenetic_modelling/simulation_plots/*
