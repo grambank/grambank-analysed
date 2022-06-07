@@ -120,7 +120,7 @@ for(feauture in features){
   #  feature <- features[1]
   cat(paste0("I'm on ", feature, " and the time is ", Sys.time(), ".\n"))
   
-cat(paste0("done with set-up on ", filename, " and the time is ", Sys.time(), ".\n"))
+cat(paste0("done with set-up on ", feature, " and the time is ", Sys.time(), ".\n"))
 
 #### Phylo Only model ####
 
@@ -142,7 +142,7 @@ lambdaonly_model = inla(formula = formula,
                         control.compute = list(waic = TRUE), 
                         data = GB)
 
-cat(paste0("Finished running phylo-only on ", filename, " and the time is ", Sys.time(), ".\n"))
+cat(paste0("Finished running phylo-only on ", feature, " and the time is ", Sys.time(), ".\n"))
 
 #### Spatial Only model ####
 ## The spatial model is set up the same way as the phylogenetic model
@@ -163,7 +163,7 @@ spatialonly_model = inla(formula = formula,
                          family = "binomial",
                          data = GB)
 
-cat(paste0("Finished running spatial only on ", filename, " and the time is ", Sys.time(), ".\n"))
+cat(paste0("Finished running spatial only on ", feature, " and the time is ", Sys.time(), ".\n"))
 
 # #### Dual Model ####
 # 
@@ -185,23 +185,23 @@ formula <-  eval(substitute(this_feature ~
 dual_model = inla(formula = formula,
                   control.compute = list(waic = TRUE),
                   family = "binomial",
-                  data = data)
+                  data = GB)
 
-cat(paste0("Finished running dual on ", filename, " and the time is ", Sys.time(), ".\n"))
+cat(paste0("Finished running dual on ", feature, " and the time is ", Sys.time(), ".\n"))
 
 #### Save output ####
 saved_file =   paste0(OUTPUTDIR, feature, ".qs")
 
 phylogeny_only = strip_inla(lambdaonly_model)
-cat(paste0("Finished running strip inla on phylo only  ", filename, " and the time is ", Sys.time(), ".\n"))
+cat(paste0("Finished running strip inla on phylo only  ", feature, " and the time is ", Sys.time(), ".\n"))
 
 spatial_only = strip_inla(spatialonly_model)
 
-cat(paste0("Finished running strip inla on spatial only  ", filename, " and the time is ", Sys.time(), ".\n"))
+cat(paste0("Finished running strip inla on spatial only  ", feature, " and the time is ", Sys.time(), ".\n"))
 
 dual_model = strip_inla(dual_model)
 
-cat(paste0("Finished running strip inla on dual  ", filename, " and the time is ", Sys.time(), ".\n"))
+cat(paste0("Finished running strip inla on dual  ", feature, " and the time is ", Sys.time(), ".\n"))
 
 ## For each model we strip out the information we need to calculate heritability scores
 ## to save on storage space. 
@@ -217,7 +217,7 @@ beep()
 
 index <- index + 1
 
-cat(paste0("I've finished ", filename, " and the time is ", Sys.time(), ".\n That means I'm ", round((index/length(range)), 2)*100, "% done.\n"))
+cat(paste0("I've finished ", feature, " and the time is ", Sys.time(), ".\n That means I'm ", round((index/length(range)), 2)*100, "% done.\n"))
 rm(model_outputs, lambdaonly_model, spatialonly_model, dual_model)
 }
 
