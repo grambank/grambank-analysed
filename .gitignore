@@ -34,3 +34,4 @@ R_grambank/output/spatiophylogenetic_modelling/simulated_data/*
 R_grambank/output/spatiophylogenetic_modelling/simulated_output/*
 R_grambank/output/spatiophylogenetic_modelling/precision_matrices.RDS
 R_grambank/output/spatiophylogenetic_modelling/simulation_plots/*
+R_grambank/output/spatiophylogenetic_modelling/featurewise/results/*
