@@ -31,6 +31,10 @@ h_load(verbose = F, pkg = c(
 	"MASS",
 	"matrixStats",
 	"cluster", 
+  "MCMCglmm", 
+"foreach",
+"geiger",
+
 
 	# "imputation
 "randomForest",
@@ -95,7 +99,3 @@ h_load(verbose = F, pkg = c(
 options(tidyverse.quiet = TRUE)
 options(warn.conflicts = FALSE)
 options(stringsAsFactors = FALSE)
-
-
-
-#ln -s /Users/skirgard/Nextcloud/Git_output/grambank-analysed/output /Users/skirgard/Git/grambank/grambank-analysed/R_grambank
