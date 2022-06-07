@@ -65,26 +65,34 @@ sink(file = paste0(OUTPUTDIR , "INLA_log_range_", start, "_", end,"_", time, ".t
 
 #loading inputs
 cat("\n###\nLoading covariance matrices...\n")
-source("spatiophylogenetic_modelling/analysis/make_vcvs.R")
+
+precision_matrices_fn <- "output/spatiophylogenetic_modelling/precision_matrices.RDS"
+if(!(file.exists(precision_matrices_fn))){
+  source("spatiophylogenetic_modelling/analysis/simulations/make_precisionmatrices.R")}
+
+precision_matrices = readRDS(precision_matrices_fn)
+phylo_prec_mat = precision_matrices$phylogenetic_precision
+spatial_prec_mat = precision_matrices$spatial_precision
 
 cat("\n###\nDone with covariance matrices.\n")
-
-## Adding random effect ids
-grambank_df = GB %>%
-  left_join(tibble(Language_ID = rownames(phylo_prec_mat),
-                   phy_id_generic = 1:nrow(phylo_prec_mat),
-                   phy_id_iid_model = 1:nrow(phylo_prec_mat),
-                   spatial_id_generic = 1:nrow(spatial_prec_mat),
-                   spatial_id_iid_model = 1:nrow(spatial_prec_mat)), 
-            by = "Language_ID") %>% 
-  left_join(languages,  by = "Language_ID") %>% 
-  rename(AUTOTYP_area_id_iid_model = AUTOTYP_area)
-
 
 tree_fn <- "output/spatiophylogenetic_modelling/processed_data/EDGE_pruned_tree.tree"
 if(!(file.exists(tree_fn))){
   source("spatiophylogenetic_modelling/processing/pruning_EDGE_tree.R")}
 tree = read.tree(tree_fn)
+
+tree_tips_df <- tree$tip.label %>% 
+  as.data.frame() %>% 
+  rename("Language_ID"= ".")
+
+#reading in GB
+GB_filename <- file.path("output", "GB_wide", "GB_cropped_for_missing.tsv")
+if (!file.exists(GB_filename)) { 
+  source("make_wide.R")
+  source("make_wide_binarized.R")
+  source("impute_missing_values.R")}		
+GB <- tree_tips_df %>% 
+  inner_join(  read.delim(GB_filename, sep = "\t"), by = "Language_ID")
 
 ## Since we are using a sparse phylogenetic matrix, we need to math taxa to the correct
 ## rows in the matrix
