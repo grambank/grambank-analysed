@@ -66,3 +66,7 @@ WIDE_COLSPEC = c(
 if (!dir.exists("output")) {
   dir.create("output")
 }
+
+if (!dir.exists("output/spatiophylogenetic_modelling/")) {
+  dir.create("output/spatiophylogenetic_modelling/")
+}
