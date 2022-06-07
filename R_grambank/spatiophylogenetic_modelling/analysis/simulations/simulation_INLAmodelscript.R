@@ -1,5 +1,3 @@
-#!/usr/bin/env Rscript
-
 # This script tests the following:
 # Pagel's lambda
 # Phylo only
