@@ -1,13 +1,13 @@
-source("functions/fun_def_h_load.R")
+source("fun_def_h_load.R")
 h_load(pkg = c("qs", "unglue", "tidyverse"))
 
-OUTPUTDIR <- "output/plots"
+OUTPUTDIR <- "output/spatiophylogenetic_modelling/simulation_plots/"
 if(!dir.exists(OUTPUTDIR)){
   dir.create(OUTPUTDIR, showWarnings = FALSE)
 }
 
-qs_files <- list.files("output/simulated_output", pattern = ".qs", full.names = TRUE)
-params <- list.files("output/simulated_output", pattern = ".qs") %>%
+qs_files <- list.files("output/spatiophylogenetic_modelling/simulated_output", pattern = ".qs", full.names = TRUE)
+params <- list.files("output/spatiophylogenetic_modelling/simulated_output", pattern = ".qs") %>%
   unglue_data("Prop{prop}_Lambda{lamb}Iter{iter}.qs",
               convert = TRUE)
 
@@ -55,11 +55,11 @@ p1 = ggplot(plot_dat_mean, aes(x = lamb, y = value)) +
  
 plot(p1)
 
-ggsave("output/plots/sim_results_means_with_points_SP.pdf", 
+ggsave(paste0(OUTPUTDIR, "sim_results_means_with_points_SP.pdf"), 
        width = 120, units = "mm")
 
 ##### save pdf ########
-pdf("output/plots/sim_results_means_with_points.pdf")
+pdf(file = paste0(OUTPUTDIR, "sim_results_means_with_points.pdf"))
 
 ggplot(plot_dat_mean, aes(lamb, value)) +
   geom_boxplot(aes(fill = Variable)) +
@@ -72,10 +72,9 @@ ggplot(plot_dat_mean, aes(lamb, value)) +
   xlab("Simulated Value of Phylogenetic 'Lambda'") +
   theme_minimal()
 
-dev.off()
+x <- dev.off()
 
-
-pdf("output/plots/sim_results_means_boxplots_only.pdf")
+pdf(file = paste0(OUTPUTDIR,"sim_results_means_boxplots_only.pdf"))
 
 ggplot(plot_dat_mean, aes(lamb, value)) +
   geom_boxplot(aes(fill = Variable)) +
@@ -85,4 +84,4 @@ ggplot(plot_dat_mean, aes(lamb, value)) +
   xlab("Simulated Value of Phylogenetic 'Lambda'") +
   theme_minimal()
 
-dev.off()
+x <- dev.off()
