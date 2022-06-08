@@ -90,7 +90,8 @@ for(iter in 1:iterations){
         value_col_name <- paste0("Prop", desired_proportion, "_Lambda",desired_lambda, "Iter", iter)
         colnames(out_df) <- c(value_col_name, "Language_ID")
         df = left_join(out_df, df, by = "Language_ID") %>% 
-          dplyr::select(Language_ID, everything())
+          dplyr::select(Language_ID, everything()) %>% 
+          dplyr::select(-y)
         
         write.csv(df, file = paste(simulated_location, "simulated_data_df.csv"), row.names = FALSE)  
       }
