@@ -42,9 +42,9 @@ locations_df = read.delim(
   dplyr::select(Language_ID, Latitude, Longitude) %>% 
   inner_join(tree_tips_df, by = "Language_ID") #subset to matches in tree
 
-df <- data.frame(matrix(ncol = 1, nrow = 0))
-colnames(df) <- c("Language_ID") 
-df$Language_ID <- as.character(df$Language_ID)
+#df to bind to in the for-loop
+df <- locations_df %>% 
+  dplyr::select(Language_ID)
 
 for(iter in 1:iterations){
   cat("Iteration", iter, "of", max(iterations), "...\n")
@@ -87,20 +87,27 @@ for(iter in 1:iterations){
         cat(paste0("... stopped search.\n"))
         out_df = data.frame(y = y - 1, # make data 0 & 1 
                             Language_ID = tree$tip.label)
+        
         value_col_name <- paste0("Prop", desired_proportion, "_Lambda",desired_lambda, "Iter", iter)
         colnames(out_df) <- c(value_col_name, "Language_ID")
-        df = left_join(out_df, df, by = "Language_ID") %>% 
-          dplyr::select(Language_ID, everything()) %>% 
-          dplyr::select(-y)
         
-        write.csv(df, file = paste(simulated_location, "simulated_data_df.csv"), row.names = FALSE)  
+        df = left_join(out_df, df, by = "Language_ID") %>% 
+          dplyr::select(Language_ID, everything())
+        
+         
+          write_delim(x = df, file = paste(simulated_location, "simulated_data_df.tsv"),delim = "\t")  
       }
         
-      
+     
     }
   }
 }
 
+if("y" %in% colnames(df)){
+df %>% 
+  dplyr::select(-y) %>% 
+  write_delim(file = paste(simulated_location, "simulated_data_df.tsv"),delim = "\t")  
+}
 
 if(beep == 1){
 beepr::beep()
