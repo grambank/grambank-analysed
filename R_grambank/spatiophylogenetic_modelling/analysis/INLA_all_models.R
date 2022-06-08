@@ -135,6 +135,7 @@ for(feauture in features){
   phylo_only_model<- INLA::inla(formula = formula,
                           family = "binomial",
                           control.compute = list(waic = TRUE), 
+                          control.predictor=list(link=1),
                           data = data)
   
   cat(paste0("Finished running phylo-only on ", feature, " and the time is ", Sys.time(), ".\n"))
@@ -154,6 +155,7 @@ for(feauture in features){
   spatialonly_model<- INLA::inla(formula = formula,
                            control.compute = list(waic = TRUE),
                            family = "binomial",
+                           control.predictor=list(link=1),
                            data = data)
   
   cat(paste0("Finished running spatial only on ", feature, " and the time is ", Sys.time(), ".\n"))
@@ -169,6 +171,7 @@ for(feauture in features){
   AUTOTYP_area_model <- INLA::inla(formula = formula,
                                   control.compute = list(waic = TRUE),
                                   family = "binomial",
+                                  control.predictor=list(link=1),
                                   data = data)
   
  
@@ -192,6 +195,7 @@ for(feauture in features){
   dual_model<- INLA::inla(formula = formula,
                           control.compute = list(waic = TRUE),
                           family = "binomial",
+                          control.predictor=list(link=1),
                           data = data)
   
   # #### Trial Model ####
@@ -218,6 +222,7 @@ for(feauture in features){
   trial_model<- INLA::inla(formula = formula,
                            control.compute = list(waic = TRUE),
                            family = "binomial",
+                           control.predictor=list(link=1),
                            data = data)
   
   cat(paste0("Finished running trial on ", feature, " and the time is ", Sys.time(), ".\n"))
