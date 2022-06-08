@@ -1,7 +1,7 @@
 ### Precison matrix set-up
 
 source("fun_def_h_load.R")
-h_load(pkg = c("ape", "adephylo", "MCMCglmm", "assertthat", "stringr"))
+h_load(pkg = c("ape", "adephylo", "MCMCglmm", "assertthat", "stringr", "tidyverse"))
 
 source('spatiophylogenetic_modelling/analysis/functions/varcov_spatial.R')
 
@@ -57,18 +57,22 @@ summary(diag(phy_cov_std)[node_idx])
 # Tips
 summary(diag(phy_cov_std)[!node_idx])
 
-# Convert the typical variance standardized covariance matrix back toa precison matrix
+# Convert the typical variance standardized covariance matrix back to a precison matrix
 phy_prec_mat = solve(phy_cov_std)
 dimnames(phy_prec_mat) = dimnames(phy_inv_nodes)
 
 #### Spatial Precison ####
 # Get the longitude and latitude data from the simulated datasets
-data = read.delim('output/non_GB_datasets/glottolog-cldf_wide_df.tsv', sep = "\t") %>% 
+locations_df = read.delim('output/non_GB_datasets/glottolog-cldf_wide_df.tsv', sep = "\t") %>% 
   inner_join(tree_tips_df, by = "Language_ID") #subset to matches in tree
+
+#check that the locations df and tree tips match
+x<- assertthat::assert_that(nrow(locations_df) == Ntip(tree), msg = "OH NO THE TREE AND LOCATIONS ARE DIFFERENT")
+x <- assertthat::assert_that(locations_df$Language_ID %in% tree$tip.label %>% sum() == nrow(locations_df),  msg = "OH NO THE TREE AND LOCATIONS ARE DIFFERENT")
 
 source("spatiophylogenetic_modelling/analysis/INLA_parameters.R")
 
-spatial_covar_mat = varcov.spatial(data[,c("Longitude", "Latitude")], 
+spatial_covar_mat = varcov.spatial(locations_df[,c("Longitude", "Latitude")], 
                                    cov.pars = sigma, 
                                    kappa = kappa)$varcov
 
@@ -76,7 +80,7 @@ spatial_covar_mat = varcov.spatial(data[,c("Longitude", "Latitude")],
 typical_variance_spatial = exp(mean(log(diag(spatial_covar_mat))))
 spatial_cov_std = spatial_covar_mat / typical_variance_spatial
 spatial_prec_mat = solve(spatial_cov_std)
-dimnames(spatial_prec_mat) = list(data$Language_ID, data$Language_ID)
+dimnames(spatial_prec_mat) = list(locations_df$Language_ID, locations_df$Language_ID)
 
 ## Save the precision matrices to be used in each script
 precision_matrices = list(
