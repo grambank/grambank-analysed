@@ -18,7 +18,7 @@ if(length(args) != 0){
   end <- args[3]
   range <- start:end
 } else { #if you're running this script chunkwise in Rstudio or similar instead of via command line, you'll read in the parameters this way:
-  sim_or_real <- "sim"
+  sim_or_real <- "real"
   start <- 1
   end <- 40
   range <- start:end
@@ -114,7 +114,7 @@ features <- features[range]
 
 index <- 0
 
-for(feauture in features){
+for(feature in features){
   #  feature <- features[1]
   cat(paste0("I'm on ", feature, " and the time is ", Sys.time(), ".\n"))
   
