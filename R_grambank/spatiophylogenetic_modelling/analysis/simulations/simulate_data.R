@@ -5,7 +5,7 @@ source("fun_def_h_load.R")
 h_load(pkg = c("ape", "dplyr"))
 
 #This script takes a while to run. If you set the variable beep to 1 it will make a little pling sound when it's finished, which can be handy. By default it's set to 0. Do not set it to 1 if you are running the script on a cluster, as clusters don't have audio capabilities.
-beep <- 0
+beep <- 1
 if(beep == 1){
   h_load("beepr")
   }
@@ -42,15 +42,19 @@ locations_df = read.delim(
   dplyr::select(Language_ID, Latitude, Longitude) %>% 
   inner_join(tree_tips_df, by = "Language_ID") #subset to matches in tree
 
+df <- data.frame(matrix(ncol = 1, nrow = 0))
+colnames(df) <- c("Language_ID") 
+df$Language_ID <- as.character(df$Language_ID)
+
 for(iter in 1:iterations){
   cat("Iteration", iter, "of", max(iterations), "...\n")
   for(i in seq_along(proportions)){
     desired_proportion = proportions[i]
-    cat("Searching for a proportion of", desired_proportion, "...\n")
     for(j in seq_along(lambda_transformations)){
       searching = TRUE
       desired_lambda = lambda_transformations[j]
       try = 0
+      cat("Searching for a proportion of", desired_proportion, "...\n")
       cat("\twith a lambda of", desired_lambda, "...\n")
       while(searching){
         if(try == try_times){ searching = FALSE }
@@ -70,8 +74,9 @@ for(iter in 1:iterations){
            observed_proportion < desired_proportion + allowable_variation)
           searching = FALSE
         
+        cat(paste0("I'm on try ", try, " out of max ", try_times,".\n"))
         try = try + 1
-        print(try)
+        
       }
       
       if(length(table(y)) == 1){
@@ -79,14 +84,15 @@ for(iter in 1:iterations){
         # we don't want that - so just skip this
         next 
       } else {
+        cat(paste0("... stopped search.\n"))
         out_df = data.frame(y = y - 1, # make data 0 & 1 
                             Language_ID = tree$tip.label)
-        out_df = left_join(out_df, locations_df, by = "Language_ID")
+        value_col_name <- paste0("Prop", desired_proportion, "_Lambda",desired_lambda, "Iter", iter)
+        colnames(out_df) <- c(value_col_name, "Language_ID")
+        df = left_join(out_df, df, by = "Language_ID") %>% 
+          dplyr::select(Language_ID, everything())
         
-        filename = paste0(simulated_location, "Prop", desired_proportion,
-                          "_Lambda",desired_lambda, "Iter", iter, ".csv")
-        
-        write.csv(out_df, filename, row.names = FALSE)  
+        write.csv(df, file = paste(simulated_location, "simulated_data_df.csv"), row.names = FALSE)  
       }
         
       
@@ -98,4 +104,3 @@ for(iter in 1:iterations){
 if(beep == 1){
 beepr::beep()
 }
-
