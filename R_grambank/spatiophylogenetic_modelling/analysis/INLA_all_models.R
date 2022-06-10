@@ -50,6 +50,7 @@ source("spatiophylogenetic_modelling/analysis/INLA_parameters.R")
 #load functions
 source('spatiophylogenetic_modelling/analysis/functions/varcov_spatial.R')
 source('spatiophylogenetic_modelling/analysis/functions/strip_inla.R')
+source("spatiophylogenetic_modelling/install_inla.R")
 
 time <- as.character(Sys.time())
 
