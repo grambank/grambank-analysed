@@ -6,7 +6,7 @@ if(verbose == T){
   }
 
 
-if(!(INLA %in% rownames(installed.packages())) & cluster == 0){
+if(!("INLA" %in% rownames(installed.packages())) & cluster == 0){
 
 source("fun_def_h_load.R")  
 
@@ -16,7 +16,7 @@ install.packages("INLA",repos=c(INLA="https://inla.r-inla-download.org/R/testing
 
 }
 
-if(!(INLA %in% rownames(installed.packages())) & cluster == 1){
+if(!("INLA" %in% rownames(installed.packages())) & cluster == 1){
   
   if(!(dir.exists("../rlibs"))) {
 mkdir("../rlibs")  
