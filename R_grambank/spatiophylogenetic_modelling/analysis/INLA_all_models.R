@@ -5,7 +5,7 @@
 # Dual model
 
 source("requirements.R")
-beep <- 1
+beep <- 0
 
 #set this as 1 if you're just running this script on 50 lgs over 3 features to debug. Otherwise set to 0.debug_run = 0
 
@@ -229,22 +229,42 @@ for(feature in features){
   cat(paste0("Finished running trial on ", feature, " and the time is ", Sys.time(), ".\n"))
   
   #strip interesting information from the INLA objects
-  phylogeny_only = strip_inla(phylo_only_model)
+  
+  phylogeny_only = try(expr = {strip_inla(phylo_only_model)})
+  
+  if (class(phylogeny_only ) == "try-error") {
+    phylogeny_only <- NULL
+    }
+  
+  
   cat(paste0("Finished running strip inla on phylo only  ", feature, " and the time is ", Sys.time(), ".\n"))
   
-  spatial_only = strip_inla(spatialonly_model)
-  
+  spatial_only = try(expr = {strip_inla(spatialonly_model)})
+
+  if (class(spatial_only ) == "try-error") {
+    spatial_only <- NULL
+  }
   cat(paste0("Finished running strip inla on spatial only of ", feature, " and the time is ", Sys.time(), ".\n"))
 
-  AUTOTYP_area = strip_inla(  AUTOTYP_area_model)
-  
+  AUTOTYP_area = try(expr = {strip_inla(  AUTOTYP_area_model)})
+    if (class(AUTOTYP_area ) == "try-error") {
+    AUTOTYP_area <- NULL
+  }
   cat(paste0("Finished running strip inla on AUTOTYP_area_model of ", feature, " and the time is ", Sys.time(), ".\n"))
   
-  dual_model = strip_inla(dual_model)
+  dual_model = try(expr = {strip_inla(dual_model)})
+  
+  if (class(dual_model) == "try-error") {
+    dual_model <- NULL
+  }
   
   cat(paste0("Finished running strip inla on dual  of ", feature, " and the time is ", Sys.time(), ".\n"))
   
-  trial_model = strip_inla(trial_model)
+  trial_model = try(expr = {strip_inla(trial_model)})
+  
+  if (class(trial_model) == "try-error") {
+    trial_model <- NULL
+  }
   
   cat(paste0("Finished running strip inla on trial model of  ", feature, " and the time is ", Sys.time(), ".\n"))
   
