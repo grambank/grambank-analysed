@@ -66,7 +66,7 @@ sink(file = paste0(OUTPUTDIR , "INLA_log_range_", start, "_", end,"_", time, ".t
 
 cat("\n###\nLoading covariance matrices...\n")
 
-precision_matrices_fn <- "output/spatiophylogenetic_modelling/precision_matrices.RDS"
+precision_matrices_fn <- "output/spatiophylogenetic_modelling/processed_data/precision_matrices.RDS"
 if(!(file.exists(precision_matrices_fn))){
   source("spatiophylogenetic_modelling/analysis/simulations/make_precisionmatrices.R")}
 

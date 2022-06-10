@@ -88,4 +88,4 @@ precision_matrices = list(
   spatial_precision = spatial_prec_mat
 )
 
-saveRDS(precision_matrices, "output/spatiophylogenetic_modelling/precision_matrices.RDS")
+saveRDS(precision_matrices, "output/spatiophylogenetic_modelling/processed_data/precision_matrices.RDS")
