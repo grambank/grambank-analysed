@@ -35,3 +35,13 @@ pcprior = list(prec = list(
 # We need to fix the residual variance to one, since it is not an identifiable quantity
 # within a binomial model. 
 obs_hyper <- list(prec = list(initial = log(1), fixed = TRUE))
+
+#making list of lgs in tree
+tree_fn <- "output/spatiophylogenetic_modelling/processed_data/EDGE_pruned_tree.tree"
+if(!(file.exists(tree_fn))){
+  source("spatiophylogenetic_modelling/processing/pruning_EDGE_tree.R")}
+
+tree_tips_df <-  read.tree(tree_fn) %>% 
+  .$tip.label %>% 
+  as.data.frame() %>% 
+  rename("Language_ID"= ".")
