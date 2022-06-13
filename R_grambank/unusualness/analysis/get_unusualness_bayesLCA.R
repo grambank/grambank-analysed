@@ -190,7 +190,7 @@ unusualness_df<-plyr::ldply(cluster_list,
   plyr::ddply("lg",function(x) data.frame(prob_lca=prod(x$prob)))
 
 
-unusualness_df %>% write_tsv(file = paste0(OUTPUTDIR_tables, "unusualness.tsv"))
+unusualness_df %>% write_tsv(file = paste0(OUTPUTDIR_tables, "/unusualness.tsv"))
 
 # Enrich GB data
 gb$prob_lca<-unusualness_df$prob_lca
@@ -214,4 +214,5 @@ gb$Estimator<-fct_recode(gb$Estimator,
                          "Kernel 30"="prob_ker_30",
                          "Kernel 40"="prob_ker_40")
 
-gb %>% write_tsv(file = paste0(OUTPUTDIR_tables, "surprisal.tsv"))
+gb %>% write_tsv(file = paste0(OUTPUTDIR_tables, "/surprisal.tsv"))
+/

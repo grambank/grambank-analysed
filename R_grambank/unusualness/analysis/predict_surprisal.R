@@ -12,7 +12,7 @@ if (!dir.exists(OUTPUTDIR_tables)) { dir.create(OUTPUTDIR_tables) }
 OUTPUTDIR_plots <- file.path("output/unusualness/plots")
 if (!dir.exists(OUTPUTDIR_plots)) { dir.create(OUTPUTDIR_plots) }		
 
-surprisal_fn <- paste0(OUTPUTDIR_tables, "surprisal.tsv")
+surprisal_fn <- paste0(OUTPUTDIR_tables, "/surprisal.tsv")
 if(!file.exists(surprisal_fn)){
   source("unusualness/analysis/get_unusualness_bayesLCA.R")
 }
