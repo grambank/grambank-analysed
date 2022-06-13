@@ -1,7 +1,11 @@
 strip_inla = function(object){
   
-  # Get the posterior of the ICC effect
-  icc_posterior = get_iccposterior(object, n = 100)
+  # try to get the posterior of the ICC effect
+  icc_posterior <-  try(get_iccposterior(object, n = 100))
+  
+  if (class(icc_posterior ) == "try-error") {
+    icc_posterior  <- NULL
+  }
   
   # save the WAIC score
   waic = object$waic
