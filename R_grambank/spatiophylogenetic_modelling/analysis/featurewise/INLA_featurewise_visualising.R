@@ -27,7 +27,7 @@ for(fn in fns) {
   trial_model_spatial_effect  <- qs[[5]]$icc_posterior[ , 2] %>% mean()
   trial_model_autotyp_area_effect  <- qs[[5]]$icc_posterior[ , 4] %>% mean()
   options(warn=0)
-  
+
   phylogeny_only_waic <- qs[[1]]$waic$waic
   spatial_only_waic <- qs[[2]]$waic$waic
   AUTOTYP_area_waic <- qs[[3]]$waic$waic
@@ -75,4 +75,11 @@ df %>%
 
 ggsave("output/spatiophylogenetic_modelling/featurewise/boxplot_waic.png")
   
+
+mean(df$phylogeny_only_waic)
+mean(df$spatial_only_waic)
+mean(df$AUTOTYP_area_waic)
+mean(df$dual_model_waic)
+mean(df$trial_model_waic)
+
   
