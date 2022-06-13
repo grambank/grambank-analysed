@@ -16,7 +16,9 @@ surprisal_fn <- paste0(OUTPUTDIR_tables, "/surprisal.tsv")
 if(!file.exists(surprisal_fn)){
   source("unusualness/analysis/get_unusualness_bayesLCA.R")
 }
-gb <- read.delim(file = surprisal_fn, sep = "\t")
+gb <- read.delim(file = surprisal_fn, sep = "\t") %>% 
+  group_by(Language_ID, aes) %>% 
+  summarise(Surprisal = mean(Surprisal, na.rm = T))
 
 ### NEXT PART REQUIRES MATRICES ETC
 
@@ -36,6 +38,22 @@ if(!(file.exists(precision_matrices_fn))){
 precision_matrices = readRDS(precision_matrices_fn)
 phylo_prec_mat = precision_matrices$phylogenetic_precision
 spatial_prec_mat = precision_matrices$spatial_precision
+
+#INLA phylo only
+source("spatiophylogenetic_modelling/analysis/INLA_parameters.R")
+source("spatiophylogenetic_modelling/install_inla.R")
+
+dual_model = inla(formula =Surprisal ~
+                    f(spatial_id,
+                      model = "generic2",
+                      Cmatrix = spatial_prec_mat,
+                      hyper = pcprior) +
+                    f(phylo_id,
+                      model = "generic2",
+                      Cmatrix = phylo_prec_mat,
+                      hyper = pcprior),
+                  data = gb,
+                  control.family = list(hyper = list(prec = list(initial = log(1e+08), fixed = TRUE))))
 
 
 formula <- Surprisal~
