@@ -1,3 +1,5 @@
+# Load pkgs
+source("requirements.R")
 
 # Set working directory for output
 #setup outpur dirs
@@ -10,14 +12,11 @@ if (!dir.exists(OUTPUTDIR_tables)) { dir.create(OUTPUTDIR_tables) }
 OUTPUTDIR_plots <- file.path("output/unusualness/plots")
 if (!dir.exists(OUTPUTDIR_plots)) { dir.create(OUTPUTDIR_plots) }		
 
-# Load pkgs
-source("requirements.R")
-
 surprisal_fn <- paste0(OUTPUTDIR_tables, "surprisal.tsv")
 if(!file.exists(surprisal_fn)){
   source("unusualness/analysis/get_unusualness_bayesLCA.R")
 }
-gb <- read_tsv(file = surprisal_fn)
+gb <- read.delim(file = surprisal_fn, sep = "\t")
 
 ### NEXT PART REQUIRES MATRICES ETC
 
@@ -29,24 +28,14 @@ gb <- read_tsv(file = surprisal_fn)
 gb<-gb %>%
   mutate(Endangerement=ifelse(aes %in% c("threatened","moribund","nearly_extinct"),"endangered",aes))
 
+#In the spatiophylogenetic modelling of the features, we use the dataset cropped for missing data but without imputation. For the unsualness analsyis, we use the imputed data. They are different in the feature values, but it is the same subset of langauges in both. Therefore, we can use the same precision matrices for both the predict unsualness analysis and spatiophylogenetic modelling with INLA.
+precision_matrices_fn <- "output/spatiophylogenetic_modelling/processed_data/precision_matrices.RDS"
+if(!(file.exists(precision_matrices_fn))){
+  source("spatiophylogenetic_modelling/analysis/simulations/make_precisionmatrices.R")}
 
-spatial_covar_mat_fn <- "output/spatiophylogenetic_modelling/spatial_covar_mat.tsv"
-if(!file.exists(spatial_covar_mat_fn)){
-  source("spatiophylogenetic_modelling/analysis/make_vcvs.R")
-}
-
-spatial_covar_mat <- read_tsv(spatial_covar_mat_fn, show_col_types = F) %>% 
-  column_to_rownames("Language_ID") %>% 
-  as.matrix()
-
-phylo_covar_mat_fn <- "output/spatiophylogenetic_modelling/phylo_covar_mat.tsv"
-if(!file.exists(phylo_covar_mat_fn)){
-  source("spatiophylogenetic_modelling/analysis/make_vcvs.R")
-}
-
-phylo_covar_mat <- read_tsv(phylo_covar_mat_fn, show_col_types = F) %>% 
-  column_to_rownames("Language_ID") %>% 
-  as.matrix()
+precision_matrices = readRDS(precision_matrices_fn)
+phylo_prec_mat = precision_matrices$phylogenetic_precision
+spatial_prec_mat = precision_matrices$spatial_precision
 
 
 formula <- Surprisal~
