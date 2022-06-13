@@ -43,6 +43,9 @@ spatial_prec_mat = precision_matrices$spatial_precision
 source("spatiophylogenetic_modelling/analysis/INLA_parameters.R")
 source("spatiophylogenetic_modelling/install_inla.R")
 
+gb <- tree_tips_df %>% 
+  inner_join(gb, by =  "Language_ID")
+
 dual_model = inla(formula =Surprisal ~
                     f(spatial_id,
                       model = "generic2",
