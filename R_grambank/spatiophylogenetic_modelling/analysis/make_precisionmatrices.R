@@ -19,7 +19,7 @@ tree <- ape::keep.tip(tree, lgs_in_analysis$Language_ID)
 tree$edge.length = tree$edge.length / 1000
 
 #check that all the tip labels in the tree match the GB and vice versa
-x <- assertthat::assert_that(tree$tip.label %in% gb_df_cropped$Language_ID %>% sum() == Ntip(tree))
+x <- assertthat::assert_that(all(tree$tip.label %in% gb_df_cropped$Language_ID))
 
 # We want the phylogenetic matrix to have a variance of about 1 to make it comparable to 
 # the spatial matrix and to compare across trees. 
