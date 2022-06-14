@@ -114,17 +114,13 @@ gb<-gb %>%
 # I. they are highly correlated within them and 
 # II. reasonably independent from features in other bundles
 
-# Get gap statistic for each number of clusters
-#test <- factoextra::fviz_nbclust(t(gb[,gb_features]), FUN = hcut, method = "gap_stat")
-
-#test2 <- cluster::clusGap(t(gb[,gb_features]), FUN = hcut, method = "gap_stat", K.max = 30)
-
 # 9 clusters selected as optimal according to this criterion
 n_clusters<-9
 
 # Obtain a hierarchical clustering of the features with that number of clusters
 hier_gb<-hcut(t(gb[,gb_features]), k = n_clusters, stand = TRUE)
-fviz_dend(hier_gb, rect = TRUE)
+
+suppressWarnings(fviz_dend(hier_gb, rect = TRUE))
 
 # Assign cluster number to each GB feature
 hier_classes<-hier_gb$cluster
