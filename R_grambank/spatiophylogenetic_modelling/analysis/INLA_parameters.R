@@ -45,3 +45,10 @@ tree_tips_df <-  read.tree(tree_fn) %>%
   .$tip.label %>% 
   as.data.frame() %>% 
   rename("Language_ID"= ".")
+
+gb_df_cropped <- readr::read_tsv(file = "output/GB_wide/GB_cropped_for_missing.tsv",show_col_types = F) 
+
+lgs_in_analysis <- gb_df_cropped %>% 
+    dplyr::select(Language_ID) %>% 
+  inner_join(tree_tips_df, by = "Language_ID")
+

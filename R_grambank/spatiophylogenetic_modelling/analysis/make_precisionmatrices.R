@@ -5,17 +5,21 @@ h_load(pkg = c("ape", "adephylo", "MCMCglmm", "assertthat", "stringr", "tidyvers
 
 source('spatiophylogenetic_modelling/analysis/functions/varcov_spatial.R')
 
+source("spatiophylogenetic_modelling/analysis/INLA_parameters.R")
+
 #### Phylogenetic Precision ####
 tree_fn <- "output/spatiophylogenetic_modelling/processed_data/EDGE_pruned_tree.tree"
 if(!(file.exists(tree_fn))){
   source("spatiophylogenetic_modelling/processing/pruning_EDGE_tree.R")}
 tree = read.tree(tree_fn)
 
+#double check that subset to lgs in GB cropped dataset
+tree <- ape::keep.tip(tree, lgs_in_analysis$Language_ID)
+
 tree$edge.length = tree$edge.length / 1000
 
-tree_tips_df <- tree$tip.label %>% 
-  as.data.frame() %>% 
-  rename("Language_ID"= ".")
+#check that all the tip labels in the tree match the GB and vice versa
+x <- assertthat::assert_that(tree$tip.label %in% gb_df_cropped$Language_ID %>% sum() == Ntip(tree))
 
 # We want the phylogenetic matrix to have a variance of about 1 to make it comparable to 
 # the spatial matrix and to compare across trees. 
@@ -64,7 +68,7 @@ dimnames(phy_prec_mat) = dimnames(phy_inv_nodes)
 #### Spatial Precison ####
 # Get the longitude and latitude data from the simulated datasets
 locations_df = read.delim('output/non_GB_datasets/glottolog-cldf_wide_df.tsv', sep = "\t") %>% 
-  inner_join(tree_tips_df, by = "Language_ID") #subset to matches in tree
+  inner_join(lgs_in_analysis, by = "Language_ID") #subset to matches in tree
 
 #check that the locations df and tree tips match
 x<- assertthat::assert_that(nrow(locations_df) == Ntip(tree), msg = "OH NO THE TREE AND LOCATIONS ARE DIFFERENT")
