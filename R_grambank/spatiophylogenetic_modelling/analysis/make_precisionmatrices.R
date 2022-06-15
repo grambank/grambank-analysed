@@ -61,11 +61,8 @@ min <- summary(diag(phy_cov_std))[["Min."]]
 x <- all.equal(min, 0, tolerance = 0.05)
 cat(paste0("The min of the phylo covariance matrix is ", round(min, 4), ".\n"))
 
-
+#set dim names. This includes internal nodes and tips. Internal nodes will have names like "Node54", tips will have glottocodes.
 dimnames(phy_cov_std) = dimnames(phy_inv_nodes)
-
-dimnames(phy_inv_nodes)[[1]] %>% 
-  as.data.frame() %>% View()
 
 # If we look at the scale of variance for nodes and not nodes (i.e. tips) 
 # we see that the variance for tips is always approximately 1 (which is what we want to see)
@@ -73,7 +70,8 @@ node_idx = str_detect(rownames(phy_cov_std), "Node")
 # Nodes
 summary(diag(phy_cov_std)[node_idx])
 # Tips
-summary(diag(phy_cov_std)[!node_idx])
+mean <- summary(diag(phy_cov_std)[!node_idx])[["Mean"]]
+cat(paste0("The mean of the phylo covariance matrix for tips is ", round(mean, 4), ".\n"))
 
 # Convert the typical variance standardized covariance matrix back to a precison matrix
 phy_prec_mat = solve(phy_cov_std)
@@ -82,13 +80,10 @@ dimnames(phy_prec_mat) = dimnames(phy_inv_nodes)
 #### Spatial Precison ####
 # Get the longitude and latitude data from the simulated datasets
 locations_df = read.delim('output/non_GB_datasets/glottolog-cldf_wide_df.tsv', sep = "\t") %>% 
-  inner_join(lgs_in_analysis, by = "Language_ID") #subset to matches in tree
+  inner_join(lgs_in_analysis, by = "Language_ID") #subset to matches in tree and in cropped in GB.
 
 #check that the locations df and tree tips match
-x<- assertthat::assert_that(nrow(locations_df) == Ntip(tree), msg = "OH NO THE TREE AND LOCATIONS ARE DIFFERENT")
-x <- assertthat::assert_that(locations_df$Language_ID %in% tree$tip.label %>% sum() == nrow(locations_df),  msg = "OH NO THE TREE AND LOCATIONS ARE DIFFERENT")
-
-source("spatiophylogenetic_modelling/analysis/INLA_parameters.R")
+x <- assertthat::assert_that(all(locations_df$Language_ID %in% tree$tip.label),  msg = "OH NO THE TREE AND LOCATIONS ARE DIFFERENT")
 
 spatial_covar_mat = varcov.spatial(locations_df[,c("Longitude", "Latitude")], 
                                    cov.pars = sigma, 
