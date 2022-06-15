@@ -40,7 +40,7 @@ x <- assertthat::assert_that(all(tree$tip.label %in% lgs_in_analysis$Language_ID
 # By including the nodes, we create a sparse matrix, which results in significant 
 # time improvements within INLA. 
 phy_inv_nodes = MCMCglmm::inverseA(tree,
-                                   nodes = "ALL",
+                                   nodes = "TIPS",
                                    scale = TRUE)$Ainv
 
 # Next, we invert the precison matrix - creating the covariance matrix
