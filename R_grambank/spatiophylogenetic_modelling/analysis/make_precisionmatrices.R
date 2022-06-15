@@ -50,9 +50,22 @@ typical_phylogenetic_variance = exp(mean(log(diag(phy_covar_nodes))))
 phy_cov_std = phy_covar_nodes / typical_phylogenetic_variance
 
 # show that variance is scaled to approximately 1
-summary(diag(phy_cov_std)) # this shows an average and upper bound of 1, but
+# this shows an average and upper bound of 1, but
 # But a minimum value of ~0. This is probably the impact of internal nodes
+
+mean <- summary(diag(phy_cov_std))[["Mean"]] 
+x <- all.equal(mean, 1, tolerance = 0.05)
+cat(paste0("The mean of the phylo covariance matrix is ", round(mean, 4), ".\n"))
+
+min <- summary(diag(phy_cov_std))[["Min."]] 
+x <- all.equal(min, 0, tolerance = 0.05)
+cat(paste0("The min of the phylo covariance matrix is ", round(min, 4), ".\n"))
+
+
 dimnames(phy_cov_std) = dimnames(phy_inv_nodes)
+
+dimnames(phy_inv_nodes)[[1]] %>% 
+  as.data.frame() %>% View()
 
 # If we look at the scale of variance for nodes and not nodes (i.e. tips) 
 # we see that the variance for tips is always approximately 1 (which is what we want to see)
