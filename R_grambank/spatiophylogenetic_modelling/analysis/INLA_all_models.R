@@ -106,7 +106,7 @@ x <- assert_that(all(data$Language_ID == lgs_in_analysis$Language_ID), msg = "Da
 ## rows in the matrix
 data$phylo_id = match(data$Language_ID, rownames(phylo_prec_mat))
 data$spatial_id = match(data$Language_ID, rownames(spatial_prec_mat))
-data$obs_id = 1:nrow(spatial_prec_mat)
+data$obs_id = 1:nrow(data)
 
 #features to loop over
 features <- data %>% 
