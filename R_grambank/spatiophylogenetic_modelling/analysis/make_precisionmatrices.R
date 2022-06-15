@@ -1,10 +1,10 @@
-### Precison matrix set-up
+### Precison matrix set-up for INLA analysis.
 
 source("fun_def_h_load.R")
 h_load(pkg = c("ape", "adephylo", "MCMCglmm", "assertthat", "stringr", "tidyverse"))
 
+#prep necessary variables and functions
 source('spatiophylogenetic_modelling/analysis/functions/varcov_spatial.R')
-
 source("spatiophylogenetic_modelling/analysis/INLA_parameters.R")
 
 #### Phylogenetic Precision ####
@@ -16,10 +16,11 @@ tree = read.tree(tree_fn)
 #double check that subset to lgs in GB cropped dataset
 tree <- ape::keep.tip(tree, lgs_in_analysis$Language_ID)
 
+#rescale the branches
 tree$edge.length = tree$edge.length / 1000
 
 #check that all the tip labels in the tree match the GB and vice versa
-x <- assertthat::assert_that(all(tree$tip.label %in% gb_df_cropped$Language_ID))
+x <- assertthat::assert_that(all(tree$tip.label %in% lgs_in_analysis$Language_ID))
 
 # We want the phylogenetic matrix to have a variance of about 1 to make it comparable to 
 # the spatial matrix and to compare across trees. 
