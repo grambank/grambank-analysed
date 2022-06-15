@@ -89,15 +89,6 @@ spatial_prec_mat = precision_matrices$spatial_precision
 
 cat("\n###\nDone with covariance matrices.\n")
 
-tree_fn <- "output/spatiophylogenetic_modelling/processed_data/EDGE_pruned_tree.tree"
-if(!(file.exists(tree_fn))){
-  source("spatiophylogenetic_modelling/processing/pruning_EDGE_tree.R")}
-tree = read.tree(tree_fn)
-
-tree_tips_df <- tree$tip.label %>% 
-  as.data.frame() %>% 
-  rename("Language_ID"= ".")
-
 #reading in AUTOTYP-area
 if (!file.exists("output/non_GB_datasets/glottolog_AUTOTYP_areas.tsv")) { s
 source("unusualness/processing/assigning_AUTOTYP_areas.R") }		
@@ -105,19 +96,16 @@ autotyp_area <- read.delim("output/non_GB_datasets/glottolog_AUTOTYP_areas.tsv",
   dplyr::select(Language_ID, AUTOTYP_area_id_iid_model = AUTOTYP_area)
 
 #subsetting data to only entries which are also in the tree in case other slunk along
-data <- tree_tips_df %>% 
+data <- lgs_in_analysis %>% 
     inner_join(df, by = "Language_ID") %>% 
   left_join(autotyp_area, by = "Language_ID")
 
-x <- assert_that(nrow(data) == Ntip(tree), msg = "Data doesn't match phylogeny!")
+x <- assert_that(all(data$Language_ID == lgs_in_analysis$Language_ID), msg = "Data doesn't match phylogeny!")
 
 ## Since we are using a sparse phylogenetic matrix, we need to math taxa to the correct
 ## rows in the matrix
-phylo_id = match(tree$tip.label, rownames(phylo_prec_mat))
-data$phylo_id = phylo_id
-
-## Other effects are in the same order they appear in the dataset. 
-data$spatial_id = 1:nrow(spatial_prec_mat)
+data$phylo_id = match(data$Language_ID, rownames(phylo_prec_mat))
+data$spatial_id = match(data$Language_ID, rownames(spatial_prec_mat))
 data$obs_id = 1:nrow(spatial_prec_mat)
 
 #features to loop over
