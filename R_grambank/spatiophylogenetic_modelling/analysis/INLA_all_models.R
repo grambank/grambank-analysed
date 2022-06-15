@@ -1,13 +1,12 @@
 # This script tests the following:
-# Pagel's lambda
 # Phylo only
 # Spatial only
-# Dual model
+# AUTOTYP-area only
+# Dual model (spatial + phylo)
+# Trial (spatial + phylo + AUTOTYP-area)
 
 source("requirements.R")
 beep <- 0
-
-#set this as 1 if you're just running this script on 50 lgs over 3 features to debug. Otherwise set to 0.debug_run = 0
 
 #wrangle CLI input
 args = commandArgs(trailingOnly = TRUE)
@@ -25,11 +24,25 @@ if(length(args) != 0){
 }
 
 if(sim_or_real == "sim"){
-  df <- readr::read_tsv(file = "output/spatiophylogenetic_modelling/simulated_data/ simulated_data_df.tsv",show_col_types = F)
+  df_fn <- "output/spatiophylogenetic_modelling/simulated_data/simulated_data_df.tsv"
+  if(!file.exists(df_fn)){
+    cat(paste0("Simulating data.\n"))
+  source("spatiophylogenetic_modelling/analysis/simulations/simulate_data.R")
+    }
+  df <- readr::read_tsv(file = df_fn, show_col_types = F)
   OUTPUTDIR_top <- "output/spatiophylogenetic_modelling/simulated_output/"
-  }
+}
+
 if(sim_or_real == "real"){
-  df <- readr::read_tsv(file = "output/GB_wide/GB_cropped_for_missing.tsv",show_col_types = F)
+  df_fn <- "output/GB_wide/GB_cropped_for_missing.tsv"
+  if(!file.exists(df_fn)){
+    cat(paste0("Making GB data wide, binarising, cropping etc..\n"))
+    source("make_wide.R")
+    source("make_wide_binarized.R")
+    source("impute_missing_values.R")
+  }  
+  df <- readr::read_tsv(file =   df_fn,show_col_types = F)
+  
   OUTPUTDIR <- "output/spatiophylogenetic_modelling/featurewise/"
 }
 
@@ -86,7 +99,8 @@ tree_tips_df <- tree$tip.label %>%
   rename("Language_ID"= ".")
 
 #reading in AUTOTYP-area
-if (!file.exists("output/non_GB_datasets/glottolog_AUTOTYP_areas.tsv")) { source("unusualness/processing/assigning_AUTOTYP_areas.R") }		
+if (!file.exists("output/non_GB_datasets/glottolog_AUTOTYP_areas.tsv")) { s
+source("unusualness/processing/assigning_AUTOTYP_areas.R") }		
 autotyp_area <- read.delim("output/non_GB_datasets/glottolog_AUTOTYP_areas.tsv", sep = "\t") %>%
   dplyr::select(Language_ID, AUTOTYP_area_id_iid_model = AUTOTYP_area)
 
