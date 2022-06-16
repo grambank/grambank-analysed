@@ -100,7 +100,7 @@ data <- lgs_in_analysis %>%
     inner_join(df, by = "Language_ID") %>% 
   left_join(autotyp_area, by = "Language_ID")
 
-x <- assert_that(all(data$Language_ID == lgs_in_analysis$Language_ID), msg = "Data doesn't match phylogeny!")
+x <- assert_that(all(data$Language_ID == lgs_in_analysis$Language_ID), msg = "Data doesn't match!")
 
 ## Since we are using a sparse phylogenetic matrix, we need to math taxa to the correct
 ## rows in the matrix
