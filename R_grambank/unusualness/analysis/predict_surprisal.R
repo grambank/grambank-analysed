@@ -17,8 +17,8 @@ if(!file.exists(surprisal_fn)){
   source("unusualness/analysis/get_unusualness_bayesLCA.R")
 }
 gb <- read.delim(file = surprisal_fn, sep = "\t") %>% 
-  group_by(Language_ID, aes) %>% 
-  summarise(Surprisal = mean(Surprisal, na.rm = T))
+  dplyr::select(Language_ID, aes, Surprisal, Estimator) %>% 
+  filter(Estimator == "Kernel 30")
 
 ### NEXT PART REQUIRES MATRICES ETC
 
