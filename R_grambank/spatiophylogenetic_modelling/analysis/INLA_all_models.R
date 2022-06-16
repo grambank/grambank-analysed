@@ -177,6 +177,8 @@ for(feature in features){
                                   control.predictor=list(link=1),
                                   data = data)
   
+  cat(paste0("Finished running AUTOTYP-area only on ", feature, " and the time is ", Sys.time(), ".\n"))
+  
  
   # #### Dual Model ####
   # 
@@ -200,6 +202,8 @@ for(feature in features){
                           family = "binomial",
                           control.predictor=list(link=1),
                           data = data)
+  
+  cat(paste0("Finished running dual only on ", feature, " and the time is ", Sys.time(), ".\n"))
   
   # #### Trial Model ####
   # 
