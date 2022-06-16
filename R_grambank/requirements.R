@@ -1,8 +1,6 @@
 # Please run this script first to make sure you have all the necessary packages 
 # installed for running the rest of the scripts in this R project
 
-source("global_variables.R")
-source("spatiophylogenetic_modelling/analysis/INLA_parameters.R")
 
 #installing packages
 #if (!suppressPackageStartupMessages(require("pacman"))) { install.packages("pacman") }
@@ -99,3 +97,6 @@ h_load(verbose = F, pkg = c(
 options(tidyverse.quiet = TRUE)
 options(warn.conflicts = FALSE)
 options(stringsAsFactors = FALSE)
+
+source("global_variables.R")
+source("spatiophylogenetic_modelling/analysis/INLA_parameters.R")
