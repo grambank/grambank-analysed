@@ -155,7 +155,7 @@ for(feature in features){
                                f(obs_id, model = "iid", hyper = obs_hyper),
                              list(this_feature=as.name(feature))))
   
-  spatialonly_model<- INLA::inla(formula = formula,
+  spatial_only_model<- INLA::inla(formula = formula,
                            control.compute = list(waic = TRUE),
                            family = "binomial",
                            control.predictor=list(link=1),
@@ -236,40 +236,41 @@ for(feature in features){
   
   #strip interesting information from the INLA objects
   
-  phylogeny_only = try(expr = {strip_inla(phylo_only_model)})
+  phylogeny_only_stripped <- try(expr = {strip_inla(phylo_only_model)})
   
-  if (class(phylogeny_only ) == "try-error") {
-    phylogeny_only <- NULL
+  if (class(phylogeny_only_stripped) == "try-error") {
+    phylogeny_only_stripped <- NULL
     }
   
   
   cat(paste0("Finished running strip inla on phylo only  ", feature, " and the time is ", Sys.time(), ".\n"))
   
-  spatial_only = try(expr = {strip_inla(spatialonly_model)})
+  spatial_only_stripped = try(expr = {strip_inla(spatial_only_model)})
 
-  if (class(spatial_only ) == "try-error") {
-    spatial_only <- NULL
+  if (class(spatial_only_stripped ) == "try-error") {
+    spatial_only_stripped <- NULL
   }
   cat(paste0("Finished running strip inla on spatial only of ", feature, " and the time is ", Sys.time(), ".\n"))
 
-  AUTOTYP_area = try(expr = {strip_inla(  AUTOTYP_area_model)})
-    if (class(AUTOTYP_area ) == "try-error") {
-    AUTOTYP_area <- NULL
+  AUTOTYP_area_stripped <- try(expr = {strip_inla(  AUTOTYP_area_model)})
+
+      if (class(AUTOTYP_area_stripped ) == "try-error") {
+    AUTOTYP_area_stripped <- NULL
   }
   cat(paste0("Finished running strip inla on AUTOTYP_area_model of ", feature, " and the time is ", Sys.time(), ".\n"))
   
-  dual_model = try(expr = {strip_inla(dual_model)})
+  dual_model_stripped = try(expr = {strip_inla(dual_model)})
   
-  if (class(dual_model) == "try-error") {
-    dual_model <- NULL
+  if (class(dual_model_stripped) == "try-error") {
+    dual_model_stripped <- NULL
   }
   
   cat(paste0("Finished running strip inla on dual  of ", feature, " and the time is ", Sys.time(), ".\n"))
   
-  trial_model = try(expr = {strip_inla(trial_model)})
+  trial_model_stripped <-try(expr = {strip_inla(trial_model)})
   
-  if (class(trial_model) == "try-error") {
-    trial_model <- NULL
+  if (class(trial_model_stripped) == "try-error") {
+    trial_model_stripped <- NULL
   }
   
   cat(paste0("Finished running strip inla on trial model of  ", feature, " and the time is ", Sys.time(), ".\n"))
@@ -278,11 +279,11 @@ for(feature in features){
   ## For each model we strip out the information we need to calculate heritability scores
   ## to save on storage space. 
   model_outputs = list(
-    phylogeny_only,
-    spatial_only,
-    AUTOTYP_area,
-    dual_model, 
-    trial_model)
+    phylogeny_only_stripped,
+    spatial_only_stripped,
+    AUTOTYP_area_stripped,
+    dual_model_stripped, 
+    trial_model_stripped)
   
   #### Save output ####
   saved_file =   paste0(OUTPUTDIR, feature, ".qs")
