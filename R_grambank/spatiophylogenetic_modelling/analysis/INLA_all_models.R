@@ -236,22 +236,27 @@ for(feature in features){
   
   #strip interesting information from the INLA objects
   
+  cat(paste0("Starting running strip inla on phylo only  ", feature, " and the time is ", Sys.time(), ".\n"))
+  
   phylogeny_only_stripped <- try(expr = {strip_inla(phylo_only_model)})
   
   if (class(phylogeny_only_stripped) == "try-error") {
     phylogeny_only_stripped <- NULL
     }
   
-  
   cat(paste0("Finished running strip inla on phylo only  ", feature, " and the time is ", Sys.time(), ".\n"))
   
-  spatial_only_stripped = try(expr = {strip_inla(spatial_only_model)})
+  cat(paste0("Starting running strip inla on spatial only of ", feature, " and the time is ", Sys.time(), ".\n"))
+  
+    spatial_only_stripped = try(expr = {strip_inla(spatial_only_model)})
 
   if (class(spatial_only_stripped ) == "try-error") {
     spatial_only_stripped <- NULL
   }
   cat(paste0("Finished running strip inla on spatial only of ", feature, " and the time is ", Sys.time(), ".\n"))
 
+  cat(paste0("Starting running strip inla on AUTOTYP_area_model of ", feature, " and the time is ", Sys.time(), ".\n"))
+  
   AUTOTYP_area_stripped <- try(expr = {strip_inla(  AUTOTYP_area_model)})
 
       if (class(AUTOTYP_area_stripped ) == "try-error") {
@@ -259,13 +264,16 @@ for(feature in features){
   }
   cat(paste0("Finished running strip inla on AUTOTYP_area_model of ", feature, " and the time is ", Sys.time(), ".\n"))
   
-  dual_model_stripped = try(expr = {strip_inla(dual_model)})
+  cat(paste0("Starting running strip inla on dual  of ", feature, " and the time is ", Sys.time(), ".\n"))
+  
+    dual_model_stripped = try(expr = {strip_inla(dual_model)})
   
   if (class(dual_model_stripped) == "try-error") {
     dual_model_stripped <- NULL
   }
   
   cat(paste0("Finished running strip inla on dual  of ", feature, " and the time is ", Sys.time(), ".\n"))
+  cat(paste0("Starting running strip inla on trial model of  ", feature, " and the time is ", Sys.time(), ".\n"))
   
   trial_model_stripped <-try(expr = {strip_inla(trial_model)})
   

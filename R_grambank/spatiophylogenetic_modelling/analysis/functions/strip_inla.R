@@ -4,11 +4,16 @@ strip_inla = function(object){
   icc_posterior <-  try(get_iccposterior(object, n = 100))
   
   if (class(icc_posterior ) == "try-error") {
+    cat(paste0("I failed in running strip_inla, most likely there's something wrong with the posteriors.\n"))
     icc_posterior  <- NULL
   }
   
   # save the WAIC score
   waic = object$waic
+
+    if(is.null(waic)){
+    cat(paste0("The waic score was NULL.\n")) 
+    }
   
   list(icc_posterior = icc_posterior,
        waic = waic)
