@@ -106,7 +106,7 @@ for(iter in 1:iterations){
 if("y" %in% colnames(df)){
 df %>% 
   dplyr::select(-y) %>% 
-  write_delim(file = paste(simulated_location, "simulated_data_df.tsv"),delim = "\t")  
+  write_delim(file = paste0(simulated_location, "simulated_data_df.tsv"),delim = "\t")  
 }
 
 if(beep == 1){
