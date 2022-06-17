@@ -22,26 +22,27 @@ tree$edge.length = tree$edge.length / 1000
 #check that all the tip labels in the tree match the GB and vice versa
 x <- assertthat::assert_that(all(tree$tip.label %in% lgs_in_analysis$Language_ID))
 
-# We want the phylogenetic matrix to have a variance of about 1 to make it comparable to 
-# the spatial matrix and to compare across trees. 
-# The easiest way to scale the phylogenetic covariance matrix is to scale the branch-lengths so the root to tip 
+# We want the phylogenetic matrix to have a variance of about 1 to make it comparable to
+# the spatial matrix and to compare across trees.
+# The easiest way to scale the phylogenetic covariance matrix is to scale the branch-lengths so the root to tip
 # distance is 1 (for an ultrametric tree), or the maximum root to tip distance is one (for non-ultrametric)
 
-# But I would recommend actually scaling the covariance matrix after it has been calculated by dividing its 
-# elements by its "typical" variance. So this is related to the idea of using the diagonals as I mentioned before, 
-# but applying it to scaling the covariance instead of to the prior. 
-# That way, you can base the prior on a typical variance of one, and use this scale for all variance factors. 
-# To do that you can apply  the same transformation on your spatial covariance matrix, to make them comparable, 
-# and use the same prior. The typical variance is calculated as exp(mean(log(diag(covar)))), where covar is your 
+# But I would recommend actually scaling the covariance matrix after it has been calculated by dividing its
+# elements by its "typical" variance. So this is related to the idea of using the diagonals as I mentioned before,
+# but applying it to scaling the covariance instead of to the prior.
+# That way, you can base the prior on a typical variance of one, and use this scale for all variance factors.
+# To do that you can apply  the same transformation on your spatial covariance matrix, to make them comparable,
+# and use the same prior. The typical variance is calculated as exp(mean(log(diag(covar)))), where covar is your
 # covariance matrix
 
 ## Calculate precision using typical variance rescaling
 # Here, we calculate the precison matrix, including all nodes and tips
-# By including the nodes, we create a sparse matrix, which results in significant 
-# time improvements within INLA. 
+# By including the nodes, we create a sparse matrix, which results in significant
+# time improvements within INLA. Note we don't want to scale the phylogeny
+# because we are doing that ourselves in a moment
 phy_inv_nodes = MCMCglmm::inverseA(tree,
                                    nodes = "ALL",
-                                   scale = TRUE)$Ainv
+                                   scale = FALSE)$Ainv
 
 # Next, we invert the precison matrix - creating the covariance matrix
 # and standardize by the typical variance, to ensure variance is scaled to 1
@@ -53,18 +54,18 @@ phy_cov_std = phy_covar_nodes / typical_phylogenetic_variance
 # this shows an average and upper bound of 1, but
 # But a minimum value of ~0. This is probably the impact of internal nodes
 
-mean <- summary(diag(phy_cov_std))[["Mean"]] 
+mean <- summary(diag(phy_cov_std))[["Mean"]]
 x <- all.equal(mean, 1, tolerance = 0.05)
 cat(paste0("The mean of the phylo covariance matrix is ", round(mean, 4), ".\n"))
 
-min <- summary(diag(phy_cov_std))[["Min."]] 
+min <- summary(diag(phy_cov_std))[["Min."]]
 x <- all.equal(min, 0, tolerance = 0.05)
 cat(paste0("The min of the phylo covariance matrix is ", round(min, 4), ".\n"))
 
 #set dim names. This includes internal nodes and tips. Internal nodes will have names like "Node54", tips will have glottocodes.
 dimnames(phy_cov_std) = dimnames(phy_inv_nodes)
 
-# If we look at the scale of variance for nodes and not nodes (i.e. tips) 
+# If we look at the scale of variance for nodes and not nodes (i.e. tips)
 # we see that the variance for tips is always approximately 1 (which is what we want to see)
 node_idx = str_detect(rownames(phy_cov_std), "Node")
 # Nodes
@@ -74,19 +75,46 @@ mean <- summary(diag(phy_cov_std)[!node_idx])[["Mean"]]
 cat(paste0("The mean of the phylo covariance matrix for tips is ", round(mean, 4), ".\n"))
 
 # Convert the typical variance standardized covariance matrix back to a precison matrix
+# we will do this by transforming the branchlengths of the tree and then using inverseA
+# again, otherwise numerically precision issues will mean our precision matrix won't
+# be properly sparse
+
+tree_scaled <- tree
+tree_scaled$edge.length <- tree_scaled$edge.length / typical_phylogenetic_variance
+phy_prec_mat_new <- MCMCglmm::inverseA(tree_scaled,
+                                       nodes = "ALL",
+                                       scale = FALSE)$Ainv
+
+# double check the matrix is more or less the same
 phy_prec_mat = solve(phy_cov_std)
 dimnames(phy_prec_mat) = dimnames(phy_inv_nodes)
 
+## matrices are identical up to tolerance
+all.equal(as.matrix(phy_prec_mat), as.matrix(phy_prec_mat_new))
+
+## But...
+## technically not that sparse:
+sum(phy_prec_mat != 0)
+## dgeMatrix is a dense matrix format
+class(phy_prec_mat)
+## this is properly sparse
+sum(phy_prec_mat_new != 0)
+## Now we have a proper dgCMatrix, a sparse format
+class(phy_prec_mat_new)
+
+## using this new phylo precision matrix should perform much better
+phy_prec_mat <- phy_prec_mat_new
+
 #### Spatial Precison ####
 # Get the longitude and latitude data from the simulated datasets
-locations_df = read.delim('output/non_GB_datasets/glottolog-cldf_wide_df.tsv', sep = "\t") %>% 
+locations_df = read.delim('output/non_GB_datasets/glottolog-cldf_wide_df.tsv', sep = "\t") %>%
   inner_join(lgs_in_analysis, by = "Language_ID") #subset to matches in tree and in cropped in GB.
 
 #check that the locations df and tree tips match
 x <- assertthat::assert_that(all(locations_df$Language_ID %in% tree$tip.label),  msg = "OH NO THE TREE AND LOCATIONS ARE DIFFERENT")
 
-spatial_covar_mat = varcov.spatial(locations_df[,c("Longitude", "Latitude")], 
-                                   cov.pars = sigma, 
+spatial_covar_mat = varcov.spatial(locations_df[,c("Longitude", "Latitude")],
+                                   cov.pars = sigma,
                                    kappa = kappa)$varcov
 
 ## Repeat the typical variance standardisation from above
