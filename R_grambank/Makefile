@@ -145,27 +145,10 @@ predict_unusualness:
 	
 INLA_featurewise:
 	@echo "## Running INLA-analysis featurewise. #"
-	@$(MAKE) -f $(THIS_MAKEFILE) 	INLA_featurewise_phylo_only
-	@$(MAKE) -f $(THIS_MAKEFILE) 	INLA_featurewise_spatial_only
-	@$(MAKE) -f $(THIS_MAKEFILE) 	INLA_featurewise_autotyp_area
-	@$(MAKE) -f $(THIS_MAKEFILE) 	INLA_featurewise_dual
-	@$(MAKE) -f $(THIS_MAKEFILE) 	INLA_featurewise_trial
+	Rscript spatiophylogenetic_modelling/analysis/INLA_all_models.R "real" 1 113
 
-INLA_featurewise_phylo_only:
-	Rscript spatiophylogenetic_modelling/analysis/featurewise/INLA_featurewise_phylo_only.R
-
-INLA_featurewise_spatial_only:
-	Rscript spatiophylogenetic_modelling/analysis/featurewise/INLA_featurewise_spatial_only.R
-
-INLA_featurewise_autotyp_area:
-	Rscript spatiophylogenetic_modelling/analysis/featurewise/INLA_featurewise_autotyp_area.R
-
-INLA_featurewise_dual:
-	Rscript spatiophylogenetic_modelling/analysis/featurewise/INLA_featurewise_dual.R
-
-INLA_featurewise_trial:
-	Rscript spatiophylogenetic_modelling/analysis/featurewise/INLA_featurewise_trial.R
-	
+INLA_simulation_binary_data:
+	Rscript spatiophylogenetic_modelling/analysis/INLA_all_models.R "sim" 1 160
 
 ## Test functions
 test:
