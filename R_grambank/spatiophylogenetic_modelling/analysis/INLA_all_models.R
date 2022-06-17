@@ -81,7 +81,7 @@ cat("\n###\nLoading covariance matrices...\n")
 
 precision_matrices_fn <- "output/spatiophylogenetic_modelling/processed_data/precision_matrices.RDS"
 if(!(file.exists(precision_matrices_fn))){
-  source("spatiophylogenetic_modelling/analysis/simulations/make_precisionmatrices.R")}
+  source("spatiophylogenetic_modelling/analysis/make_precisionmatrices.R")}
 
 precision_matrices = readRDS(precision_matrices_fn)
 phylo_prec_mat = precision_matrices$phylogenetic_precision
