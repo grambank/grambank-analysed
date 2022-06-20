@@ -1,9 +1,11 @@
+object = phylo_only_model
+
 strip_inla = function(object){
   
   # try to get the posterior of the ICC effect
   icc_posterior <-  try(get_iccposterior(object, n = 100))
   
-  if (class(icc_posterior ) == "try-error") {
+  if ("try-error" %in% class(icc_posterior )) {
     cat(paste0("I failed in running strip_inla, most likely there's something wrong with the posteriors.\n"))
     icc_posterior  <- NULL
   }
