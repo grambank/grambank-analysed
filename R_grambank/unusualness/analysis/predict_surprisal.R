@@ -66,7 +66,7 @@ source("spatiophylogenetic_modelling/install_inla.R")
 
 dual_model = INLA::inla(Surprisal ~
                     f(spatial_id,
-                      model = "generic2",
+                      model = "generic0",
                       Cmatrix = spatial_prec_mat,
                       hyper = pcprior) +
                     f(phylo_id,
