@@ -35,6 +35,7 @@ if(sim_or_real == "sim"){
     }
   df <- readr::read_tsv(file = df_fn, show_col_types = F)
   OUTPUTDIR_top <- "output/spatiophylogenetic_modelling/simulated_output/"
+  done_fns <- list.files("output/spatiophylogenetic_modelling/simulated_output/", pattern = "*.qs") 
 }
 
 if(sim_or_real == "real"){
@@ -46,7 +47,7 @@ if(sim_or_real == "real"){
     source("impute_missing_values.R")
   }  
   df <- readr::read_tsv(file =   df_fn,show_col_types = F)
-  
+  done_fns <- list.files("output/spatiophylogenetic_modelling/featurewise/", pattern = "*.qs") 
   OUTPUTDIR <- "output/spatiophylogenetic_modelling/featurewise/"
 }
 
@@ -112,10 +113,18 @@ data$phylo_id = match(data$Language_ID, rownames(phylo_prec_mat))
 data$spatial_id = match(data$Language_ID, rownames(spatial_prec_mat))
 data$obs_id = 1:nrow(data)
 
+
+#subsetting what to loop over
+done_fns <- done_fns %>% 
+  as_tibble() %>% 
+  mutate(value = str_replace_all(value, ".qs", ""))
+
 #features to loop over
-features <- data %>% 
+features <- df %>% 
   dplyr::select(-Language_ID) %>% 
   colnames() 
+
+features <- setdiff(features, done_fns$value) 
 
 features <- features[range]
 
