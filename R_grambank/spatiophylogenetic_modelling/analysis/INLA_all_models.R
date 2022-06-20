@@ -237,8 +237,13 @@ for(feature in features){
                            data = data)
   
   cat(paste0("Finished running trial on ", feature, " and the time is ", Sys.time(), ".\n"))
+
+  ############
+  #######strip interesting information from the INLA objects
+  #########
   
-  #strip interesting information from the INLA objects
+  cat(paste0("  ####\n  Finishing running the INLA models for ", feature,".\n",
+             "  Starting stripping the INLA-models for relevant data for later analysis.\n  ####\n"))
   
   cat(paste0("Starting running strip inla on phylo only  ", feature, " and the time is ", Sys.time(), ".\n"))
   
@@ -310,7 +315,7 @@ for(feature in features){
   index <- index + 1
   
   cat(paste0("I've finished ", feature, " and the time is ", Sys.time(), ".\n That means I'm ", round((index/length(range)), 2)*100, "% done.\n"))
-  rm(model_outputs, phylo_only_model, spatialonly_model, dual_model)
+  rm(model_outputs, phylo_only_model, spatial_only_model, dual_model)
 }
 
 sink(file = NULL)
