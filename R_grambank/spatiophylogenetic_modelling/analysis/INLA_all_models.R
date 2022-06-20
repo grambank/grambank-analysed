@@ -6,7 +6,7 @@
 # Trial (spatial + phylo + AUTOTYP-area)
 
 source("requirements.R")
-beep <- 1
+beep <- 0
 if(beep == 1){
   h_load("beepr")
   beep(11) #starting sound
@@ -22,8 +22,8 @@ if(length(args) != 0){
   range <- start:end
 } else { #if you're running this script chunkwise in Rstudio or similar instead of via command line, you'll read in the parameters this way:
   sim_or_real <- "real"
-  start <- 1
-  end <- 3
+  start <- 4
+  end <- 40
   range <- start:end
 }
 
