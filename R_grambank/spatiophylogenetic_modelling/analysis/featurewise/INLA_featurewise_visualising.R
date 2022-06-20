@@ -58,7 +58,7 @@ for(fn in fns) {
                          "phylogeny_only_waic", "spatial_only_waic", "AUTOTYP_area_waic", "dual_model_waic", "trial_model_waic", "Feature_ID"))
 }
 
-df %>% 
+df_waic_mind <- df %>% 
   dplyr::select(Feature_ID, 
                 phylogeny_only_waic,
                 spatial_only_waic ,
@@ -66,19 +66,5 @@ df %>%
                 dual_model_waic  ,
                 trial_model_waic ) %>% 
   reshape2::melt(id.vars= "Feature_ID") %>%
-  ggplot() +
-  geom_boxplot(aes(x = variable, y = value)) +
-  theme_classic() +
-  theme(axis.text.x = element_text(angle= 70, hjust = 1), legend.position = "None") +
-  geom_jitter(aes(x = variable, y = value, color = variable))
-
-ggsave("output/spatiophylogenetic_modelling/featurewise/boxplot_waic.png")
-  
-
-mean(df$phylogeny_only_waic)
-mean(df$spatial_only_waic)
-mean(df$AUTOTYP_area_waic)
-mean(df$dual_model_waic)
-mean(df$trial_model_waic)
-
-  
+  group_by(Feature_ID) %>% 
+  slice(which.min(value))
