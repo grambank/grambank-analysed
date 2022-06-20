@@ -1,5 +1,6 @@
 strip_inla = function(object){
   
+#  object <- phylo_only_model
   # try to get the posterior of the ICC effect
   icc_posterior <-  try(get_iccposterior(object, n = 100))
   
@@ -10,13 +11,12 @@ strip_inla = function(object){
   
   # save the WAIC score
   waic = object$waic
+  cpo =  object$cpo$cpo
+  pit = object$cpo$pit
+  cpo_failure = object$cpo$failure
 
-    if(is.null(waic)){
-    cat(paste0("The waic score was NULL.\n")) 
-    }
-  
   list(icc_posterior = icc_posterior,
-       waic = waic)
+       waic = waic, cpi = cpo, pit = pit, cpo_failure = cpo_failure)
 }
 
 get_iccposterior = function(object, n = 100){
