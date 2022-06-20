@@ -153,7 +153,7 @@ for(feature in features){
   
   phylo_only_model<- INLA::inla(formula = formula,
                           family = "binomial",
-                          control.compute = list(waic = TRUE, cpo = TRUE), 
+                          control.compute = list(waic = TRUE, cpo = TRUE, dic = TRUE), 
                           control.predictor=list(link=1),
                           data = data)
   
@@ -172,7 +172,7 @@ for(feature in features){
                              list(this_feature=as.name(feature))))
   
   spatial_only_model<- INLA::inla(formula = formula,
-                                  control.compute = list(waic = TRUE, cpo = TRUE), 
+                                  control.compute = list(waic = TRUE, cpo = TRUE, dic = TRUE), 
                                   family = "binomial",
                            control.predictor=list(link=1),
                            data = data)
@@ -188,7 +188,7 @@ for(feature in features){
                             list(this_feature=as.name(feature))))
   
   AUTOTYP_area_model <- INLA::inla(formula = formula,
-                                   control.compute = list(waic = TRUE, cpo = TRUE), 
+                                   control.compute = list(waic = TRUE, cpo = TRUE, dic = TRUE), 
                                    family = "binomial",
                                   control.predictor=list(link=1),
                                   data = data)
@@ -214,7 +214,7 @@ for(feature in features){
                               list(this_feature=as.name(feature))))
   
   dual_model<- INLA::inla(formula = formula,
-                          control.compute = list(waic = TRUE, cpo = TRUE), 
+                          control.compute = list(waic = TRUE, cpo = TRUE, dic = TRUE), 
                           family = "binomial",
                           control.predictor=list(link=1),
                           data = data)
@@ -243,7 +243,7 @@ for(feature in features){
   
   
   trial_model<- INLA::inla(formula = formula,
-                           control.compute = list(waic = TRUE, cpo = TRUE), 
+                           control.compute = list(waic = TRUE, cpo = TRUE, dic = TRUE), 
                            family = "binomial",
                            control.predictor=list(link=1),
                            data = data)
