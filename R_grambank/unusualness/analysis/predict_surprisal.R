@@ -73,8 +73,10 @@ dual_model = INLA::inla(Surprisal ~
                       model = "generic2",
                       Cmatrix = phylo_prec_mat,
                       hyper = pcprior),
-                  data = data,
-                  control.family = list(hyper = list(prec = list(initial = log(1e+08), fixed = TRUE))))
+                    control.compute = list(waic = TRUE, cpo = TRUE),
+                  data = data#,
+                  #control.family = list(hyper = list(prec = list(initial = log(1e+08), fixed = TRUE)))
+                  )
 
 
 
