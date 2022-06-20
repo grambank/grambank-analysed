@@ -123,6 +123,9 @@ index <- 0
 
 for(feature in features){
   #  feature <- features[1]
+  cat(paste0("  ####\n  Running the INLA models for ", feature,".\n",
+  "  ####\n"))
+  
   cat(paste0("I'm on ", feature, " and the time is ", Sys.time(), ".\n"))
   
   #### Phylo Only model ####
