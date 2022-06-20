@@ -22,7 +22,7 @@ if(length(args) != 0){
   range <- start:end
 } else { #if you're running this script chunkwise in Rstudio or similar instead of via command line, you'll read in the parameters this way:
   sim_or_real <- "real"
-  start <- 4
+  start <- 1
   end <- 40
   range <- start:end
 }
