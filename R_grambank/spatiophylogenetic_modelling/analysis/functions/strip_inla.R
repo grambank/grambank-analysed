@@ -1,6 +1,6 @@
 strip_inla = function(object){
   
-#  object <- phylo_only_model
+#  object <- trial_model
   # try to get the posterior of the ICC effect
   icc_posterior <-  try(get_iccposterior(object, n = 100))
   
@@ -42,5 +42,20 @@ get_iccposterior = function(object, n = 100){
     posterior = cbind(posterior_1, posterior_2)
     colnames(posterior) = colnames(hyper_sample)
   }
-  posterior
+  if(ncol(hyper_sample) == 3){
+    sigma_1 = 1 / hyper_sample[,1]
+    sigma_2 = 1 / hyper_sample[,2]
+    sigma_3 = 1 / hyper_sample[,3]
+    
+    posterior_1 = sigma_1 / (sigma_1 + sigma_2 + 1 + binomial_error)
+    posterior_2 = sigma_2 / (sigma_1 + sigma_2 + 1 + binomial_error)
+    posterior_3 = sigma_3 / (sigma_1 + sigma_2 + 1 + binomial_error)
+    
+    posterior = cbind(posterior_1, posterior_2)
+    colnames(posterior) = colnames(hyper_sample)
+  }
+  
+  
+  
+    posterior
 }
