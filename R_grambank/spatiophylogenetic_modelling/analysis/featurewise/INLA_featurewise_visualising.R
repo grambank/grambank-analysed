@@ -4,28 +4,30 @@ fns <- list.files("output/spatiophylogenetic_modelling/featurewise/", pattern = 
 
 
   df <- data.frame(matrix(ncol = 13, nrow = 0))
-colnames(df) <- c("phylogeny_only", "spatial_only","AUTOTYP_area",  "dual_model_phylo", "dual_model_spatial", "trial_model_phylo", "trial_model_spatial", "trial_model_autotyp_area", "phylogeny_only_waic", "spatial_only_waic", "AUTOTYP_area_waic", "dual_model_waic", "trial_model_waic")
+colnames(df) <- c("phylogeny_only_effect", "spatial_only_effect", "AUTOTYP_area_effect", "dual_model_spatial_effect", "dual_model_phylo_effect",
+                  "trial_model_phylo_effect", "trial_model_spatial_effect", "trial_model_autotyp_area_effect", "phylogeny_only_waic", "spatial_only_waic",
+                  "AUTOTYP_area_waic", "dual_model_waic", "trial_model_waic")
 
 df <- df %>% 
   mutate_all(as.numeric)
 
-df$Feature_ID <- as.character(df$phylogeny_only)
+df$Feature_ID <- as.character(df$phylogeny_only) 
 
 for(fn in fns) {
   qs <- qs::qread(fn) 
-#  qs <- qs::qread( fns[1]) 
-
+#  qs <- qs::qread( fns[10]) 
+  
   Feature_ID <- basename(fn) %>% str_replace_all(".qs", "")
   
-  options(warn=-1) #everytime one of the output from strip_INLA is null there will be a warning. So we're turning off warnings temporarily to not clog the console
+  #options(warn=-1) #everytime one of the output from strip_INLA is null there will be a warning. So we're turning off warnings temporarily to not clog the console
   phylogeny_only_effect <- qs[[1]]$icc_posterior %>% mean()
   spatial_only_effect <- qs[[2]]$icc_posterior %>% mean()
   AUTOTYP_area_effect <- qs[[3]]$icc_posterior %>% mean()
   dual_model_spatial_effect  <- qs[[4]]$icc_posterior[ , 1] %>% mean()
   dual_model_phylo_effect  <- qs[[4]]$icc_posterior[ , 2] %>% mean()
-  trial_model_phylo_effect  <- qs[[5]]$icc_posterior[ , 1] %>%mean()
-  trial_model_spatial_effect  <- qs[[5]]$icc_posterior[ , 2] %>% mean()
-  trial_model_autotyp_area_effect  <- qs[[5]]$icc_posterior[ , 4] %>% mean()
+  trial_model_phylo_effect  <- qs[[5]]$icc_posterior[ , 1] %>% suppressWarnings(mean())
+  trial_model_spatial_effect  <- qs[[5]]$icc_posterior[ , 2] %>% suppressWarnings(mean())
+  trial_model_autotyp_area_effect  <- qs[[5]]$icc_posterior[ , 4] %>% suppressWarnings(mean())
   options(warn=0)
 
   phylogeny_only_waic <- qs[[1]]$waic$waic
@@ -52,11 +54,8 @@ for(fn in fns) {
   df <- df_spec %>% 
     mutate_all(as.numeric) %>% 
     mutate(Feature_ID = Feature_ID) %>% 
-    full_join(df, by = c("phylogeny_only_effect", "spatial_only_effect", "AUTOTYP_area_effect",
-                         "dual_model_spatial_effect", "dual_model_phylo_effect", "trial_model_phylo_effect",
-                         "trial_model_spatial_effect", "trial_model_autotyp_area_effect", "phylogeny_only_waic",
-                         "spatial_only_waic", "AUTOTYP_area_waic", "dual_model_waic", "trial_model_waic", "Feature_ID")
-    )
+    full_join(df, by = c("phylogeny_only_effect", "spatial_only_effect", "AUTOTYP_area_effect", "dual_model_spatial_effect", "dual_model_phylo_effect",
+                         "phylogeny_only_waic", "spatial_only_waic", "AUTOTYP_area_waic", "dual_model_waic", "trial_model_waic", "Feature_ID"))
 }
 
 df %>% 
