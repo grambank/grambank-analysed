@@ -1,5 +1,3 @@
-object = phylo_only_model
-
 strip_inla = function(object){
   
   # try to get the posterior of the ICC effect
