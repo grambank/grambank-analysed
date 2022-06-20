@@ -16,7 +16,7 @@ strip_inla = function(object){
   cpo_failure = object$cpo$failure
   ## get marginal likelihood, note this will need to have a normalising constant added to it later
   ## this normalising constant only needs to be calculated once for each precision matrix
-  ## and is 0.5 * log, where det is the determinant of the precision matrix. If the model uses two
+  ## and is 0.5 * log(det), where det is the determinant of the precision matrix. If the model uses two
   ## precision matrices both constants need to be added.
   ## Let me know if you want to do the calculation here. It can be done but strip_inla() will
   ## get a bit more complicated because the constant can't be extracted from the model object,
