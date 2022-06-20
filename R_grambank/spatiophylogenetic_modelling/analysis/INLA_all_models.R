@@ -6,7 +6,11 @@
 # Trial (spatial + phylo + AUTOTYP-area)
 
 source("requirements.R")
-beep <- 0
+beep <- 1
+if(beep == 1){
+  h_load("beepr")
+  beep(11) #starting sound
+}
 
 #wrangle CLI input
 args = commandArgs(trailingOnly = TRUE)
@@ -18,8 +22,8 @@ if(length(args) != 0){
   range <- start:end
 } else { #if you're running this script chunkwise in Rstudio or similar instead of via command line, you'll read in the parameters this way:
   sim_or_real <- "real"
-  start <- 41
-  end <- 80
+  start <- 1
+  end <- 3
   range <- start:end
 }
 
