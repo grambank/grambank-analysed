@@ -11,7 +11,7 @@ colnames(df) <- c("phylogeny_only_effect", "spatial_only_effect", "AUTOTYP_area_
 df <- df %>% 
   mutate_all(as.numeric)
 
-df$Feature_ID <- as.character(df$phylogeny_only) 
+df$Feature_ID <- as.character() 
 
 for(fn in fns) {
   #fn <- fns[10]
