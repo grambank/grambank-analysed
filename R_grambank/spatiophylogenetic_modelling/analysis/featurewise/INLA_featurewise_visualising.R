@@ -15,4 +15,9 @@ df_for_plot %>%
   left_join(parameters_binary) %>% 
   ggplot(aes(x = mean_phylo_in_dual, y = mean_spatial_in_dual, color = Main_domain)) +
   geom_point() +
-  theme_classic()
+  theme_classic() +
+  xlim(c(0,1))+
+  ylim(c(0,1)) +
+  coord_fixed()
+
+ggsave(filename = "output/spatiophylogenetic_modelling/featurewise/dual_effect_scatterplot.png")
