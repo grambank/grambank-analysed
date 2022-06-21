@@ -14,21 +14,12 @@ df <- df %>%
 df$Feature_ID <- as.character(df$phylogeny_only) 
 
 for(fn in fns) {
+  #fn <- fns[10]
   qs <- qs::qread(fn) 
-#  qs <- qs::qread( fns[10]) 
-  
+
   Feature_ID <- basename(fn) %>% str_replace_all(".qs", "")
   
   #options(warn=-1) #everytime one of the output from strip_INLA is null there will be a warning. So we're turning off warnings temporarily to not clog the console
-  phylogeny_only_effect <- qs[[1]]$icc_posterior %>% mean()
-  spatial_only_effect <- qs[[2]]$icc_posterior %>% mean()
-  AUTOTYP_area_effect <- qs[[3]]$icc_posterior %>% mean()
-  dual_model_spatial_effect  <- qs[[4]]$icc_posterior[ , 1] %>% mean()
-  dual_model_phylo_effect  <- qs[[4]]$icc_posterior[ , 2] %>% mean()
-  trial_model_phylo_effect  <- qs[[5]]$icc_posterior[ , 1] %>% suppressWarnings(mean())
-  trial_model_spatial_effect  <- qs[[5]]$icc_posterior[ , 2] %>% suppressWarnings(mean())
-  trial_model_autotyp_area_effect  <- qs[[5]]$icc_posterior[ , 4] %>% suppressWarnings(mean())
-  options(warn=0)
 
   phylogeny_only_waic <- qs[[1]]$waic$waic
   spatial_only_waic <- qs[[2]]$waic$waic
