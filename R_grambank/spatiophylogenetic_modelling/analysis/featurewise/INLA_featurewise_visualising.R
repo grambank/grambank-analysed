@@ -1,61 +1,18 @@
 source("requirements.R")
 
-fns <- list.files("output/spatiophylogenetic_modelling/featurewise/", pattern = "*qs", full.names = T)
+parameters_binary <- read_csv("feature_grouping_for_analysis.csv", show_col_types = F)
 
+posteriors_df <- read_tsv("output/spatiophylogenetic_modelling/featurewise/posteriors_df.tsv", show_col_types = F)
 
-  df <- data.frame(matrix(ncol = 13, nrow = 0))
-colnames(df) <- c("phylogeny_only_effect", "spatial_only_effect", "AUTOTYP_area_effect", "dual_model_spatial_effect", "dual_model_phylo_effect",
-                  "trial_model_phylo_effect", "trial_model_spatial_effect", "trial_model_autotyp_area_effect", "phylogeny_only_waic", "spatial_only_waic",
-                  "AUTOTYP_area_waic", "dual_model_waic", "trial_model_waic")
+df_for_plot <- posteriors_df %>%
+  dplyr::select(Feature_ID, `Precision for phylo_id_in_dual`, `Precision for spatial_id_in_dual`) 
 
-df <- df %>% 
-  mutate_all(as.numeric)
-
-df$Feature_ID <- as.character() 
-
-for(fn in fns) {
-  #fn <- fns[10]
-  qs <- qs::qread(fn) 
-
-  Feature_ID <- basename(fn) %>% str_replace_all(".qs", "")
-  
-  #options(warn=-1) #everytime one of the output from strip_INLA is null there will be a warning. So we're turning off warnings temporarily to not clog the console
-
-  phylogeny_only_waic <- qs[[1]]$waic$waic
-  spatial_only_waic <- qs[[2]]$waic$waic
-  AUTOTYP_area_waic <- qs[[3]]$waic$waic
-  dual_model_waic  <- qs[[4]]$waic$waic
-  trial_model_waic  <- qs[[5]]$waic$waic
-  
-  df_spec <- cbind(    phylogeny_only_effect = phylogeny_only_effect,
-    spatial_only_effect = spatial_only_effect,
-    AUTOTYP_area_effect = AUTOTYP_area_effect,
-    dual_model_spatial_effect  = dual_model_spatial_effect,
-    dual_model_phylo_effect  = dual_model_phylo_effect ,
-    trial_model_phylo_effect  = trial_model_phylo_effect,
-    trial_model_spatial_effect  = trial_model_spatial_effect  ,
-    trial_model_autotyp_area_effect  =  trial_model_autotyp_area_effect, 
-    phylogeny_only_waic = phylogeny_only_waic ,
-    spatial_only_waic =  spatial_only_waic ,
-    AUTOTYP_area_waic =    AUTOTYP_area_waic ,
-    dual_model_waic  = dual_model_waic,
-    trial_model_waic  =  ifelse(is.null(trial_model_waic), NA, trial_model_waic)
-  ) %>% as.data.frame()
- 
-  df <- df_spec %>% 
-    mutate_all(as.numeric) %>% 
-    mutate(Feature_ID = Feature_ID) %>% 
-    full_join(df, by = c("phylogeny_only_effect", "spatial_only_effect", "AUTOTYP_area_effect", "dual_model_spatial_effect", "dual_model_phylo_effect",
-                         "phylogeny_only_waic", "spatial_only_waic", "AUTOTYP_area_waic", "dual_model_waic", "trial_model_waic", "Feature_ID"))
-}
-
-df_waic_mind <- df %>% 
-  dplyr::select(Feature_ID, 
-                phylogeny_only_waic,
-                spatial_only_waic ,
-                AUTOTYP_area_waic ,
-                dual_model_waic  ,
-                trial_model_waic ) %>% 
-  reshape2::melt(id.vars= "Feature_ID") %>%
+df_for_plot %>% 
   group_by(Feature_ID) %>% 
-  slice(which.min(value))
+  summarise(mean_spatial_in_dual = mean(`Precision for spatial_id_in_dual`), 
+            mean_phylo_in_dual = mean(`Precision for phylo_id_in_dual`), 
+  ) %>% 
+  left_join(parameters_binary) %>% 
+  ggplot(aes(x = mean_phylo_in_dual, y = mean_spatial_in_dual, color = Main_domain)) +
+  geom_point() +
+  theme_classic()
