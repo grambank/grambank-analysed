@@ -97,6 +97,3 @@ h_load(verbose = F, pkg = c(
 options(tidyverse.quiet = TRUE)
 options(warn.conflicts = FALSE)
 options(stringsAsFactors = FALSE)
-
-source("global_variables.R")
-source("spatiophylogenetic_modelling/analysis/INLA_parameters.R")
