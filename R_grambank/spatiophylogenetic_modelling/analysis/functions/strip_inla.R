@@ -7,6 +7,7 @@ strip_inla = function(object){
   # save the WAIC score
   waic = object$waic
   cpo =  object$cpo$cpo
+  dic =  object$dic
   pit = object$cpo$pit
   cpo_failure = object$cpo$failure
   ## get marginal likelihood, note this will need to have a normalising constant added to it later
@@ -20,7 +21,7 @@ strip_inla = function(object){
   mlik <- object$mlik
 
   list(hyper_sample = hyper_sample,
-       waic = waic, cpo = cpo, pit = pit, cpo_failure = cpo_failure, mlik = mlik)
+       waic = waic, cpo = cpo, pit = pit, cpo_failure = cpo_failure, mlik = mlik, dic = dic)
 }
 
 get_hyper_sample = function(object, n = 100){
