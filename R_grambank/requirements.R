@@ -97,3 +97,5 @@ h_load(verbose = F, pkg = c(
 options(tidyverse.quiet = TRUE)
 options(warn.conflicts = FALSE)
 options(stringsAsFactors = FALSE)
+
+source("global_variables.R")
