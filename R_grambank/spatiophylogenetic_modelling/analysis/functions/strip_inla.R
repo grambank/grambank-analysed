@@ -20,7 +20,7 @@ strip_inla = function(object){
   mlik <- object$mlik
 
   list(hyper_sample = hyper_sample,
-       waic = waic, cpi = cpo, pit = pit, cpo_failure = cpo_failure, mlik = mlik)
+       waic = waic, cpo = cpo, pit = pit, cpo_failure = cpo_failure, mlik = mlik)
 }
 
 get_hyper_sample = function(object, n = 100){
