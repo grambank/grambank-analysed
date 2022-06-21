@@ -27,7 +27,7 @@ model_scores_df_fn <- "output/spatiophylogenetic_modelling/featurewise/model_sco
 if(!file.exists(model_scores_df_fn)){
   source("spatiophylogenetic_modelling/analysis/functions/extract_model_fit_scores.R")
 }
-model_scores_df <- read_tsv(model_scores_df_fn, na = "")
+model_scores_df <- read_tsv(model_scores_df_fn, na = "", show_col_types = F)
 
 colnames(model_scores_df) <- colnames(model_scores_df) %>% str_replace_all("_", "\n ")
 
