@@ -91,21 +91,5 @@ for(fn in fns){
 
 }
 
-colnames(df) <- colnames(df) %>% str_replace_all("_", "\n ")
-
-png("output/spatiophylogenetic_modelling/featurewise/SLOM_phylo_only_model_fits.png")
 df %>% 
-  dplyr::select("phylogeny\n only\n waic", "phylogeny\n only\n cpo","phylogeny\n only\n pit", "phylogeny\n only\n mlik\n integration", "phylogeny\n only\n mlik\n gaussian") %>% 
-pairs.panels( 
-             method = "pearson", # correlation method
-             hist.col = "#a3afd1",# "#a9d1a3","",""),
-             density = TRUE,  # show density plots
-             ellipses = F, # show correlation ellipses
-             cex.labels= 1,
-             #           smoother= T,
-             cor=T,
-             lm=T,
-             ci = T, cex.cor = 0.9,stars = T
-)
-x <- dev.off()
-
+  write_tsv("output/spatiophylogenetic_modelling/featurewise/model_scores.tsv", na = "")

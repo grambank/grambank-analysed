@@ -21,3 +21,29 @@ df_for_plot %>%
   coord_fixed()
 
 ggsave(filename = "output/spatiophylogenetic_modelling/featurewise/dual_effect_scatterplot.png")
+
+#visualising model fits
+model_scores_df_fn <- "output/spatiophylogenetic_modelling/featurewise/model_scores.tsv"
+if(!file.exists(model_scores_df_fn)){
+  source("spatiophylogenetic_modelling/analysis/functions/extract_model_fit_scores.R")
+}
+model_scores_df <- read_tsv(model_scores_df_fn, na = "")
+
+colnames(model_scores_df) <- colnames(model_scores_df) %>% str_replace_all("_", "\n ")
+
+png("output/spatiophylogenetic_modelling/featurewise/SLOM_phylo_only_model_fits.png")
+model_scores_df %>% 
+  dplyr::select("phylogeny\n only\n waic", "phylogeny\n only\n cpo","phylogeny\n only\n pit",  "phylogeny\n only\n mlik\n gaussian") %>% 
+  pairs.panels( 
+    method = "pearson", # correlation method
+    hist.col = "#a3afd1",# "#a9d1a3","",""),
+    density = TRUE,  # show density plots
+    ellipses = F, # show correlation ellipses
+    cex.labels= 1,
+    #           smoother= T,
+    cor=T,
+    lm=T,
+    ci = T, cex.cor = 0.9,stars = T
+  )
+x <- dev.off()
+
