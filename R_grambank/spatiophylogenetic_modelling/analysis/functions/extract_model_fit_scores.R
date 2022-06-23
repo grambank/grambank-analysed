@@ -76,11 +76,11 @@ for(fn in fns){
     dual_model_mlik_gaussian  = mean(qs[[1]]$mlik[2] ,na.rm = T),
     trial_model_mlik_gaussian  = mean(qs[[1]]$mlik[2] ,na.rm = T),
 
-    phylogeny_only_cpo = mean(qs[[1]]$cpi, na.rm = T),
-    spatial_only_cpo = mean(qs[[2]]$cpi ,na.rm = T),
-    AUTOTYP_area_cpo = mean(qs[[3]]$cpi,na.rm = T),
-    dual_model_cpo  = mean(qs[[4]]$cpi ,na.rm = T),
-    trial_model_cpo  = mean(qs[[5]]$cpi ,na.rm = T))
+    phylogeny_only_cpo = mean(qs[[1]]$cpo, na.rm = T),
+    spatial_only_cpo = mean(qs[[2]]$cpo ,na.rm = T),
+    AUTOTYP_area_cpo = mean(qs[[3]]$cpo,na.rm = T),
+    dual_model_cpo  = mean(qs[[4]]$cpo ,na.rm = T),
+    trial_model_cpo  = mean(qs[[5]]$cpo ,na.rm = T))
 
   df <- df_spec %>%
     full_join(df, by = c("Feature_ID", "phylogeny_only_waic", "spatial_only_waic", "AUTOTYP_area_waic", "dual_model_waic", "trial_model_waic",
