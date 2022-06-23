@@ -48,6 +48,8 @@ for(fn in fns){
     qs <- qs::qread(fn)
     index <- index + 1
     
+
+    
   cat(paste0("I'm on ", basename(fn), ". ", index,".\n"))
     
     df_spec <- data.frame(
@@ -57,6 +59,12 @@ for(fn in fns){
     AUTOTYP_area_waic = qs[[3]]$waic$waic,
     dual_model_waic  = qs[[4]]$waic$waic,
     trial_model_waic  = qs[[5]]$waic$waic,
+    
+    phylogeny_only_dic = qs[[1]]$dic$dic,
+    spatial_only_dic = qs[[2]]$dic$dic,
+    AUTOTYP_area_dic = qs[[3]]$dic$dic,
+    dual_model_dic  = qs[[4]]$dic$dic,
+    trial_model_dic  = qs[[5]]$dic$dic,
 
     phylogeny_only_pit = mean(qs[[1]]$pit ,na.rm = T),
     spatial_only_pit = mean(qs[[2]]$pit ,na.rm = T),
