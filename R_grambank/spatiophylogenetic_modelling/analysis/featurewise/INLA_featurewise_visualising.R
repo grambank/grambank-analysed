@@ -31,6 +31,28 @@ model_scores_df <- read_tsv(model_scores_df_fn, na = "", show_col_types = F)
 
 colnames(model_scores_df) <- colnames(model_scores_df) %>% str_replace_all("_", "\n ")
 
+model_scores_df %>%
+  reshape2::melt(id.vars = "Feature\n ID") %>% 
+  filter(str_detect(variable, "waic")) %>% 
+  ggplot(aes(x = variable, y = value, color = variable))+
+  geom_boxplot() +
+  geom_jitter() +
+  theme_classic() +  
+  theme(legend.position = "none", 
+        axis.title.x = element_blank()) +
+  ylab("WAIC")
+
+ggsave("output/spatiophylogenetic_modelling/featurewise/boxplot_waic_scorse_featurewise.png")
+
+
+model_scores_df %>%
+  reshape2::melt(id.vars = "Feature\n ID") %>% 
+  filter(str_detect(variable, "waic")) %>% 
+  group_by(`Feature\n ID`) %>% 
+  slice_min(value) %>% 
+  group_by(variable) %>% 
+  summarise(n = n())
+
 png("output/spatiophylogenetic_modelling/featurewise/SLOM_phylo_only_model_fits.png")
 model_scores_df %>% 
   dplyr::select("phylogeny\n only\n waic", "phylogeny\n only\n cpo","phylogeny\n only\n pit",  "phylogeny\n only\n mlik\n gaussian") %>% 
