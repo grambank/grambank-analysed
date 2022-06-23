@@ -118,24 +118,15 @@ endangerment_analysis:
 	Rscript diversity_endangerment.R
 
 #step 6
-## INLA PCA
-INLA: data pca sp_models sensitivity_testing
+## INLA 
+INLA: data INLA_featurewise
 
-## Phylo-spatial modelling
-sp_models: output/PCA/PCA_language_values.tsv
-	@echo "## Running spatiophylogenetic modelling with INLA on the first three components. ##"
-	@echo "If INLA isn't installed it will be installed. This may require input from you regarding compilation of binary files."
-	@echo Strap-in, these models take a while!
-	Rscript spatiophylogenetic_modelling/analysis/spatiophylogenetic_jaegermodel.R
-	Rscript spatiophylogenetic_modelling/analysis/plot_spatiophylogeneticmodels.R
+INLA_featurewise:
+	@echo "## Running INLA-analysis featurewise. #"
+	Rscript spatiophylogenetic_modelling/analysis/INLA_all_models.R "real" 1 113
 
-## Sensitivity testing of INLA.
-sensitivity_testing:
-	@echo "## Running sensitivity testing of INLA. ##"
-	Rscript spatiophylogenetic_modelling/analysis/spatial_parameters.R
-	Rscript spatiophylogenetic_modelling/analysis/variogram.R
-	Rscript spatiophylogenetic_modelling/analysis/waic_test.R
-	Rscript spatiophylogenetic_modelling/analysis/detect_coderbias.R
+INLA_simulation_binary_data:
+	Rscript spatiophylogenetic_modelling/analysis/INLA_all_models.R "sim" 1 160
 
 #step 7
 ## BRMS-analysis of unsualness scores
@@ -143,12 +134,6 @@ predict_unusualness:
 	@echo "## Running BRMS-analysis of unsualness scores (cluster recommended). #"
 	Rscript unusualness/analysis/predict_unusualness.R
 	
-INLA_featurewise:
-	@echo "## Running INLA-analysis featurewise. #"
-	Rscript spatiophylogenetic_modelling/analysis/INLA_all_models.R "real" 1 113
-
-INLA_simulation_binary_data:
-	Rscript spatiophylogenetic_modelling/analysis/INLA_all_models.R "sim" 1 160
 
 ## Test functions
 test:
