@@ -5,7 +5,11 @@ source("requirements.R")
 
 OUTPUTDIR <- file.path('.',"output", 'PCA')
 
-Language_meta_data <-  read_csv(GRAMBANK_LANGUAGES, col_types=LANGUAGES_COLSPEC) %>%		
+Language_meta_data_fn <- "output/non_GB_datasets/glottolog-cldf_wide_df.tsv"
+if(!file.exists(Language_meta_data_fn)){
+  source("make_glottolog-cldf_table.R")
+}
+Language_meta_data  <- read_tsv(Language_meta_data_fn, show_col_types = F) %>% 
   dplyr::select(Language_ID = Language_level_ID, Family_name, Name, Longitude, Latitude, Macroarea) %>% 
   distinct(Language_ID, .keep_all = T) %>% 
   mutate(Family_name = ifelse(is.na(Family_name), "Isolate", Family_name))
