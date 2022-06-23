@@ -46,7 +46,7 @@ basemap <- ggplot(df_long_shifted) +
                colour="gray87",
                fill="white", size = 0.3) +
   scale_color_viridis( name='% of data', 
-                      breaks = 0.25*0:4, labels = percent(0.25*0:4)) +
+                      breaks = 0.25*0:4, labels = percent(0.25*0:4), direction = -1) +
     theme(
     # all of these lines are just removing default things like grid lines, axes etc
     panel.grid.major = element_blank(),
