@@ -26,14 +26,15 @@ if(sim_or_real == "real"){ #running the on the real data
 
 
 #empty df to bind to in for loop
-df <- data.frame(matrix(ncol = 25, nrow = 0))
+df <- data.frame(matrix(ncol = 30, nrow = 0))
 colnames(df) <- c( "phylogeny_only_waic"   ,          "spatial_only_waic"      ,         "AUTOTYP_area_waic",              
                               "dual_model_waic"  ,               "trial_model_waic"     ,           "phylogeny_only_pit"   ,           "spatial_only_pit"            ,   
                                "AUTOTYP_area_pit"         ,       "dual_model_pit"             ,     "trial_model_pit"       ,         "phylogeny_only_mlik_integration",
                               "spatial_only_mlik_integration"   ,"AUTOTYP_area_mlik_integration" ,  "dual_model_mlik_integration"    , "trial_model_mlik_integration"   ,
                               "phylogeny_only_mlik_gaussian" ,  "spatial_only_mlik_gaussian"  ,    "AUTOTYP_area_mlik_gaussian"    ,  "dual_model_mlik_gaussian"    ,   
                              "trial_model_mlik_gaussian"    ,   "phylogeny_only_cpo"    ,          "spatial_only_cpo"   ,             "AUTOTYP_area_cpo"    ,           
-                           "dual_model_cpo"          ,        "trial_model_cpo"            )
+                           "dual_model_cpo"          ,        "trial_model_cpo"     ,  "phylogeny_only_dic"    ,          "spatial_only_dic"   ,             "AUTOTYP_area_dic"    ,           
+                   "dual_model_dic"          ,        "trial_model_dic"          )
 
 df <- df %>% 
   mutate_all(as.numeric)
@@ -47,9 +48,7 @@ for(fn in fns){
   #fn <- fns[49]
     qs <- qs::qread(fn)
     index <- index + 1
-    
-
-    
+  
   cat(paste0("I'm on ", basename(fn), ". ", index,".\n"))
     
     df_spec <- data.frame(
@@ -92,10 +91,11 @@ for(fn in fns){
 
   df <- df_spec %>%
     full_join(df, by = c("Feature_ID", "phylogeny_only_waic", "spatial_only_waic", "AUTOTYP_area_waic", "dual_model_waic", "trial_model_waic",
-                         "phylogeny_only_pit", "spatial_only_pit", "AUTOTYP_area_pit", "dual_model_pit", "trial_model_pit", "phylogeny_only_mlik_integration",
-                         "spatial_only_mlik_integration", "AUTOTYP_area_mlik_integration", "dual_model_mlik_integration", "trial_model_mlik_integration",
-                         "phylogeny_only_mlik_gaussian", "spatial_only_mlik_gaussian", "AUTOTYP_area_mlik_gaussian", "dual_model_mlik_gaussian",
-                         "trial_model_mlik_gaussian", "phylogeny_only_cpo", "spatial_only_cpo", "AUTOTYP_area_cpo", "dual_model_cpo", "trial_model_cpo"))
+                       "phylogeny_only_dic", "spatial_only_dic", "AUTOTYP_area_dic", "dual_model_dic", "trial_model_dic", "phylogeny_only_pit", "spatial_only_pit",
+                       "AUTOTYP_area_pit", "dual_model_pit", "trial_model_pit", "phylogeny_only_mlik_integration", "spatial_only_mlik_integration",
+                       "AUTOTYP_area_mlik_integration", "dual_model_mlik_integration", "trial_model_mlik_integration", "phylogeny_only_mlik_gaussian",
+                       "spatial_only_mlik_gaussian", "AUTOTYP_area_mlik_gaussian", "dual_model_mlik_gaussian", "trial_model_mlik_gaussian", "phylogeny_only_cpo",
+                       "spatial_only_cpo", "AUTOTYP_area_cpo", "dual_model_cpo", "trial_model_cpo"))
 
 }
 
