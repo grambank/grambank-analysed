@@ -87,7 +87,9 @@ density_spatial_domain =
              fill = Main_domain,
              col = Main_domain)) + 
   geom_density(alpha = 0.3, size = 0.25) + theme_void() + 
-    theme(legend.position = "none")
+    theme(legend.position = "none") + 
+  scale_colour_manual(values = colour_blind) + 
+  scale_fill_manual(values = colour_blind)
 
 density_phylogeny_domain = 
   ggplot(data = dual_posterior,
@@ -95,7 +97,9 @@ density_phylogeny_domain =
              fill = Main_domain,
              col = Main_domain)) + 
   geom_density(alpha = 0.3, size = 0.25) + theme_void() + 
-  theme(legend.position = "none")
+  theme(legend.position = "none") + 
+  scale_colour_manual(values = colour_blind) + 
+  scale_fill_manual(values = colour_blind)
 
 ## Desnity plots by feature
 density_spatial_feature = 
