@@ -19,8 +19,6 @@ if(!file.exists(surprisal_fn)){
 }
 gb <- read_tsv(file = surprisal_fn)
 
-### NEXT PART REQUIRES MATRICES ETC
-
 #########################################
 ## (5) Model unusualness in terms of genealogical, areal covariates, and endangerement status
 #########################################
@@ -29,7 +27,7 @@ gb <- read_tsv(file = surprisal_fn)
 gb<-gb %>%
   mutate(Endangerement=ifelse(aes %in% c("threatened","moribund","nearly_extinct"),"endangered",aes))
 
-
+# Get spatial/phylogenetic covariance matrix
 spatial_covar_mat_fn <- "output/spatiophylogenetic_modelling/spatial_covar_mat.tsv"
 if(!file.exists(spatial_covar_mat_fn)){
   source("spatiophylogenetic_modelling/analysis/make_vcvs.R")
@@ -49,15 +47,17 @@ phylo_covar_mat <- read_tsv(phylo_covar_mat_fn, show_col_types = F) %>%
   as.matrix()
 
 
-formula <- Surprisal~
-  (1 | gr(Glottocode, cov = spatial_covar_mat)) +
-  (1 | gr(Glottocode, cov = phylo_covar_mat))  (1|Family)+
-  Endangerement
+formula <- 
 
 # Function that obtains a predictive model of surprisal
-model_surprisal<-function(df) {
-  m<-brm(formula = formula,
+model_surprisal<-function(df,s_cov,p_cov) {
+  m<-brm(formula = Surprisal~
+           (1|AUTOTYP_area)+
+           (1 | gr(Language_ID, cov = p_cov))+
+           Endangerement,
          data=df,
+         data2=list(s_cov=s_cov,
+                    p_cov=p_cov),
          chains = 4,
          iter = 12000,
          warmup = 5000,
@@ -65,6 +65,9 @@ model_surprisal<-function(df) {
          control = list(adapt_delta=0.99),
          backend="cmdstanr")
   return(m)}
+
+
+pepy<-model_surprisal(gb[gb$Estimator=="Kernel 30",],s_cov=spatial_covar_mat,p_cov=phylo_covar_mat)
 
 # From now on we centered our analyses on two estimates: LCA and kernel-20
 gb_redux<-gb %>%
