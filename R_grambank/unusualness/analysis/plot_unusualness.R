@@ -14,11 +14,11 @@ if (!dir.exists(OUTPUTDIR_plots)) { dir.create(OUTPUTDIR_plots) }
 # Load pkgs
 source("requirements.R")
 
-surprisal_fn <- paste0(OUTPUTDIR_tables, "surprisal.tsv")
+surprisal_fn <- paste0(OUTPUTDIR_tables, "/surprisal.tsv")
 if(!file.exists(surprisal_fn)){
   source("unusualness/analysis/get_unusualness_bayesLCA.R")
 }
-gb <- read_tsv(file = surprisal_fn)
+gb <- read_tsv(file = surprisal_fn, show_col_types = F)
 
 # Plot the pairwise relations between probabilities
 gb %>%
