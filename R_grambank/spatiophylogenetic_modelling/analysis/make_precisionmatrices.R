@@ -100,7 +100,7 @@ class(phy_prec_mat)
 ## this is properly sparse
 sum(phy_prec_mat_new != 0)
 ## Now we have a proper dgCMatrix, a sparse format
-class(phy_prec_mat_new)
+# class(phy_prec_mat_new)
 
 ## using this new phylo precision matrix should perform much better
 phy_prec_mat <- phy_prec_mat_new
