@@ -1,6 +1,6 @@
 source("requirements.R")
 
-rarity_df <-   read.delim(file = "output/unusualness/tables/surprisal.tsv", sep = "\t") %>% 
+surprisal_df <-   read.delim(file = "output/unusualness/tables/surprisal.tsv", sep = "\t") %>% 
   dplyr::select(Language_ID, surprisal, Probability)
 
 languages_df <- read_csv(GRAMBANK_LANGUAGES, col_types=LANGUAGES_COLSPEC) %>%		
@@ -12,9 +12,9 @@ languages_df <- read_csv(GRAMBANK_LANGUAGES, col_types=LANGUAGES_COLSPEC) %>%
   ungroup %>%
   mutate(Family_group = if_else(n == 1, "Singleton", Family_group)) 
 
-limit <- quantile(rarity_df$surprisal, 0.98, na.rm = T)  # top 2 %
+limit <- quantile(surprisal_df$surprisal, 0.98, na.rm = T)  # top 2 %
 
-h <- rarity_df %>% 
+h <- surprisal_df %>% 
   ggplot(aes(x = surprisal, fill=..x..)) +
   geom_histogram(bins = 50) +
   annotate("segment",col="black", alpha = 0.6, x = limit, xend = limit, y = 0, yend = 50, size = 0.5, linetype = "dashed") +
@@ -33,7 +33,7 @@ world <- map_data('world', wrap=c(-25,335), ylim=c(-56,80), margin=T)
 lakes <- map_data("lakes", wrap=c(-25,335), col="white", border="gray", ylim=c(-55,65), margin=T)
 
 #shifting the longlat of the dataframe to match the pacific centered map
-scores_joined_for_plotting <- rarity_df %>% 
+scores_joined_for_plotting <- surprisal_df %>% 
   left_join(languages_df, by = "Language_ID") %>%
   mutate(Longitude = if_else(Longitude <= -25, Longitude + 360, Longitude))
 
@@ -79,7 +79,7 @@ scores <- read.delim("output/unusualness/tables/scores.tsv", sep = "\t") %>%
   dplyr::select(Language_ID = ID, score)
 
 both_df <- scores %>% 
-  full_join(rarity_df, by = "Language_ID")
+  full_join(surprisal_df, by = "Language_ID")
 
 both_df$score <- 1 - both_df$score
 
