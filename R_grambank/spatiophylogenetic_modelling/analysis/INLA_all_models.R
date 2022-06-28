@@ -113,7 +113,6 @@ data$phylo_id = match(data$Language_ID, rownames(phylo_prec_mat))
 data$spatial_id = match(data$Language_ID, rownames(spatial_prec_mat))
 data$obs_id = 1:nrow(data)
 
-
 #subsetting what to loop over
 done_fns <- done_fns %>% 
   as_tibble() %>% 
