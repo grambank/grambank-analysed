@@ -1,6 +1,8 @@
 source("requirements.R")
 
 surprisal_df <-   read.delim(file = "output/unusualness/tables/surprisal.tsv", sep = "\t") %>%
+  dplyr::select(Language_ID, aes, Surprisal, Estimator, Probability) %>% 
+  filter(Estimator == "Kernel 30") %>% 
   dplyr::select(Language_ID, Surprisal, Probability)
 
 languages_df <- read_csv(GRAMBANK_LANGUAGES, col_types=LANGUAGES_COLSPEC) %>%		
