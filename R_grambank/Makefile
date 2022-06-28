@@ -28,7 +28,10 @@ requirements.log:
  
 #step 1
 ## Fetch data from grambank-cldf into required formats for plotting.
-data:
+submodules:
+	git submodule update --init
+
+data: submodules
 	@echo "# Preparing the dataset (including imputation and pruning of global tree. #"
 	@mkdir output/non_GB_datasets
 	@mkdir output/coverage_plots
@@ -39,7 +42,7 @@ data:
 	@$(MAKE) -f $(THIS_MAKEFILE) output/GB_wide/GB_wide_imputed_binarized.tsv
 	@$(MAKE) -f $(THIS_MAKEFILE) output/coverage_plots/WALS_GB_coverage_overlay.png
 	@$(MAKE) -f $(THIS_MAKEFILE) output/coverage_plots/coverage_macroarea.png
-	@$(MAKE) -f $(THIS_MAKEFILE) output/pruning_jagertree
+	@$(MAKE) -f $(THIS_MAKEFILE) output/pruning_EDGE_tree.R
 	Rscript unusualness/processing/assigning_AUTOTYP_areas.R
 
 output/non_GB_datasets/glottolog-cldf_wide_df.tsv:
@@ -66,10 +69,10 @@ output/coverage_plots/coverage_macroarea.png:
 	@echo Making plots for coverage per macroarea.
 	Rscript coverage_bar_plots.R
 
-output/pruning_jagertree:
+output/pruning_EDGE_tree.R:
 	mkdir -p output/spatiophylogenetic_modelling
 	mkdir -p output/spatiophylogenetic_modelling/processed_data
-	RScript spatiophylogenetic_modelling/processing/pruning_jagertree.R
+	RScript spatiophylogenetic_modelling/processing/pruning_EDGE_tree.R
 
 #step 2
 ## PCA analysis and plots.
