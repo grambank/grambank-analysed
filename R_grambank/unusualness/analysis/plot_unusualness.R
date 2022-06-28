@@ -22,7 +22,7 @@ gb <- read_tsv(file = surprisal_fn, show_col_types = F)
 
 # Plot the pairwise relations between probabilities
 gb %>%
-  select(c(Surprisal,Estimator,Language_ID)) %>%
+  dplyr::select(c(Surprisal,Estimator,Language_ID)) %>%
   pivot_wider(id_cols = Language_ID,names_from = Estimator,values_from = Surprisal) %>%
   GGally::ggpairs(columns=c("Bayesian LCA","Kernel 1","Kernel 5","Kernel 10","Kernel 20","Kernel 30","Kernel 40"),
                   mapping = aes(alpha = 0.1))+
@@ -34,7 +34,7 @@ ggsave("comparison_surprisals.png",height=8,width = 10)
 
 # Zooming into the LCA and the kernel-20 approaches, and highlighting Macroarea
 gb %>%
-  select(c(Surprisal,Estimator,Name,Family,Macroarea)) %>%
+  dplyr::select(c(Surprisal,Estimator,Name,Family,Macroarea)) %>%
   filter(Estimator %in% c("prob_lca","prob_ker_20")) %>%
   pivot_wider(id_cols = c(Name,Family,Macroarea),names_from = Estimator,values_from = Surprisal) %>%
   mutate(IE=ifelse(Family=="indo1319","IE","nIE")) %>%
@@ -47,7 +47,7 @@ gb %>%
 ggsave("comparison_surprisals_pairwise_macroareas.png",width=25,height=18)
 
 gb[gb$aes %in% c("threatened","not_endangered","nearly_extinct","moribund"),] %>%
-  select(c(Surprisal,Estimator,Name,aes)) %>%
+  dplyr::select(c(Surprisal,Estimator,Name,aes)) %>%
   filter(Estimator %in% c("prob_lca","prob_ker_20")) %>%
   pivot_wider(id_cols = c(Name,aes),names_from = Estimator,values_from = Surprisal) %>%
   mutate(Endangerment=ifelse(aes=="not_endangered","Safe","Not safe")) %>%
@@ -132,7 +132,7 @@ ggsave("unexpected_surprisal.png",height=4,width=7)
 # Check outliers
 gb_lca %>%
   filter(abs(gb_lca$surprisal_z)>2) %>%
-  select(Name,Endangerement,AUTOTYP_area,Macroarea,Family,surprisal_z) %>%
+  dplyr::select(Name,Endangerement,AUTOTYP_area,Macroarea,Family,surprisal_z) %>%
   arrange(desc(surprisal_z))
 
 # Plot outliers
