@@ -135,7 +135,6 @@ gb_lca %>%
   arrange(desc(surprisal_z))
 
 # Plot outliers
-require(ggrepel)
 unusualness_ext %>%
   filter(abs(unusualness_ext$surprisal_z)>2.3) %>%
   ggplot(aes(x=1,y=surprisal_z,label=Name,color=surprisal_z))+
