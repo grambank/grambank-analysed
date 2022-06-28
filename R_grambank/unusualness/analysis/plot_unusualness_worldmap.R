@@ -1,7 +1,7 @@
 source("requirements.R")
 
-rarity_df <- read.delim("output/unusualness/tables/DB_rarity.tsv", sep = "\t") %>% 
-  dplyr::select(Language_ID, surprisal, prob)
+rarity_df <-   read.delim(file = "output/unusualness/tables/surprisal.tsv", sep = "\t") %>% 
+  dplyr::select(Language_ID, surprisal, Probability)
 
 languages_df <- read_csv(GRAMBANK_LANGUAGES, col_types=LANGUAGES_COLSPEC) %>%		
   dplyr::select(Language_ID = Language_level_ID, Longitude, Latitude, Family_name, Name) %>% 
