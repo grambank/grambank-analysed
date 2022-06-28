@@ -18,7 +18,7 @@ surprisal_fn <- paste0(OUTPUTDIR_tables, "/surprisal.tsv")
 if(!file.exists(surprisal_fn)){
   source("unusualness/analysis/get_unusualness_bayesLCA.R")
 }
-gb <- read_tsv(file = surprisal_fn, show_col_types = F)
+gb <- read_tsv(file = surprisal_fn, show_col_types = F) 
 
 # Plot the pairwise relations between probabilities
 gb %>%
@@ -30,14 +30,12 @@ gb %>%
 
 ggsave("comparison_surprisals.png",height=8,width = 10)
 
-
-
 # Zooming into the LCA and the kernel-20 approaches, and highlighting Macroarea
 gb %>%
-  dplyr::select(c(Surprisal,Estimator,Name,Family,Macroarea)) %>%
+  dplyr::select(c(Surprisal,Estimator,Name,Family_ID,Macroarea)) %>%
   filter(Estimator %in% c("prob_lca","prob_ker_20")) %>%
-  pivot_wider(id_cols = c(Name,Family,Macroarea),names_from = Estimator,values_from = Surprisal) %>%
-  mutate(IE=ifelse(Family=="indo1319","IE","nIE")) %>%
+  pivot_wider(id_cols = c(Name,Family_ID,Macroarea),names_from = Estimator,values_from = Surprisal) %>%
+  mutate(IE=ifelse(Family_ID=="indo1319","IE","nIE")) %>%
   ggplot(aes(x=prob_lca,y=prob_ker_20,label=Name,color=Macroarea))+
   geom_text(alpha=0.7)+
   theme_bw()+
