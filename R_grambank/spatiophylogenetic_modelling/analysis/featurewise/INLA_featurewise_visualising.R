@@ -29,6 +29,15 @@ if(!file.exists(model_scores_df_fn)){
 }
 model_scores_df <- read_tsv(model_scores_df_fn, na = "", show_col_types = F)
 
+model_scores_df %>% 
+  reshape2::melt(id.vars = "Feature_ID") %>% 
+  filter(str_detect(variable, "waic")) %>% 
+  group_by(Feature_ID) %>% 
+  slice_min(order_by = value)  %>% 
+  group_by(variable) %>% 
+  summarise(n = n() )
+
+
 colnames(model_scores_df) <- colnames(model_scores_df) %>% str_replace_all("_", "\n ")
 
 model_scores_df %>%
