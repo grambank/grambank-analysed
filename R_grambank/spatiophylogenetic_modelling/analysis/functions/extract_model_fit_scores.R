@@ -32,9 +32,8 @@ if(sim_or_real == "real"){ #running the on the real data
 
 #The output of strip_inla() is calculated per effect in the INLA-models. We specify five models: phylo only, spatial only, autotyp-area only, dual (spatial + phylo) and trial (phylo, spatial and autoty-area). The strip_inla() function pulls out the waic, dic, cpo and pit scores as well as the hypersample. The hypersample is what we use here to calculate the posteriors.
 
-
 #empty df to bind to in for loop
-df <- data.frame(matrix(ncol = 35, nrow = 0))
+df <- data.frame(matrix(ncol = 40, nrow = 0))
 colnames(df) <- c( "phylogeny_only_waic"   ,          "spatial_only_waic"      ,         "AUTOTYP_area_waic",
                               "dual_model_waic"  ,               "trial_model_waic"     ,           "phylogeny_only_pit"   ,           "spatial_only_pit"            ,
                                "AUTOTYP_area_pit"         ,       "dual_model_pit"             ,     "trial_model_pit"       ,         "phylogeny_only_mlik_integration",
@@ -98,11 +97,11 @@ for(fn in fns){
     trial_model_mlik_gaussian  = mean(qs[[5]]$mlik[2] ,na.rm = T) + phylo_const + spatial_const,
 
     ## these should be summarised as the sum of the log values
-    phylogeny_only_cpo = sum(log(qs[[1]]$cpi), na.rm = T),
-    spatial_only_cpo = sum(log(qs[[2]]$cpi), na.rm = T),
-    AUTOTYP_area_cpo = sum(log(qs[[3]]$cpi), na.rm = T),
-    dual_model_cpo  = sum(log(qs[[4]]$cpi), na.rm = T),
-    trial_model_cpo  = sum(log(qs[[5]]$cpi), na.rm = T))
+    phylogeny_only_cpo = sum(log(qs[[1]]$cpo), na.rm = T),
+    spatial_only_cpo = sum(log(qs[[2]]$cpo), na.rm = T),
+    AUTOTYP_area_cpo = sum(log(qs[[3]]$cpo), na.rm = T),
+    dual_model_cpo  = sum(log(qs[[4]]$cpo), na.rm = T),
+    trial_model_cpo  = sum(log(qs[[5]]$cpo), na.rm = T))
 
     ## bayes factors
     best_mlik_integration <- max(df_spec$phylogeny_only_mlik_integration,
@@ -118,15 +117,11 @@ for(fn in fns){
                               df_spec$trial_model_mlik_gaussian)
 
   df <- df_spec %>%
-    full_join(df, by = c("Feature_ID", "phylogeny_only_waic", "spatial_only_waic", "AUTOTYP_area_waic", "dual_model_waic", "trial_model_waic",
-                         "phylogeny_only_pit", "spatial_only_pit", "AUTOTYP_area_pit", "dual_model_pit", "trial_model_pit", "phylogeny_only_mlik_integration",
-                         "spatial_only_mlik_integration", "AUTOTYP_area_mlik_integration", "dual_model_mlik_integration", "trial_model_mlik_integration",
-                         "phylogeny_only_mlik_gaussian", "spatial_only_mlik_gaussian", "AUTOTYP_area_mlik_gaussian", "dual_model_mlik_gaussian",
-                         "trial_model_mlik_gaussian", "phylogeny_only_cpo", "spatial_only_cpo", "AUTOTYP_area_cpo", "dual_model_cpo", "trial_model_cpo",
-                         "phylogeny_only_bf_integration",
-                         "spatial_only_bf_integration", "AUTOTYP_area_bf_integration", "dual_model_bf_integration", "trial_model_bf_integration",
-                         "phylogeny_only_bf_gaussian", "spatial_only_bf_gaussian", "AUTOTYP_area_bf_gaussian", "dual_model_bf_gaussian",
-                         "trial_model_bf_gaussian"))
+    full_join(df,by = c("Feature_ID", "phylogeny_only_waic", "spatial_only_waic", "AUTOTYP_area_waic", "dual_model_waic", "trial_model_waic", "phylogeny_only_dic", "spatial_only_dic",
+  "AUTOTYP_area_dic", "dual_model_dic", "trial_model_dic", "phylogeny_only_pit", "spatial_only_pit", "AUTOTYP_area_pit", "dual_model_pit", "trial_model_pit",
+  "phylogeny_only_mlik_integration", "spatial_only_mlik_integration", "AUTOTYP_area_mlik_integration", "dual_model_mlik_integration", "trial_model_mlik_integration",
+  "phylogeny_only_mlik_gaussian", "spatial_only_mlik_gaussian", "AUTOTYP_area_mlik_gaussian", "dual_model_mlik_gaussian", "trial_model_mlik_gaussian", "phylogeny_only_cpo",
+  "spatial_only_cpo", "AUTOTYP_area_cpo", "dual_model_cpo", "trial_model_cpo"))
 
 
 
