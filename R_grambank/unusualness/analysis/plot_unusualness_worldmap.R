@@ -1,7 +1,9 @@
 source("requirements.R")
 
-unusualness_df <-   read.delim(file = "output/unusualness/tables/unusualness.tsv", sep = "\t") %>%
-  dplyr::select(Language_ID, prob_lca) 
+surprisal_df <-   read.delim(file = "output/unusualness/tables/surprisal.tsv", sep = "\t") %>%
+  dplyr::select(Language_ID, aes, Surprisal, Estimator, Probability) %>% 
+  filter(Estimator == "Kernel 30") %>% 
+  dplyr::select(Language_ID, Surprisal, Probability)
 
 languages_df <- read_csv(GRAMBANK_LANGUAGES, col_types=LANGUAGES_COLSPEC) %>%		
   dplyr::select(Language_ID = Language_level_ID, Longitude, Latitude, Family_name, Name) %>% 
@@ -12,15 +14,15 @@ languages_df <- read_csv(GRAMBANK_LANGUAGES, col_types=LANGUAGES_COLSPEC) %>%
   ungroup %>%
   mutate(Family_group = if_else(n == 1, "Singleton", Family_group)) 
 
-limit <- quantile(unusualness_df$prob_lca, 0.98, na.rm = T)  # top 2 %
+limit <- quantile(surprisal_df$Surprisal, 0.98, na.rm = T)  # top 2 %
 
-h <- unusualness_df %>% 
-  ggplot(aes(x = prob_lca, fill=..x..)) +
+h <- surprisal_df %>% 
+  ggplot(aes(x = Surprisal, fill=..x..)) +
   geom_histogram(bins = 50) +
   annotate("segment",col="black", alpha = 0.6, x = limit, xend = limit, y = 0, yend = 50, size = 0.5, linetype = "dashed") +
-  scale_fill_viridis('prob_lca', option="D", direction = -1) +
+  scale_fill_viridis('Surprisal', option="D", direction = -1) +
   guides(fill="none") +
-  xlab("prob_lca") + ylab("Number of Languages") +
+  xlab("Surprisal") + ylab("Number of Languages") +
   theme_classic() +
   theme(    axis.title = element_text(size = 8),
             panel.background = element_rect(fill = "transparent", colour = NA),  
@@ -33,7 +35,7 @@ world <- map_data('world', wrap=c(-25,335), ylim=c(-56,80), margin=T)
 lakes <- map_data("lakes", wrap=c(-25,335), col="white", border="gray", ylim=c(-55,65), margin=T)
 
 #shifting the longlat of the dataframe to match the pacific centered map
-scores_joined_for_plotting <- unusualness_df %>% 
+scores_joined_for_plotting <- surprisal_df %>% 
   left_join(languages_df, by = "Language_ID") %>%
   mutate(Longitude = if_else(Longitude <= -25, Longitude + 360, Longitude))
 
@@ -44,12 +46,12 @@ map <- ggplot(scores_joined_for_plotting) +
   geom_polygon(data=lakes, aes(x=long, y=lat, group=group),
                colour="gray87",
                fill="white", size = 0.3) +
-  geom_point(aes(x=Longitude, y=Latitude, color=prob_lca), alpha = 0.6) +
+  geom_point(aes(x=Longitude, y=Latitude, color=Surprisal), alpha = 0.6) +
   geom_text_repel(
-    data=scores_joined_for_plotting[scores_joined_for_plotting$prob_lca >= limit, ],
+    data=scores_joined_for_plotting[scores_joined_for_plotting$Surprisal >= limit, ],
     aes(x=Longitude, y=Latitude, label=Name),color="black", max.overlaps = 20
   ) +
-  scale_color_viridis('prob_lca', option="D", direction = -1) +
+  scale_color_viridis('Surprisal', option="D", direction = -1) +
   theme(
     legend.position = "none",
     # all of these lines are just removing default things like grid lines, axes etc
