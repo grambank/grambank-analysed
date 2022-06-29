@@ -212,4 +212,3 @@ gb$Estimator<-fct_recode(gb$Estimator,
                          "Kernel 40"="prob_ker_40")
 
 gb %>% write_tsv(file = paste0(OUTPUTDIR_tables, "/surprisal.tsv"))
-/
