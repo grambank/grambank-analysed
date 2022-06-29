@@ -48,8 +48,7 @@ dual_summary = dual_posterior %>%
             domain = first(Main_domain))
 
 #### Make Plot ####
-center_plot = 
-  ggplot() + 
+center_plot =   ggplot() + 
   geom_point(data = dual_summary,
              aes(x = mean_phylogenetic, 
                  y = mean_spatial, 
@@ -65,15 +64,23 @@ center_plot =
                alpha = 0.3,
                color = NA) + 
   ylim(c(0, 1)) + xlim(c(0, 1)) + 
-  theme_minimal(base_size = 6) + 
+  theme_minimal(base_size = 10) + 
   xlab("Variance explained by Phylogeny") + 
   ylab("Variance explained by Geography") + 
   scale_colour_manual(values = colour_blind) + 
   scale_fill_manual(values = colour_blind) + 
   coord_equal() + 
-  theme(legend.position = "bottom",
-        legend.title = element_blank())
-  
+  theme(legend.position = "None",
+        legend.title = element_blank()) +
+  facet_wrap(~domain,nrow = 2, strip.position = "bottom")
+
+ggsave(plot = center_plot,
+       filename = "output/spatiophylogenetic_modelling/spatiophylogenetic_figure_panels.jpg",
+       width = 210 / 2,
+       height = 210 / 2,
+       units = "mm")
+
+
 
 dual_posterior2 = dual_posterior %>% 
   dplyr::filter(!Feature_ID %in% c("GB198", "GB098", "GB096", "GB111", "GB116"))
