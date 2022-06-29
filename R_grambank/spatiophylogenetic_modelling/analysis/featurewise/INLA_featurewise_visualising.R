@@ -37,19 +37,18 @@ model_scores_df %>%
   group_by(variable) %>% 
   summarise(n = n() )
 
-
 colnames(model_scores_df) <- colnames(model_scores_df) %>% str_replace_all("_", "\n ")
 
 model_scores_df %>%
   reshape2::melt(id.vars = "Feature\n ID") %>% 
-  filter(str_detect(variable, "waic")) %>% 
+  filter(str_detect(variable, "cpo")) %>% 
   ggplot(aes(x = variable, y = value, color = variable))+
   geom_boxplot() +
   geom_jitter() +
   theme_classic() +  
   theme(legend.position = "none", 
         axis.title.x = element_blank()) +
-  ylab("WAIC")
+  ylab("CPO")
 
 ggsave("output/spatiophylogenetic_modelling/featurewise/boxplot_waic_scorse_featurewise.png")
 
