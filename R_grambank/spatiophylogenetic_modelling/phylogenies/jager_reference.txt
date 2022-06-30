@@ -1,4 +1,0 @@
-Jäger, Gerhard. 2018. “Global-Scale Phylogenetic Linguistic Inference from Lexical Resources.” Scientific Data 5(1):180189. doi: 10.1038/sdata.2018.189.
-
-Resources are held:
-https://osf.io/8bzu5/

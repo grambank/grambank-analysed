@@ -1,33 +1,49 @@
-verbose <- F
-cluster = 0
-
-if(verbose == T){
-  cat("For the analysis in this paper, we are using the testing-version of INLA, beta if you will, version = INLA_22.06.03. If you have another version of INLA running, please set it to this for maximum reproducibility.")
-  }
-
-
-if(!("INLA" %in% rownames(installed.packages())) & cluster == 0){
+R_version <- 4.2
+testing <- "yes"
+experimental <- "yes"
 
 source("fun_def_h_load.R")  
 
-h_load(pkg = c("Deriv", "Ecdat", "HKprocess", "gsl", "mlogit", "orthopolynom", "rgdal", "rgeos", "sn", "splancs"))
+h_load("BiocManager")
 
-install.packages("INLA",repos=c(INLA="https://inla.r-inla-download.org/R/testing"), dep=TRUE)
-
-}
-
-if(!("INLA" %in% rownames(installed.packages())) & cluster == 1){
+  # Install INLA dependencies with BiocManager using: 
+  BiocManager::install(c("graph","Rgraphviz",
+                         "rgdal",
+                         "rgl",
+                         "spdep"))
   
-  if(!(dir.exists("../rlibs"))) {
-mkdir("../rlibs")  
+  # Update foreach (although it unclear how vital this step was) using: 
+ 
+ h_load("foreach")
+  
+  # 4. Install INLA using: 
+  # NOTE: This is a big download
+
+ if(R_version >=4.2){
+     if(testing != "yes"){
+    
+      if (!("INLA" %in% rownames(installed.packages()))) { 
+      cat("INLA wasn't installed, installing now.\n") 
+    
+      install.packages("INLA", repos=c(getOption("repos"), 
+                                   INLA="https://inla.r-inla-download.org/R/stable"), 
+                   dep=TRUE)
+  }}else{
+  
+  install.packages("INLA",repos=c(getOption("repos"),INLA="https://inla.r-inla-download.org/R/testing"), dep=TRUE)
   }
-  
-install.packages("INLA",repos=c(INLA="https://inla.r-inla-download.org/R/testing"), dep=TRUE, lib = "../rlibs")
-INLA::inla.binary.install(os = "Ubuntu-18.0", path = "../rlibs/INLA/bin/linux/")
+ }else{
+   h_load("remotes")
+   remotes::install_version("INLA", version="22.05.03",repos=c(getOption("repos"),INLA="https://inla.r-inla-download.org/R/testing"), dep=TRUE)
+   
+ }
+
+suppressPackageStartupMessages(
+  library(INLA, quietly = T, warn.conflicts = F, verbose = F)
+  )
+
+if(experimental== "yes"){
+INLA::inla.setOption(inla.mode="experimental")
 }
 
-library("INLA")
-INLA::inla.setOption(inla.mode="experimental")
-
-
-
+cat(paste0("Loaded INLA version ", packageVersion("INLA"), ".\n"))

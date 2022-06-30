@@ -43,8 +43,5 @@ pruned_tree$tip.label <- pruned_tree$tip.label %>%
   dplyr::select(Language_ID) %>% 
   .[,1]
 
-outputdir <- "output/spatiophylogenetic_modelling/processed_data/"
-if(!dir.exists(outputdir)){dir.create(outputdir)}
-
 pruned_tree %>% 
-  write.tree(file = paste0(outputdir, "EDGE_pruned_tree.tree"))
+  write.tree("output/spatiophylogenetic_modelling/processed_data/EDGE_pruned_tree.tree")

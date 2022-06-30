@@ -16,10 +16,12 @@ clean:
 	rm -r output/non_GB_datasets*
 	rm -r output/coverage_plots*
 	rm -r output/GB_wide*
+	rm -r output/B
 	rm -r output/PCA*
 	rm -r output/unusualness*
-#	rm -r output/spatiophylogenetic_modelling*
-
+	rm -r output/spatiophylogenetic_modelling*
+#to do need to make excetion for output/README.md
+	
 #step 0
 ## Check and install dependencies if needed.
 requirements.log:
@@ -28,10 +30,7 @@ requirements.log:
  
 #step 1
 ## Fetch data from grambank-cldf into required formats for plotting.
-submodules:
-	git submodule update --init
-
-data: submodules
+data:
 	@echo "# Preparing the dataset (including imputation and pruning of global tree. #"
 	@mkdir output/non_GB_datasets
 	@mkdir output/coverage_plots
@@ -42,7 +41,7 @@ data: submodules
 	@$(MAKE) -f $(THIS_MAKEFILE) output/GB_wide/GB_wide_imputed_binarized.tsv
 	@$(MAKE) -f $(THIS_MAKEFILE) output/coverage_plots/WALS_GB_coverage_overlay.png
 	@$(MAKE) -f $(THIS_MAKEFILE) output/coverage_plots/coverage_macroarea.png
-	@$(MAKE) -f $(THIS_MAKEFILE) output/pruning_EDGE_tree.R
+	@$(MAKE) -f $(THIS_MAKEFILE) output/pruning_jagertree
 	Rscript unusualness/processing/assigning_AUTOTYP_areas.R
 
 output/non_GB_datasets/glottolog-cldf_wide_df.tsv:
@@ -69,10 +68,10 @@ output/coverage_plots/coverage_macroarea.png:
 	@echo Making plots for coverage per macroarea.
 	Rscript coverage_bar_plots.R
 
-output/pruning_EDGE_tree.R:
+output/pruning_jagertree:
 	mkdir -p output/spatiophylogenetic_modelling
 	mkdir -p output/spatiophylogenetic_modelling/processed_data
-	RScript spatiophylogenetic_modelling/processing/pruning_EDGE_tree.R
+	RScript spatiophylogenetic_modelling/processing/pruning_jagertree.R
 
 #step 2
 ## PCA analysis and plots.
@@ -121,21 +120,53 @@ endangerment_analysis:
 	Rscript diversity_endangerment.R
 
 #step 6
-## INLA 
-INLA: data INLA_featurewise
+## INLA PCA
+INLA: data pca sp_models sensitivity_testing
 
-INLA_featurewise:
-	@echo "## Running INLA-analysis featurewise. #"
-	Rscript spatiophylogenetic_modelling/analysis/INLA_all_models.R "real" 1 113
+## Phylo-spatial modelling
+sp_models: output/PCA/PCA_language_values.tsv
+	@echo "## Running spatiophylogenetic modelling with INLA on the first three components. ##"
+	@echo "If INLA isn't installed it will be installed. This may require input from you regarding compilation of binary files."
+	@echo Strap-in, these models take a while!
+	Rscript spatiophylogenetic_modelling/analysis/spatiophylogenetic_jaegermodel.R
+	Rscript spatiophylogenetic_modelling/analysis/plot_spatiophylogeneticmodels.R
 
-INLA_simulation_binary_data:
-	Rscript spatiophylogenetic_modelling/analysis/INLA_all_models.R "sim" 1 160
+## Sensitivity testing of INLA.
+sensitivity_testing:
+	@echo "## Running sensitivity testing of INLA. ##"
+	Rscript spatiophylogenetic_modelling/analysis/spatial_parameters.R
+	Rscript spatiophylogenetic_modelling/analysis/variogram.R
+	Rscript spatiophylogenetic_modelling/analysis/waic_test.R
+	Rscript spatiophylogenetic_modelling/analysis/detect_coderbias.R
 
 #step 7
 ## BRMS-analysis of unsualness scores
 predict_unusualness: 
 	@echo "## Running BRMS-analysis of unsualness scores (cluster recommended). #"
 	Rscript unusualness/analysis/predict_unusualness.R
+	
+INLA_featurewise:
+	@echo "## Running INLA-analysis featurewise. #"
+	@$(MAKE) -f $(THIS_MAKEFILE) 	INLA_featurewise_phylo_only
+	@$(MAKE) -f $(THIS_MAKEFILE) 	INLA_featurewise_spatial_only
+	@$(MAKE) -f $(THIS_MAKEFILE) 	INLA_featurewise_autotyp_area
+	@$(MAKE) -f $(THIS_MAKEFILE) 	INLA_featurewise_dual
+	@$(MAKE) -f $(THIS_MAKEFILE) 	INLA_featurewise_trial
+
+INLA_featurewise_phylo_only:
+	Rscript spatiophylogenetic_modelling/analysis/featurewise/INLA_featurewise_phylo_only.R
+
+INLA_featurewise_spatial_only:
+	Rscript spatiophylogenetic_modelling/analysis/featurewise/INLA_featurewise_spatial_only.R
+
+INLA_featurewise_autotyp_area:
+	Rscript spatiophylogenetic_modelling/analysis/featurewise/INLA_featurewise_autotyp_area.R
+
+INLA_featurewise_dual:
+	Rscript spatiophylogenetic_modelling/analysis/featurewise/INLA_featurewise_dual.R
+
+INLA_featurewise_trial:
+	Rscript spatiophylogenetic_modelling/analysis/featurewise/INLA_featurewise_trial.R
 	
 
 ## Test functions
