@@ -1,4 +1,4 @@
-# Please run this script first to make sure you have all the necessary packages 
+# Please run this script first to make sure you have all the necessary packages
 # installed for running the rest of the scripts in this R project
 
 
@@ -15,8 +15,8 @@ h_load(verbose = F, pkg = c(
 	"reshape2",
 	"broom",
 #	"plyr",
-	"broom.mixed", 
-	"naniar", 
+	"broom.mixed",
+	"naniar",
 	"glue",
 	"forcats",
 	"magrittr",
@@ -28,8 +28,8 @@ h_load(verbose = F, pkg = c(
 
 	"MASS",
 	"matrixStats",
-	"cluster", 
-  "MCMCglmm", 
+	"cluster",
+  "MCMCglmm",
 "foreach",
 "geiger",
 
@@ -37,8 +37,9 @@ h_load(verbose = F, pkg = c(
 	# "imputation
 "randomForest",
 	"missForest",
-	
+
 	#plotting graphs
+  "ellipse",
 	"scales",
 	"RColorBrewer",
   "car",
@@ -58,7 +59,7 @@ h_load(verbose = F, pkg = c(
 	"rlang",
 	"devtools",
 	"patchwork",
-		
+
 	#making maps
   "maps",
 	"mapdata",
@@ -72,18 +73,18 @@ h_load(verbose = F, pkg = c(
 "factoextra",
 "GGally",
 
-	
+
 	#sensitivity testing spatial
 #	rnaturalearth",
 #	rnaturalearthdata",
-"ggforce", 
+"ggforce",
 	"geosphere",
 "sf",
-	
+
 	# phylogenetic packages
 "ape",
 "phytools",
-	"caper", 
+	"caper",
 "synchrony",
   "geiger",
 "synchrony",
