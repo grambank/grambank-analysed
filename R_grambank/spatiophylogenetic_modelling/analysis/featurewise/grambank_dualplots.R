@@ -4,7 +4,7 @@ source('requirements.R')
 ## Change this vector to change the colour palette of the plots
 #col_vector  <- c("#009E73", "#0072B2", "#F0E442", "#D55E00")
 
-col_vector <- c("orange", "purple4",  "#c23c3c", "turquoise3")
+col_vector <- c("#039e37", "purple4",  "#c23c3c", "turquoise3")
 
 
 #### Format Posterior Data ####
@@ -70,17 +70,20 @@ center_plot =   ggplot() +
                alpha = 0.3,
                color = NA) + 
   theme_light(base_size = 10) + 
-  xlab("Variance explained by Phylogeny") + 
-  ylab("Variance explained by Geography") + 
+  xlab("Variance explained by Phylogeny (log10)") + 
+  ylab("Variance explained by Geography (log10)") + 
   scale_colour_manual(values = col_vector) + 
   scale_fill_manual(values = col_vector) + 
   scale_x_continuous(expand=c(0,0)) +
   scale_y_continuous(expand=c(0,0)) +
+  scale_x_log10() +
+  scale_y_log10() +
   coord_equal() + 
-  geom_abline(intercept = 1, slope = -1, linetype = "dashed", color = "#e6e6e6") +
- geom_polygon(aes(x=x, y=y), data=trinf, fill="#ffffff") +
+#  geom_abline(intercept = 1, slope = -1, linetype = "dashed", color = "#e6e6e6") +
+# geom_polygon(aes(x=x, y=y), data=trinf, fill="#ffffff") +
   theme(legend.position = "None",
-        legend.title = element_blank()) +
+        legend.title = element_blank(), 
+        panel.spacing = unit(2, "lines")) +
   facet_wrap(~domain,nrow = 2, strip.position = "bottom")
 
 plot(center_plot)
