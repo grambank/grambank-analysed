@@ -2,7 +2,10 @@
 source('requirements.R')
 
 ## Change this vector to change the colour palette of the plots
-colour_blind  <- c("#009E73", "#0072B2", "#F0E442", "#D55E00")
+#col_vector  <- c("#009E73", "#0072B2", "#F0E442", "#D55E00")
+
+col_vector <- c("orange", "purple4",  "#c23c3c", "turquoise3")
+
 
 #### Format Posterior Data ####
 ## Feature Metadata
@@ -47,6 +50,9 @@ dual_summary = dual_posterior %>%
             error_spatial = sd(spatial),
             domain = first(Main_domain))
 
+trinf <- data.frame(x=c(0,1,1),y=c(1,0,1))
+
+
 #### Make Plot ####
 center_plot =   ggplot() + 
   geom_point(data = dual_summary,
@@ -63,16 +69,21 @@ center_plot =   ggplot() +
                    fill = domain),
                alpha = 0.3,
                color = NA) + 
-  ylim(c(0, 1)) + xlim(c(0, 1)) + 
-  theme_minimal(base_size = 10) + 
+  theme_light(base_size = 10) + 
   xlab("Variance explained by Phylogeny") + 
   ylab("Variance explained by Geography") + 
-  scale_colour_manual(values = colour_blind) + 
-  scale_fill_manual(values = colour_blind) + 
+  scale_colour_manual(values = col_vector) + 
+  scale_fill_manual(values = col_vector) + 
+  scale_x_continuous(expand=c(0,0)) +
+  scale_y_continuous(expand=c(0,0)) +
   coord_equal() + 
+  geom_abline(intercept = 1, slope = -1, linetype = "dashed", color = "#e6e6e6") +
+ geom_polygon(aes(x=x, y=y), data=trinf, fill="#ffffff") +
   theme(legend.position = "None",
         legend.title = element_blank()) +
   facet_wrap(~domain,nrow = 2, strip.position = "bottom")
+
+plot(center_plot)
 
 ggsave(plot = center_plot,
        filename = "output/spatiophylogenetic_modelling/spatiophylogenetic_figure_panels.jpg",
@@ -95,8 +106,8 @@ density_spatial_domain =
              col = Main_domain)) + 
   geom_density(alpha = 0.3, size = 0.25) + theme_void() + 
     theme(legend.position = "none") + 
-  scale_colour_manual(values = colour_blind) + 
-  scale_fill_manual(values = colour_blind)
+  scale_colour_manual(values = col_vector) + 
+  scale_fill_manual(values = col_vector)
 
 density_phylogeny_domain = 
   ggplot(data = dual_posterior,
@@ -105,8 +116,8 @@ density_phylogeny_domain =
              col = Main_domain)) + 
   geom_density(alpha = 0.3, size = 0.25) + theme_void() + 
   theme(legend.position = "none") + 
-  scale_colour_manual(values = colour_blind) + 
-  scale_fill_manual(values = colour_blind)
+  scale_colour_manual(values = col_vector) + 
+  scale_fill_manual(values = col_vector)
 
 ## Desnity plots by feature
 density_spatial_feature = 
@@ -116,8 +127,8 @@ density_spatial_feature =
              fill = Main_domain,
              col = Main_domain)) + 
   geom_density(alpha = 0.3, size = 0.25) + theme_void() + 
-  scale_colour_manual(values = colour_blind) + 
-  scale_fill_manual(values = colour_blind) + 
+  scale_colour_manual(values = col_vector) + 
+  scale_fill_manual(values = col_vector) + 
   theme(legend.position = "none")
 
 density_phylogeny_feature = 
@@ -127,8 +138,8 @@ density_phylogeny_feature =
              fill = Main_domain,
              col = Main_domain)) + 
   geom_density(alpha = 0.3, size = 0.25) + theme_void() + 
-  scale_colour_manual(values = colour_blind) + 
-  scale_fill_manual(values = colour_blind) + 
+  scale_colour_manual(values = col_vector) + 
+  scale_fill_manual(values = col_vector) + 
   theme(legend.position = "none")
 
 # Figure design grid
