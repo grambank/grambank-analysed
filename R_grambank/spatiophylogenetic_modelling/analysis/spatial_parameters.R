@@ -143,6 +143,8 @@ plot_df = plot_df[order(plot_df$distance),]
 plot_df$distance_std = plot_df$distance / max(plot_df$distance)
 
 cols = RColorBrewer::brewer.pal(5, "Set1")
+
+jpeg('output/spatiophylogenetic_modelling/spatial_parameter_fig.jpg')
 plot(x = plot_df$distance,
      y = 1 - plot_df$distance_std, 
      type = "l", 
@@ -169,6 +171,7 @@ legend_text = c("1 - Haversine",
                 paste0("Spatial: k = ", parameters[4,1],"; s = ", parameters[4,2]))
 
 leg_cols = c("black", cols)
-legend(7500, 1.0, 
+legend(700, 1.0, 
        legend=legend_text,
        col=leg_cols, lty=1, cex=0.8, lwd = 3)
+dev.off()
