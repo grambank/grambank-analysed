@@ -17,10 +17,6 @@ if(!file.exists(surprisal_fn)){
   source("unusualness/analysis/get_unusualness_bayesLCA.R")
 }
 
-source("global_variables.R")
-source("spatiophylogenetic_modelling/analysis/INLA_parameters.R")
-source('spatiophylogenetic_modelling/analysis/functions/strip_inla.R')
-
 #read in data
 gb <- read.delim(file = surprisal_fn, sep = "\t") %>% 
   dplyr::select(Language_ID, aes, Surprisal, Estimator) %>% 
@@ -34,50 +30,37 @@ gb <- read.delim(file = surprisal_fn, sep = "\t") %>%
 ## (5) Model unusualness in terms of genealogical, areal covariates, and endangerement status
 #########################################
 
-#In the spatiophylogenetic modelling of the features, we use the dataset cropped for missing data but without imputation. For the unsualness analsyis, we use the imputed data. They are different in the feature values, but it is the same subset of langauges in both. Therefore, we can use the same precision matrices for both the predict unsualness analysis and spatiophylogenetic modelling with INLA.
-precision_matrices_fn <- "output/spatiophylogenetic_modelling/processed_data/precision_matrices.RDS"
-if(!(file.exists(precision_matrices_fn))){
-  source("spatiophylogenetic_modelling/analysis/simulations/make_precisionmatrices.R")}
 
-precision_matrices = readRDS(precision_matrices_fn)
-phylo_prec_mat = precision_matrices$phylogenetic_precision
-spatial_prec_mat = precision_matrices$spatial_precision
+phylogenetic_tree <- phylogenetic_tree %>% keep.tip(inner_joined_df$Glottocode)
 
-#reading in AUTOTYP-area
-if (!file.exists("output/non_GB_datasets/glottolog_AUTOTYP_areas.tsv")) { s
-  source("unusualness/processing/assigning_AUTOTYP_areas.R") }		
-autotyp_area <- read.delim("output/non_GB_datasets/glottolog_AUTOTYP_areas.tsv", sep = "\t") %>%
-  dplyr::select(Language_ID, AUTOTYP_area_id_iid_model = AUTOTYP_area)
-
-data <- gb %>% 
-  left_join(autotyp_area, by = "Language_ID")
-
-x <- assert_that(all(data$Language_ID == lgs_in_analysis$Language_ID), msg = "Data doesn't match!")
-
-## Since we are using a sparse phylogenetic matrix, we need to math taxa to the correct
-## rows in the matrix
-data$phylo_id = match(data$Language_ID, rownames(phylo_prec_mat))
-data$spatial_id = match(data$Language_ID, rownames(spatial_prec_mat))
-data$obs_id = 1:nrow(data)
-
-#INLA phylo only
-#dual model
-source("spatiophylogenetic_modelling/install_inla.R")
-
-dual_model = INLA::inla(Surprisal ~
-                    f(spatial_id,
-                      model = "generic0",
-                      Cmatrix = spatial_prec_mat,
-                      hyper = pcprior) +
-                    f(phylo_id,
-                      model = "generic2",
-                      Cmatrix = phylo_prec_mat,
-                      hyper = pcprior),
-                    control.compute = list(waic = TRUE, cpo = TRUE),
-                  data = data#,
-                  #control.family = list(hyper = list(prec = list(initial = log(1e+08), fixed = TRUE)))
-                  )
+#brms
+#making a covariance matrix of the tree
+vcv_tree <- vcv.phylo(phylogenetic_tree)
 
 
+###BRMS
 
-dual_model_stripped <- strip_inla(dual_model)
+formula_for_brms <- unusualness_score ~ L1_log10 + L2_log10 + Is_Written + Official +
+  (1 | gr(Glottocode, cov = vcv_tree)) +
+  (L1_log10 + L2_log10 + Is_Written + Official | Family_ID)
+
+full_model <- brms::brm(formula = formula_for_brms,
+                        data = filter(inner_joined_df, !is.na(L1), !is.na(L2)),
+                        data2 = list(vcv_tree= vcv_tree),
+                        iter = 7500,
+                        iter = 10000,
+                        cores = 4,
+                        control = list(adapt_delta =0.99, max_treedepth=15)
+) %>% add_criterion("waic")
+full_model %>% broom.mixed::tidy() %>% write_csv("unusualness/analysis/full_model.csv")
+
+simplified_model <- brms::brm(unusualness_score ~ 1 + (1 | gr(Glottocode, cov = vcv_tree)),
+                              data = filter(inner_joined_df, !is.na(L1), !is.na(L2)),
+                              data2 = list(vcv_tree= vcv_tree),
+                              iter = 7500,
+                              iter = 25000,
+                              control = list(adapt_delta =0.99, max_treedepth=15)
+) %>% add_criterion("waic")
+simplified_model %>% broom.mixed::tidy() %>% write_csv("unusualness/analysis/simplified_model.csv")
+
+loo_compare(full_model, simplified_model, criterion="waic") %>% as.tibble() %>% write_csv("unusualness/analysis/model_comparison.csv")
