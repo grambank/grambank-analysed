@@ -6,7 +6,6 @@ source('requirements.R')
 
 col_vector <- c("#039e37", "purple4",  "#c23c3c", "turquoise3")
 
-
 #### Format Posterior Data ####
 ## Feature Metadata
 parameters_binary <- read_csv("feature_grouping_for_analysis.csv", show_col_types = F)
@@ -129,6 +128,8 @@ ggsave(plot = center_plot,
        height = 210 / 2,
        units = "mm")
 
+h_load("lemon")
+
 center_plot =   ggplot() +
   geom_polygon(aes(x, y,
                    fill = domain,
@@ -141,122 +142,32 @@ center_plot =   ggplot() +
                  y = mean_spatial,
                  col = domain),
              size = 0.5) +
-  # geom_ellipse(data = dual_summary, # remove this geom to remove the error ellipses
-  #   aes(x0 = mean_phylogenetic,
-  #                  y0 = mean_spatial,
-  #                  a = error_phylogenetic, ## I think this shouldn't be halved
-  #                  b = error_spatial,
-  #                  angle = 0,
-  #                  fill = domain),
-  #              alpha = 0.3,
-  #              color = NA) +
-  theme_light(base_size = 10) +
-  xlab("Variance explained by Phylogeny (log10)") +
-  ylab("Variance explained by Geography (log10)") +
+  theme_classic(base_size = 10) +
+  xlab("Variance explained by Phylogeny") +
+  ylab("Variance explained by Geography") +
   scale_colour_manual(values = col_vector) +
   scale_fill_manual(values = col_vector) +
-  # scale_x_continuous(expand=c(0,0)) +
-  # scale_y_continuous(expand=c(0,0)) +
-  scale_x_log10(expand=c(0,0)) +
-  scale_y_log10(expand=c(0,0)) +
+  scale_x_continuous(expand=c(0,0)) +
+  scale_y_continuous(expand=c(0,0), breaks = c(0, 0.2, 0.4, 0.6, 0.7)) +
+  ylim(c(0, 0.7))+
   coord_equal() +
-  #geom_abline(intercept = 1, slope = -1, linetype = "dashed", color = "#e6e6e6") +
   geom_path(aes(x, y), data = data.frame(x = seq(0, 1, length.out = 100),
                                          y = seq(1, 0, length.out = 100)),
             linetype = "dashed", color = "#e6e6e6", size = 1.5) +
-  geom_polygon(aes(x=x, y=y), data=trinf, fill="#ffffff") +
+  geom_polygon(aes(x=x, y=y), data=trinf, fill="#F9F9F9") +
   theme(legend.position = "None",
         legend.title = element_blank(),
-        panel.spacing = unit(2, "lines")) +
-  facet_wrap(~domain,nrow = 2, strip.position = "bottom")
+        panel.spacing = unit(2, "lines"), 
+        strip.text = element_text(size = 10)
+        ) +
+  lemon::facet_rep_wrap(~domain,nrow = 2, repeat.tick.labels = T) 
 
 plot(center_plot)
 
 ggsave(plot = center_plot,
-       filename = "output/spatiophylogenetic_modelling/spatiophylogenetic_figure_panels_ellipses_log.jpg",
+       filename = "output/spatiophylogenetic_modelling/spatiophylogenetic_figure_panels_ellipses.jpg",
        width = 210 / 2,
        height = 210 / 2,
        units = "mm")
 
-
-
-dual_posterior2 = dual_posterior %>%
-  dplyr::filter(!Feature_ID %in% c("GB198", "GB098", "GB096", "GB111", "GB116"))
-
-## Creating marginal density plots
-
-## Density plots by Domain
-density_spatial_domain =
-  ggplot(data = dual_posterior,
-         aes(y = spatial,
-             fill = Main_domain,
-             col = Main_domain)) +
-  geom_density(alpha = 0.3, size = 0.25) + theme_void() +
-    theme(legend.position = "none") +
-  scale_colour_manual(values = col_vector) +
-  scale_fill_manual(values = col_vector)
-
-density_phylogeny_domain =
-  ggplot(data = dual_posterior,
-         aes(x = phylogenetic,
-             fill = Main_domain,
-             col = Main_domain)) +
-  geom_density(alpha = 0.3, size = 0.25) + theme_void() +
-  theme(legend.position = "none") +
-  scale_colour_manual(values = col_vector) +
-  scale_fill_manual(values = col_vector)
-
-## Desnity plots by feature
-density_spatial_feature =
-  ggplot(data = dual_posterior2,
-         aes(y = spatial,
-             group = Feature_ID,
-             fill = Main_domain,
-             col = Main_domain)) +
-  geom_density(alpha = 0.3, size = 0.25) + theme_void() +
-  scale_colour_manual(values = col_vector) +
-  scale_fill_manual(values = col_vector) +
-  theme(legend.position = "none")
-
-density_phylogeny_feature =
-  ggplot(data = dual_posterior2,
-         aes(x = phylogenetic,
-             group = Feature_ID,
-             fill = Main_domain,
-             col = Main_domain)) +
-  geom_density(alpha = 0.3, size = 0.25) + theme_void() +
-  scale_colour_manual(values = col_vector) +
-  scale_fill_manual(values = col_vector) +
-  theme(legend.position = "none")
-
-# Figure design grid
-design = "
-  14
-  23
-  23
-"
-
-# Build figure with domain densities
-figure_domain =
-  (density_phylogeny_domain / center_plot) + density_spatial_domain +
-  plot_layout(design = design, widths = c(1, 0.2),
-              heights = c(0.2, 1))
-
-# Build figure with feature densities
-figure_feature = (density_phylogeny_feature / center_plot) + density_spatial_feature +
-  plot_layout(design = design, widths = c(1, 0.2),
-              heights = c(0.2, 1))
-
-
-ggsave(plot = figure_domain,
-       filename = "output/spatiophylogenetic_modelling/spatiophylogenetic_figure_domaindensity.jpg",
-       width = 210 / 2,
-       height = 210 / 2,
-       units = "mm")
-
-ggsave(plot = figure_feature,
-       filename = "output/spatiophylogenetic_modelling/spatiophylogenetic_figure_featuredensity.jpg",
-       width = 210 / 2,
-       height = 210 / 2,
-       units = "mm")
 
