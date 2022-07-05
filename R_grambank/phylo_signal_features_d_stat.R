@@ -5,8 +5,7 @@ OUTPUTDIR <- file.path("output", "phylosig")
 if (!dir.exists(OUTPUTDIR)) { dir.create(OUTPUTDIR) }	
 
 #reading in global tree. This tree has been processed already by spatiophylogenetic_modelling/processing/pruning_jagertree.R
-tree <- read.tree("output/spatiophylogenetic_modelling/processed_data/jaeger_pruned.tree")
-
+tree <- read.tree("output/spatiophylogenetic_modelling/processed_data/EDGE_pruned_tree.tree")
 tree_tips <- tree$tip.label %>% 
   as.data.frame() %>% 
   dplyr::rename(Language_ID = ".")
@@ -38,7 +37,7 @@ pb = txtProgressBar(min = 0, max = length(seq_along(features)), initial = 0, sty
 #for loop for running phylo.d over each feature given the global tree
 for (idx in seq_along(features)) {
   feature <- features[idx]
-
+  #feature <- features[103]
   setTxtProgressBar(pb, idx)
   output <- eval(substitute(phylo.d(data = df_comp, binvar = this_feature),
                             list(this_feature=as.name(feature))))
