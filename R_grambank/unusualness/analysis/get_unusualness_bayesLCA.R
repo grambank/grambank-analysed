@@ -185,6 +185,7 @@ unusualness_df<-plyr::ldply(cluster_list,
                        .id="Cluster") %>%
   plyr::ddply("lg",function(x) data.frame(prob_lca=prod(x$prob)))
 
+unusualness_df$Language_ID <-gb$Language_ID
 
 unusualness_df %>% write_tsv(file = paste0(OUTPUTDIR_tables, "/unusualness.tsv"))
 
@@ -211,4 +212,3 @@ gb$Estimator<-fct_recode(gb$Estimator,
                          "Kernel 40"="prob_ker_40")
 
 gb %>% write_tsv(file = paste0(OUTPUTDIR_tables, "/surprisal.tsv"))
-/

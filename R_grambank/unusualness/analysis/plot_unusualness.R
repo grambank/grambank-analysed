@@ -28,21 +28,22 @@ gb %>%
                   mapping = aes(alpha = 0.1))+
   theme_minimal()
 
-ggsave("comparison_surprisals.png",height=8,width = 10)
+ggsave(file.path(OUTPUTDIR_plots,"comparison_surprisals.png"),height=8,width = 10)
 
 # Zooming into the LCA and the kernel-20 approaches, and highlighting Macroarea
 gb %>%
-  dplyr::select(c(Surprisal,Estimator,Name,Family_ID,Macroarea)) %>%
-  filter(Estimator %in% c("prob_lca","prob_ker_20")) %>%
-  pivot_wider(id_cols = c(Name,Family_ID,Macroarea),names_from = Estimator,values_from = Surprisal) %>%
+  dplyr::select(c(Surprisal,Estimator,Name,Family_ID,Macroarea)) %>% 
+  filter(Estimator == "Bayesian LCA" |
+           Estimator == "Kernel 20") %>% 
+  pivot_wider(id_cols = c(Name,Family_ID,Macroarea),names_from = Estimator,values_from = Surprisal) %>% 
   mutate(IE=ifelse(Family_ID=="indo1319","IE","nIE")) %>%
-  ggplot(aes(x=prob_lca,y=prob_ker_20,label=Name,color=Macroarea))+
+  ggplot(aes(x=`Bayesian LCA`,y=`Kernel 20`,label=Name,color=Macroarea))+
   geom_text(alpha=0.7)+
   theme_bw()+
   theme(legend.position = "none")+
   labs(x="Surprisal based on LCA approximation",y="Unnormalized surprisal based on 20-kernel")
 
-ggsave("comparison_surprisals_pairwise_macroareas.png",width=25,height=18)
+ggsave(filename = file.path(OUTPUTDIR_plots, "comparison_surprisals_pairwise_macroareas.png"),width=25,height=18)
 
 gb[gb$aes %in% c("threatened","not_endangered","nearly_extinct","moribund"),] %>%
   dplyr::select(c(Surprisal,Estimator,Name,aes)) %>%
@@ -55,7 +56,7 @@ gb[gb$aes %in% c("threatened","not_endangered","nearly_extinct","moribund"),] %>
   theme(legend.position = c(0.8,0.2))+
   labs(x="Surprisal based on LCA approximation",y="Unnormalized surprisal based on 20-kernel")
 
-ggsave("comparison_surprisals_pairwise_endangerement.png",width=25,height=18)
+ggsave(file.path(OUTPUTDIR_plots,"comparison_surprisals_pairwise_endangerement.png"),width=25,height=18)
 
 # Plot individual surprisals
 gb %>%
@@ -125,7 +126,7 @@ gb_lca %>%
   theme(legend.position="none")+
   theme(plot.background = element_rect(fill="white"))
 
-ggsave("unexpected_surprisal.png",height=4,width=7)
+ggsave(file.path(OUTPUTDIR_plots,"unexpected_surprisal.png"),height=4,width=7)
 
 # Check outliers
 gb_lca %>%
@@ -134,7 +135,6 @@ gb_lca %>%
   arrange(desc(surprisal_z))
 
 # Plot outliers
-require(ggrepel)
 unusualness_ext %>%
   filter(abs(unusualness_ext$surprisal_z)>2.3) %>%
   ggplot(aes(x=1,y=surprisal_z,label=Name,color=surprisal_z))+
@@ -147,7 +147,7 @@ unusualness_ext %>%
   scale_color_gradient2()
 
 
-ggsave("unexpected_surprisal_lgs.png",height=7,width=6)
+ggsave(file.path(OUTPUTDIR_plots,"unexpected_surprisal_lgs.png"),height=7,width=6)
 
 ## Test
 plyr::ddply(gb[gb$Estimator=="prob_lca"&!is.na(gb$aes),],"AUTOTYP_area",function(x) data.frame(E=sum(x$Endangerement=="endangered")/sum(x$Endangerement %in% c("not_endangered","endangered")),
@@ -161,7 +161,7 @@ plyr::ddply(gb[gb$Estimator=="prob_lca"&!is.na(gb$aes),],"AUTOTYP_area",function
   theme(legend.position = "none")+
   labs(x="Mean unexpectedness in region",y="Proportion of threatened/moribund/near extinct lgs in region")
 
-ggsave("endangerment_and_area.png")
+ggsave(file.path(OUTPUTDIR_plots,"endangerment_and_area.png"))
 
 
 plyr::ddply(gb[gb$Estimator=="prob_lca"&!is.na(gb$aes),],"Macroarea",function(x) data.frame(E=sum(x$Endangerement=="endangered")/sum(x$Endangerement %in% c("not_endangered","endangered")),
