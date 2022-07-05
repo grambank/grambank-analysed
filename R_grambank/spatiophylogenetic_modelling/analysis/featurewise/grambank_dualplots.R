@@ -61,10 +61,18 @@ trinf <- trinf_sf %>%
   as.data.frame() %>%
   dplyr::select(x = X, y = Y)
 
+#make col for plot labels with a, b, c, d
+dual_summary <- dual_summary %>% 
+  mutate(plot_label = str_replace(domain, "clause", "a")) %>% 
+  mutate(plot_label = str_replace(plot_label, "nominal domain", "b")) %>% 
+  mutate(plot_label = str_replace(plot_label, "pronoun", "c")) %>% 
+  mutate(plot_label = str_replace(plot_label, "verbal domain", "d"))
+
 ## ellipses
 ellipses <- dual_summary %>%
   rowwise() %>%
   summarise(Feature_ID = Feature_ID,
+            plot_label =plot_label,
             domain = domain,
             ellipse = ellipse::ellipse(cor, centre = c(mean_phylogenetic, mean_spatial),
                                        scale = c(error_phylogenetic, error_spatial),
@@ -77,13 +85,11 @@ ellipses <- dual_summary %>%
          y = ifelse(y > 1, 1, y)) %>%
   ungroup()
 
-
-
 h_load("lemon")
 
 center_plot =   ggplot() +
   geom_polygon(aes(x, y,
-                   fill = domain,
+                   fill = plot_label,
                    group = Feature_ID),
                data = ellipses,
                alpha = 0.1,
@@ -91,14 +97,14 @@ center_plot =   ggplot() +
   geom_point(data = dual_summary,
              aes(x = mean_phylogenetic,
                  y = mean_spatial,
-                 col = domain),
+                 col = plot_label),
              size = 0.5) +
   theme_classic(base_size = 10) +
   xlab("Variance explained by Phylogeny") +
   ylab("Variance explained by Geography") +
   scale_colour_manual(values = col_vector) +
   scale_fill_manual(values = col_vector) +
-  scale_x_continuous(expand=c(0,0), breaks=c(0, 0.25, 0.5, 0.75, 1), labels = scales::percent_format(scale = 100)) +
+  scale_x_continuous(expand=c(0,0), breaks=c(0.25, 0.5, 0.75, 1), labels = scales::percent_format(scale = 100)) +
   scale_y_continuous(expand=c(0,0), breaks=c(0, 0.25, 0.5, 0.7), limits = c(0, 0.7), labels = scales::percent_format(scale = 100)) +
   coord_equal() +
   geom_path(aes(x, y), data = data.frame(x = seq(0, 1, length.out = 100),
@@ -110,7 +116,7 @@ center_plot =   ggplot() +
         panel.spacing = unit(2, "lines"), 
         strip.text = element_text(size = 10)
         ) +
-  lemon::facet_rep_wrap(~domain,nrow = 2, repeat.tick.labels = T) 
+  lemon::facet_rep_wrap(~plot_label,nrow = 2, repeat.tick.labels = T) 
 
 plot(center_plot)
 
