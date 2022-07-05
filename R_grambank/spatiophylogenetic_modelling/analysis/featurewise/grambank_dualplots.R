@@ -46,6 +46,7 @@ dual_summary = dual_posterior %>%
             error_phylogenetic = sd(phylogenetic),
             error_spatial = sd(spatial),
             domain = first(Main_domain),
+            Nichols_1995_prediction = first(Nichols_1995_prediction),
             cor = list(cor(cbind(phylogenetic, spatial))))
 
 trinf <- data.frame(x=c(0,1,1),y=c(1,0,1))
@@ -61,17 +62,18 @@ trinf <- trinf_sf %>%
 
 #make col for plot labels with a, b, c, d
 dual_summary <- dual_summary %>% 
-  mutate(plot_label = str_replace(domain, "clause", "a")) %>% 
-  mutate(plot_label = str_replace(plot_label, "nominal domain", "b")) %>% 
-  mutate(plot_label = str_replace(plot_label, "pronoun", "c")) %>% 
-  mutate(plot_label = str_replace(plot_label, "verbal domain", "d"))
+  mutate(letter_plot_label = str_replace(domain, "clause", "a")) %>% 
+  mutate(letter_plot_label = str_replace(letter_plot_label, "nominal domain", "b")) %>% 
+  mutate(letter_plot_label = str_replace(letter_plot_label, "pronoun", "c")) %>% 
+  mutate(letter_plot_label = str_replace(letter_plot_label, "verbal domain", "d"))
 
 ## ellipses
 ellipses <- dual_summary %>%
   rowwise() %>%
   summarise(Feature_ID = Feature_ID,
-            plot_label =plot_label,
+            letter_plot_label =letter_plot_label,
             domain = domain,
+            Nichols_1995_prediction = Nichols_1995_prediction,
             ellipse = ellipse::ellipse(cor, centre = c(mean_phylogenetic, mean_spatial),
                                        scale = c(error_phylogenetic, error_spatial),
                                        level = 0.68)) %>%
@@ -85,18 +87,29 @@ ellipses <- dual_summary %>%
 
 h_load("lemon")
 
-
-center_plot =   ggplot() +
+plot_function <- function(label = c("letter_plot_label", "domain", "Nichols_1995_prediction"), facet, fn = spatiophylogenetic_figure_panels_ellipses){
+  #label <- "letter_plot_label"
+  
+  dual_summary <- dual_summary %>% 
+    dplyr::select(Feature_ID, all_of(label), mean_phylogenetic, mean_spatial) %>% 
+    rename(label = 2) %>% 
+    filter(!is.na(label))
+  
+  ellipses <- ellipses %>% 
+    dplyr::select(Feature_ID, all_of(label), x, y) %>% 
+    rename(label = 2) %>% 
+    filter(!is.na(label))
+  
+center_plot =   ggplot(data = dual_summary,
+                       aes(x = mean_phylogenetic,
+                           y = mean_spatial)) +
   geom_polygon(aes(x, y,
-                   fill = plot_label,
+                   fill = label,
                    group = Feature_ID),
                data = ellipses,
                alpha = 0.1,
                color = NA) +
-  geom_point(data = dual_summary,
-             aes(x = mean_phylogenetic,
-                 y = mean_spatial,
-                 col = plot_label),
+  geom_point(aes(col = label, fill = label),
              size = 0.5) +
   theme_classic(base_size = 10) +
   xlab("Variance explained by Phylogeny") +
@@ -110,19 +123,41 @@ center_plot =   ggplot() +
                                          y = seq(1, 0, length.out = 100)),
             linetype = "dashed", color = "#e6e6e6", size = 1.5) +
   geom_polygon(aes(x=x, y=y), data=trinf, fill="#F9F9F9") +
-  theme(legend.position = "None",
-        legend.title = element_blank(),
+  theme(legend.title = element_blank(),
         panel.spacing = unit(2, "lines"), 
         strip.text = element_text(size = 10)
-        ) +
-  lemon::facet_rep_wrap(~plot_label,nrow = 2, repeat.tick.labels = T) 
+        ) 
+
+if(facet == T){
+center_plot  <- center_plot  +
+  lemon::facet_rep_wrap(~label,nrow = 2, repeat.tick.labels = T) + 
+  theme(legend.position = "None")
+}
+
+
+if(facet == F ){
+  center_plot  <- center_plot  +
+    geom_point(aes(shape = label)) 
+  }
+
+
+if(str_detect(fn, "ichols")){
+  center_plot  <- center_plot  +
+    ggtitle(label = "Nichols (1995) predictions")
+  }
 
 plot(center_plot)
 
 ggsave(plot = center_plot,
-       filename = "output/spatiophylogenetic_modelling/spatiophylogenetic_figure_panels_ellipses.jpg",
+       filename = paste0("output/spatiophylogenetic_modelling/", fn, ".jpg"),
        width = 230 / 2,
        height = 210 / 2,
        units = "mm")
 
+}
 
+plot_function(label = "letter_plot_label", facet = T, fn = "spatiophylogenetic_figure_panels_ellipses")
+
+plot_function(label = "domain", facet = T, fn = "spatiophylogenetic_figure_panels_ellipses_domain")
+
+plot_function(label = "Nichols_1995_prediction", facet = F, fn = "spatiophylogenetic_figure_panels_ellipses_nichols_prediction")
