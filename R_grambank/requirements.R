@@ -9,8 +9,15 @@ source("fun_def_h_load.R")
 h_load(verbose = F, pkg = c(
 #pacman::p_load(
   "spam",
-	"tidyverse",
-	"readr",
+	"dplyr",
+  "ggplot2",
+  "tidyr",
+  "forcats",
+  "magrittr",
+  "purrr",
+  "stringr",
+  "tibble",
+  	"readr",
 	"fields",
 	"reshape2",
 	"broom",

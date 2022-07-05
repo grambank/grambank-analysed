@@ -17,15 +17,12 @@ if(!file.exists(surprisal_fn)){
   source("unusualness/analysis/get_unusualness_bayesLCA.R")
 }
 
-source("global_variables.R")
-source("spatiophylogenetic_modelling/analysis/INLA_parameters.R")
-source('spatiophylogenetic_modelling/analysis/functions/strip_inla.R')
+source('spatiophylogenetic_modelling/analysis/functions/varcov_spatial.R')
 
 #read in data
 gb <- read.delim(file = surprisal_fn, sep = "\t") %>% 
   dplyr::select(Language_ID, aes, Surprisal, Estimator) %>% 
   filter(Estimator == "Kernel 30") %>% 
-  inner_join(lgs_in_analysis, by = "Language_ID") %>% #subset to the lgs where we have phylo prec matrices
   mutate(Endangerement=ifelse(aes %in% c("threatened","moribund","nearly_extinct"),"endangered",aes)) # Recode endangerment
 
 ### NEXT PART REQUIRES MATRICES ETC
@@ -34,50 +31,68 @@ gb <- read.delim(file = surprisal_fn, sep = "\t") %>%
 ## (5) Model unusualness in terms of genealogical, areal covariates, and endangerement status
 #########################################
 
-#In the spatiophylogenetic modelling of the features, we use the dataset cropped for missing data but without imputation. For the unsualness analsyis, we use the imputed data. They are different in the feature values, but it is the same subset of langauges in both. Therefore, we can use the same precision matrices for both the predict unsualness analysis and spatiophylogenetic modelling with INLA.
-precision_matrices_fn <- "output/spatiophylogenetic_modelling/processed_data/precision_matrices.RDS"
-if(!(file.exists(precision_matrices_fn))){
-  source("spatiophylogenetic_modelling/analysis/simulations/make_precisionmatrices.R")}
+#### Phylogenetic Precision ####
+tree_fn <- "output/spatiophylogenetic_modelling/processed_data/EDGE_pruned_tree.tree"
+if(!(file.exists(tree_fn))){
+  source("spatiophylogenetic_modelling/processing/pruning_EDGE_tree.R")}
+phylogenetic_tree = read.tree(tree_fn)
 
-precision_matrices = readRDS(precision_matrices_fn)
-phylo_prec_mat = precision_matrices$phylogenetic_precision
-spatial_prec_mat = precision_matrices$spatial_precision
+#subsetting gb to those with matches in the tree and subsetting the tree to those with matches in gb
+phylogenetic_tree_tips_df <- phylogenetic_tree$tip.label %>% 
+  as.data.frame() %>% 
+  rename(Language_ID = ".")
 
-#reading in AUTOTYP-area
-if (!file.exists("output/non_GB_datasets/glottolog_AUTOTYP_areas.tsv")) { s
-  source("unusualness/processing/assigning_AUTOTYP_areas.R") }		
-autotyp_area <- read.delim("output/non_GB_datasets/glottolog_AUTOTYP_areas.tsv", sep = "\t") %>%
-  dplyr::select(Language_ID, AUTOTYP_area_id_iid_model = AUTOTYP_area)
+gb <- gb %>% 
+  inner_join(phylogenetic_tree_tips_df, by = "Language_ID")
+  
+phylogenetic_tree <- ape::keep.tip(phylogenetic_tree, gb$Language_ID)
 
-data <- gb %>% 
-  left_join(autotyp_area, by = "Language_ID")
+#brms
+#making a covariance matrix of the tree
+vcv_tree <- vcv.phylo(phylogenetic_tree)
 
-x <- assert_that(all(data$Language_ID == lgs_in_analysis$Language_ID), msg = "Data doesn't match!")
+vcv_tree  %>% 
+  qs::qsave("output/unusualness/tables/vcv_tree.qs")
 
-## Since we are using a sparse phylogenetic matrix, we need to math taxa to the correct
-## rows in the matrix
-data$phylo_id = match(data$Language_ID, rownames(phylo_prec_mat))
-data$spatial_id = match(data$Language_ID, rownames(spatial_prec_mat))
-data$obs_id = 1:nrow(data)
+#spatial vcv
 
-#INLA phylo only
-#dual model
-source("spatiophylogenetic_modelling/install_inla.R")
+kappa = 2 # smoothness parameter as recommended by Dinnage et al. (2020)
+sigma = c(1, 1.15) # Sigma parameter. First value is not used. 
 
-dual_model = INLA::inla(Surprisal ~
-                    f(spatial_id,
-                      model = "generic0",
-                      Cmatrix = spatial_prec_mat,
-                      hyper = pcprior) +
-                    f(phylo_id,
-                      model = "generic2",
-                      Cmatrix = phylo_prec_mat,
-                      hyper = pcprior),
-                    control.compute = list(waic = TRUE, cpo = TRUE),
-                  data = data#,
-                  #control.family = list(hyper = list(prec = list(initial = log(1e+08), fixed = TRUE)))
-                  )
+# Get the longitude and latitude data from the simulated datasets
+locations_df = read.delim('output/non_GB_datasets/glottolog-cldf_wide_df.tsv', sep = "\t") %>%
+  inner_join(gb, by = "Language_ID") #subset to matches in tree and in cropped in GB.
 
+spatial_covar_mat = varcov.spatial(locations_df[,c("Longitude", "Latitude")],
+                                   cov.pars = sigma,
+                                   kappa = kappa)$varcov
 
+spatial_covar_mat  %>% 
+  qs::qsave("output/unusualness/tables/spatial_covar_mat.qs")
 
-dual_model_stripped <- strip_inla(dual_model)
+###BRMS
+
+formula_for_brms <- unusualness_score ~ L1_log10 + L2_log10 + Is_Written + Official +
+  (1 | gr(Glottocode, cov = vcv_tree)) +
+  (L1_log10 + L2_log10 + Is_Written + Official | Family_ID)
+
+full_model <- brms::brm(formula = formula_for_brms,
+                        data = filter(inner_joined_df, !is.na(L1), !is.na(L2)),
+                        data2 = list(vcv_tree= vcv_tree),
+                        iter = 7500,
+                        iter = 10000,
+                        cores = 4,
+                        control = list(adapt_delta =0.99, max_treedepth=15)
+) %>% add_criterion("waic")
+full_model %>% broom.mixed::tidy() %>% write_csv("unusualness/analysis/full_model.csv")
+
+simplified_model <- brms::brm(unusualness_score ~ 1 + (1 | gr(Glottocode, cov = vcv_tree)),
+                              data = filter(inner_joined_df, !is.na(L1), !is.na(L2)),
+                              data2 = list(vcv_tree= vcv_tree),
+                              iter = 7500,
+                              iter = 25000,
+                              control = list(adapt_delta =0.99, max_treedepth=15)
+) %>% add_criterion("waic")
+simplified_model %>% broom.mixed::tidy() %>% write_csv("unusualness/analysis/simplified_model.csv")
+
+loo_compare(full_model, simplified_model, criterion="waic") %>% as.tibble() %>% write_csv("unusualness/analysis/model_comparison.csv")
