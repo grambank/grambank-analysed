@@ -147,9 +147,8 @@ center_plot =   ggplot() +
   ylab("Variance explained by Geography") +
   scale_colour_manual(values = col_vector) +
   scale_fill_manual(values = col_vector) +
-  scale_x_continuous(expand=c(0,0)) +
-  scale_y_continuous(expand=c(0,0), breaks = c(0, 0.2, 0.4, 0.6, 0.7)) +
-  ylim(c(0, 0.7))+
+  scale_x_continuous(expand=c(0,0), breaks=c(0, 0.25, 0.5, 0.75, 1), labels = scales::percent_format(scale = 100)) +
+  scale_y_continuous(expand=c(0,0), breaks=c(0, 0.25, 0.5, 0.7), limits = c(0, 0.7), labels = scales::percent_format(scale = 100)) +
   coord_equal() +
   geom_path(aes(x, y), data = data.frame(x = seq(0, 1, length.out = 100),
                                          y = seq(1, 0, length.out = 100)),
@@ -166,7 +165,7 @@ plot(center_plot)
 
 ggsave(plot = center_plot,
        filename = "output/spatiophylogenetic_modelling/spatiophylogenetic_figure_panels_ellipses.jpg",
-       width = 210 / 2,
+       width = 230 / 2,
        height = 210 / 2,
        units = "mm")
 
