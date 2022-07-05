@@ -2,8 +2,6 @@
 source('requirements.R')
 
 ## Change this vector to change the colour palette of the plots
-#col_vector  <- c("#009E73", "#0072B2", "#F0E442", "#D55E00")
-
 col_vector <- c("#039e37", "purple4",  "#c23c3c", "turquoise3")
 
 #### Format Posterior Data ####
@@ -86,6 +84,7 @@ ellipses <- dual_summary %>%
   ungroup()
 
 h_load("lemon")
+
 
 center_plot =   ggplot() +
   geom_polygon(aes(x, y,
