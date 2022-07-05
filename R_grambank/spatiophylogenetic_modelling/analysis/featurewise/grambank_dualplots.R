@@ -76,6 +76,9 @@ ellipses <- dual_summary %>%
          y = ifelse(y > 1, 1, y)) %>%
   ungroup()
 
+annotate_df = data.frame(domain = c("clause", "nominal domain", "pronoun", "verbal domain"),
+                         label = c("Clause", "Nominal domain", "Pronoun", "Verbal domain"),
+                         x = 0.55, y = 0.55)
 
 #### Make Plot ####
 center_plot =   ggplot() +
@@ -90,34 +93,24 @@ center_plot =   ggplot() +
                  y = mean_spatial,
                  col = domain),
              size = 0.5) +
-  # geom_ellipse(data = dual_summary, # remove this geom to remove the error ellipses
-  #   aes(x0 = mean_phylogenetic,
-  #                  y0 = mean_spatial,
-  #                  a = error_phylogenetic, ## I think this shouldn't be halved
-  #                  b = error_spatial,
-  #                  angle = 0,
-  #                  fill = domain),
-  #              alpha = 0.3,
-  #              color = NA) +
   theme_light(base_size = 10) +
-  xlab("Variance explained by Phylogeny (log10)") +
-  ylab("Variance explained by Geography (log10)") +
+  xlab("Variance explained by Phylogeny") +
+  ylab("Variance explained by Geography") +
   scale_colour_manual(values = col_vector) +
   scale_fill_manual(values = col_vector) +
   scale_x_continuous(expand=c(0,0)) +
   scale_y_continuous(expand=c(0,0)) +
-  # scale_x_log10(expand=c(0,0)) +
-  # scale_y_log10(expand=c(0,0)) +
   coord_equal() +
-  #geom_abline(intercept = 1, slope = -1, linetype = "dashed", color = "#e6e6e6") +
   geom_path(aes(x, y), data = data.frame(x = seq(0, 1, length.out = 100),
                                          y = seq(1, 0, length.out = 100)),
             linetype = "dashed", color = "#e6e6e6", size = 1.5) +
   geom_polygon(aes(x=x, y=y), data=trinf, fill="#ffffff") +
+  geom_text(data = annotate_df, aes(label = label, x = x, y = y), angle = -45) + 
+  facet_wrap(~domain, nrow = 2) + 
   theme(legend.position = "None",
         legend.title = element_blank(),
-        panel.spacing = unit(2, "lines")) +
-  facet_wrap(~domain,nrow = 2, strip.position = "bottom")
+        panel.spacing = unit(2, "lines"),
+        strip.text.x = element_blank())
 
 plot(center_plot)
 
