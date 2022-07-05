@@ -14,15 +14,15 @@ if (!dir.exists(OUTPUTDIR_plots)) { dir.create(OUTPUTDIR_plots) }
 # Load pkgs
 source("requirements.R")
 
-surprisal_fn <- paste0(OUTPUTDIR_tables, "surprisal.tsv")
+surprisal_fn <- paste0(OUTPUTDIR_tables, "/surprisal.tsv")
 if(!file.exists(surprisal_fn)){
   source("unusualness/analysis/get_unusualness_bayesLCA.R")
 }
-gb <- read_tsv(file = surprisal_fn)
+gb <- read_tsv(file = surprisal_fn, show_col_types = F) 
 
 # Plot the pairwise relations between probabilities
 gb %>%
-  dplyr::select(Surprisal,Estimator,Language_ID) %>%
+  dplyr::select(c(Surprisal,Estimator,Language_ID)) %>%
   pivot_wider(id_cols = Language_ID,names_from = Estimator,values_from = Surprisal) %>%
   GGally::ggpairs(columns=c("Bayesian LCA","Kernel 1","Kernel 5","Kernel 10","Kernel 20","Kernel 30","Kernel 40"),
                   mapping = aes(alpha = 0.1))+
@@ -30,14 +30,13 @@ gb %>%
 
 ggsave("comparison_surprisals.png",height=8,width = 10)
 
-
 # Zooming into the LCA and the kernel-20 approaches, and highlighting Macroarea
 gb %>%
-  dplyr::select(Surprisal,Estimator,Name,Family_ID,Macroarea) %>%
-  filter(Estimator %in% c("Bayesian LCA","Kernel 20")) %>%
+  dplyr::select(c(Surprisal,Estimator,Name,Family_ID,Macroarea)) %>%
+  filter(Estimator %in% c("prob_lca","prob_ker_20")) %>%
   pivot_wider(id_cols = c(Name,Family_ID,Macroarea),names_from = Estimator,values_from = Surprisal) %>%
-  mutate(IE=ifelse(Family=="indo1319","IE","nIE")) %>%
-  ggplot(aes(x=Bayesian LCA,y=Kernel 20,label=Name,color=Macroarea))+
+  mutate(IE=ifelse(Family_ID=="indo1319","IE","nIE")) %>%
+  ggplot(aes(x=prob_lca,y=prob_ker_20,label=Name,color=Macroarea))+
   geom_text(alpha=0.7)+
   theme_bw()+
   theme(legend.position = "none")+
@@ -46,11 +45,11 @@ gb %>%
 ggsave("comparison_surprisals_pairwise_macroareas.png",width=25,height=18)
 
 gb[gb$aes %in% c("threatened","not_endangered","nearly_extinct","moribund"),] %>%
-  select(c(Surprisal,Estimator,Name,aes)) %>%
-  filter(Estimator %in% c("Bayesian LCA","Kernel 20")) %>%
+  dplyr::select(c(Surprisal,Estimator,Name,aes)) %>%
+  filter(Estimator %in% c("prob_lca","prob_ker_20")) %>%
   pivot_wider(id_cols = c(Name,aes),names_from = Estimator,values_from = Surprisal) %>%
   mutate(Endangerment=ifelse(aes=="not_endangered","Safe","Not safe")) %>%
-  ggplot(aes(x=Bayesian LCA,y=Kernel 20,label=Name,color=Endangerment))+
+  ggplot(aes(x=prob_lca,y=prob_ker_20,label=Name,color=Endangerment))+
   geom_text(alpha=0.7)+
   theme_bw()+
   theme(legend.position = c(0.8,0.2))+
@@ -60,56 +59,56 @@ ggsave("comparison_surprisals_pairwise_endangerement.png",width=25,height=18)
 
 # Plot individual surprisals
 gb %>%
-  filter(Estimator=="Bayesian LCA") %>%
+  filter(Estimator=="prob_lca") %>%
   ggplot(aes(x=Surprisal,y=..density..))+
   geom_density(color="dodgerblue3")+
   geom_histogram(bins = 50,alpha=0.7,fill="dodgerblue1")+
   labs(x="Surprisal of Grambank language",y="Density")+
   theme_minimal()+
-  annotate("text",label="English",x=gb$Surprisal[gb$Name=="English"&gb$Estimator=="Bayesian LCA"],y=0.04)+
-  annotate("text",label="French",x=gb$Surprisal[gb$Name=="French"&gb$Estimator=="Bayesian LCA"],y=0.041)+
-  annotate("text",label="Mandarin",x=gb$Surprisal[gb$Name=="Mandarin Chinese"&gb$Estimator=="Bayesian LCA"],y=0.04)+
-  annotate("text",label="Turkish",x=gb$Surprisal[gb$Name=="Turkish"&gb$Estimator=="Bayesian LCA"],y=0.041)+
-  annotate("text",label="Japanese",x=gb$Surprisal[gb$Name=="Japanese"&gb$Estimator=="Bayesian LCA"],y=0.041)+
-  annotate("text",label="Igbo",x=gb$Surprisal[gb$Name=="Igbo"&gb$Estimator=="Bayesian LCA"],y=0.042)+
-  annotate("text",label="Mapudungun",x=gb$Surprisal[gb$Name=="Mapudungun"&gb$Estimator=="Bayesian LCA"],y=0.042)+
-  annotate("text",label="Yapese",x=gb$Surprisal[gb$Name=="Yapese"&gb$Estimator=="Bayesian LCA"],y=0.041)+
-  annotate("text",label="Yanomamö",x=gb$Surprisal[gb$Name=="Yanomamö"&gb$Estimator=="Bayesian LCA"],y=0.039)+
-  annotate("text",label="Tamil",x=gb$Surprisal[gb$Name=="Tamil"&gb$Estimator=="Bayesian LCA"],y=0.042)+
-  annotate("text",label="Standard Arabic",x=gb$Surprisal[gb$Name=="Standard Arabic"&gb$Estimator=="Bayesian LCA"],y=0.039)+
-  annotate("text",label="Russian",x=gb$Surprisal[gb$Name=="Russian"&gb$Estimator=="Bayesian LCA"],y=0.039)+
-  annotate("text",label="Hebrew",x=gb$Surprisal[gb$Name=="Hebrew"&gb$Estimator=="Bayesian LCA"],y=0.039)+
-  annotate("text",label="Standard Indonesian",x=gb$Surprisal[gb$Name=="Standard Indonesian"&gb$Estimator=="Bayesian LCA"],y=0.039)+
-  annotate("text",label="Hungarian",x=gb$Surprisal[gb$Name=="Hungarian"&gb$Estimator=="Bayesian LCA"],y=0.043)
+  annotate("text",label="English",x=gb$Surprisal[gb$Name=="English"&gb$Estimator=="prob_lca"],y=0.04)+
+  annotate("text",label="French",x=gb$Surprisal[gb$Name=="French"&gb$Estimator=="prob_lca"],y=0.041)+
+  annotate("text",label="Mandarin",x=gb$Surprisal[gb$Name=="Mandarin Chinese"&gb$Estimator=="prob_lca"],y=0.04)+
+  annotate("text",label="Turkish",x=gb$Surprisal[gb$Name=="Turkish"&gb$Estimator=="prob_lca"],y=0.041)+
+  annotate("text",label="Japanese",x=gb$Surprisal[gb$Name=="Japanese"&gb$Estimator=="prob_lca"],y=0.041)+
+  annotate("text",label="Igbo",x=gb$Surprisal[gb$Name=="Igbo"&gb$Estimator=="prob_lca"],y=0.042)+
+  annotate("text",label="Mapudungun",x=gb$Surprisal[gb$Name=="Mapudungun"&gb$Estimator=="prob_lca"],y=0.042)+
+  annotate("text",label="Yapese",x=gb$Surprisal[gb$Name=="Yapese"&gb$Estimator=="prob_lca"],y=0.041)+
+  annotate("text",label="Yanomamö",x=gb$Surprisal[gb$Name=="Yanomamö"&gb$Estimator=="prob_lca"],y=0.039)+
+  annotate("text",label="Tamil",x=gb$Surprisal[gb$Name=="Tamil"&gb$Estimator=="prob_lca"],y=0.042)+
+  annotate("text",label="Standard Arabic",x=gb$Surprisal[gb$Name=="Standard Arabic"&gb$Estimator=="prob_lca"],y=0.039)+
+  annotate("text",label="Russian",x=gb$Surprisal[gb$Name=="Russian"&gb$Estimator=="prob_lca"],y=0.039)+
+  annotate("text",label="Hebrew",x=gb$Surprisal[gb$Name=="Hebrew"&gb$Estimator=="prob_lca"],y=0.039)+
+  annotate("text",label="Standard Indonesian",x=gb$Surprisal[gb$Name=="Standard Indonesian"&gb$Estimator=="prob_lca"],y=0.039)+
+  annotate("text",label="Hungarian",x=gb$Surprisal[gb$Name=="Hungarian"&gb$Estimator=="prob_lca"],y=0.043)
 
 gb %>%
-  filter(Estimator=="Kernel 20") %>%
+  filter(Estimator=="prob_ker_20") %>%
   ggplot(aes(x=Surprisal,y=..density..))+
   geom_density(color="dodgerblue3")+
   geom_histogram(bins = 50,alpha=0.7,fill="dodgerblue1")+
   labs(x="Surprisal of Grambank language",y="Density")+
   theme_minimal()+
-  annotate("text",label="English",x=gb$Surprisal[gb$Name=="English"&gb$Estimator=="Kernel 20"],y=0.74)+
-  annotate("text",label="French",x=gb$Surprisal[gb$Name=="French"&gb$Estimator=="Kernel 20"],y=0.72)+
-  annotate("text",label="Mandarin",x=gb$Surprisal[gb$Name=="Mandarin Chinese"&gb$Estimator=="Kernel 20"],y=0.7)+
-  annotate("text",label="Turkish",x=gb$Surprisal[gb$Name=="Turkish"&gb$Estimator=="Kernel 20"],y=0.78)+
-  annotate("text",label="Japanese",x=gb$Surprisal[gb$Name=="Japanese"&gb$Estimator=="Kernel 20"],y=0.74)+
-  annotate("text",label="Igbo",x=gb$Surprisal[gb$Name=="Igbo"&gb$Estimator=="Kernel 20"],y=0.78)+
-  annotate("text",label="Mapudungun",x=gb$Surprisal[gb$Name=="Mapudungun"&gb$Estimator=="Kernel 20"],y=0.64)+
-  annotate("text",label="Yapese",x=gb$Surprisal[gb$Name=="Yapese"&gb$Estimator=="Kernel 20"],y=0.77)+
-  annotate("text",label="Yanomamö",x=gb$Surprisal[gb$Name=="Yanomamö"&gb$Estimator=="Kernel 20"],y=0.78)+
-  annotate("text",label="Tamil",x=gb$Surprisal[gb$Name=="Tamil"&gb$Estimator=="Kernel 20"],y=0.742)+
-  annotate("text",label="Standard Arabic",x=gb$Surprisal[gb$Name=="Standard Arabic"&gb$Estimator=="Kernel 20"],y=0.739)+
-  annotate("text",label="Russian",x=gb$Surprisal[gb$Name=="Russian"&gb$Estimator=="Kernel 20"],y=0.65)+
-  annotate("text",label="Hebrew",x=gb$Surprisal[gb$Name=="Hebrew"&gb$Estimator=="Kernel 20"],y=0.7)+
-  annotate("text",label="Standard Indonesian",x=gb$Surprisal[gb$Name=="Standard Indonesian"&gb$Estimator=="Kernel 20"],y=0.76)+
-  annotate("text",label="Hungarian",x=gb$Surprisal[gb$Name=="Hungarian"&gb$Estimator=="Kernel 20"],y=0.77)
+  annotate("text",label="English",x=gb$Surprisal[gb$Name=="English"&gb$Estimator=="prob_ker_20"],y=0.74)+
+  annotate("text",label="French",x=gb$Surprisal[gb$Name=="French"&gb$Estimator=="prob_ker_20"],y=0.72)+
+  annotate("text",label="Mandarin",x=gb$Surprisal[gb$Name=="Mandarin Chinese"&gb$Estimator=="prob_ker_20"],y=0.7)+
+  annotate("text",label="Turkish",x=gb$Surprisal[gb$Name=="Turkish"&gb$Estimator=="prob_ker_20"],y=0.78)+
+  annotate("text",label="Japanese",x=gb$Surprisal[gb$Name=="Japanese"&gb$Estimator=="prob_ker_20"],y=0.74)+
+  annotate("text",label="Igbo",x=gb$Surprisal[gb$Name=="Igbo"&gb$Estimator=="prob_ker_20"],y=0.78)+
+  annotate("text",label="Mapudungun",x=gb$Surprisal[gb$Name=="Mapudungun"&gb$Estimator=="prob_ker_20"],y=0.64)+
+  annotate("text",label="Yapese",x=gb$Surprisal[gb$Name=="Yapese"&gb$Estimator=="prob_ker_20"],y=0.77)+
+  annotate("text",label="Yanomamö",x=gb$Surprisal[gb$Name=="Yanomamö"&gb$Estimator=="prob_ker_20"],y=0.78)+
+  annotate("text",label="Tamil",x=gb$Surprisal[gb$Name=="Tamil"&gb$Estimator=="prob_ker_20"],y=0.742)+
+  annotate("text",label="Standard Arabic",x=gb$Surprisal[gb$Name=="Standard Arabic"&gb$Estimator=="prob_ker_20"],y=0.739)+
+  annotate("text",label="Russian",x=gb$Surprisal[gb$Name=="Russian"&gb$Estimator=="prob_ker_20"],y=0.65)+
+  annotate("text",label="Hebrew",x=gb$Surprisal[gb$Name=="Hebrew"&gb$Estimator=="prob_ker_20"],y=0.7)+
+  annotate("text",label="Standard Indonesian",x=gb$Surprisal[gb$Name=="Standard Indonesian"&gb$Estimator=="prob_ker_20"],y=0.76)+
+  annotate("text",label="Hungarian",x=gb$Surprisal[gb$Name=="Hungarian"&gb$Estimator=="prob_ker_20"],y=0.77)
 
 
 
 
 # Produce predictions and attach them to the empirical surprisals
-gb_lca<-gb[gb$Estimator=="Bayesian LCA"&!is.na(gb$Endangerement),]
+gb_lca<-gb[gb$Estimator=="prob_lca"&!is.na(gb$Endangerement),]
 predicted_surprisal_lca<-as.data.frame(predict(model_surprisal_lca))[,c("Estimate","Est.Error")]
 gb_lca$surprisal_pred<-predicted_surprisal_lca$Estimate
 gb_lca$surprisal_er<-predicted_surprisal_lca$'Est.Error'
@@ -131,7 +130,7 @@ ggsave("unexpected_surprisal.png",height=4,width=7)
 # Check outliers
 gb_lca %>%
   filter(abs(gb_lca$surprisal_z)>2) %>%
-  select(Name,Endangerement,AUTOTYP_area,Macroarea,Family,surprisal_z) %>%
+  dplyr::select(Name,Endangerement,AUTOTYP_area,Macroarea,Family,surprisal_z) %>%
   arrange(desc(surprisal_z))
 
 # Plot outliers
@@ -151,7 +150,7 @@ unusualness_ext %>%
 ggsave("unexpected_surprisal_lgs.png",height=7,width=6)
 
 ## Test
-plyr::ddply(gb[gb$Estimator=="Bayesian LCA"&!is.na(gb$aes),],"AUTOTYP_area",function(x) data.frame(E=sum(x$Endangerement=="endangered")/sum(x$Endangerement %in% c("not_endangered","endangered")),
+plyr::ddply(gb[gb$Estimator=="prob_lca"&!is.na(gb$aes),],"AUTOTYP_area",function(x) data.frame(E=sum(x$Endangerement=="endangered")/sum(x$Endangerement %in% c("not_endangered","endangered")),
                                                                                                U=mean(x$Surprisal),
                                                                                                N=nrow(x))) %>%
   ggplot(aes(x=U,y=E,label=AUTOTYP_area))+
@@ -165,7 +164,7 @@ plyr::ddply(gb[gb$Estimator=="Bayesian LCA"&!is.na(gb$aes),],"AUTOTYP_area",func
 ggsave("endangerment_and_area.png")
 
 
-plyr::ddply(gb[gb$Estimator=="Bayesian LCA"&!is.na(gb$aes),],"Macroarea",function(x) data.frame(E=sum(x$Endangerement=="endangered")/sum(x$Endangerement %in% c("not_endangered","endangered")),
+plyr::ddply(gb[gb$Estimator=="prob_lca"&!is.na(gb$aes),],"Macroarea",function(x) data.frame(E=sum(x$Endangerement=="endangered")/sum(x$Endangerement %in% c("not_endangered","endangered")),
                                                                                             U=mean(x$Surprisal),
                                                                                             N=nrow(x))) %>%
   ggplot(aes(x=U,y=E,label=Macroarea))+
@@ -180,7 +179,7 @@ plyr::ddply(gb[gb$Estimator=="Bayesian LCA"&!is.na(gb$aes),],"Macroarea",functio
 
 # Plot unusualness
 gb %>%
-  filter(Estimator=="Bayesian LCA") %>%
+  filter(Estimator=="prob_lca") %>%
   mutate(Endagerement=fct_reorder(aes,Surprisal)) %>%
   ggplot(aes(y=Surprisal,x=Endagerement))+
   geom_boxplot()+
