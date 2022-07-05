@@ -65,6 +65,35 @@ tree = read.tree(tree_fn)
 #double check that subset to lgs in GB cropped dataset
 tree <- ape::keep.tip(tree, lgs_in_analysis$Language_ID)
 
+glottolog_df <- read_tsv("output/non_GB_datasets/glottolog-cldf_wide_df.tsv") %>% 
+  mutate(Family_ID = ifelse(is.na(Family_ID), "Isolate", Family_ID))
+
+h_load("randomcoloR")
+
+  
+tree_all_df <- tree$tip.label %>% 
+  as.data.frame() %>% 
+  rename("Language_ID" = ".") %>% 
+    left_join(glottolog_df)
+
+n <- length(unique(tree_all_df$Family_ID)) #counting how many distinct colors we need. Note that "NA" is also counted, and represents Isolates.
+
+color_vector_families <- randomcoloR::distinctColorPalette(n)
+
+tree_all_df$tip.color_vec <- color_vector_families[as.factor(tree_all_df$Family_ID)]
+
+png(file = "output/coverage_plots/EDGE_tree_full.png", width = 15.27, height = 15.69, units = "in", res = 600)
+
+plot.phylo(ladderize(tree  , right = F), 
+           col="grey", 
+           tip.color = tree_all_df$tip.color, 
+           type = "fan", 
+           cex = 0.3,
+           label.offset = 0.02)
+
+x <- dev.off()
+
+
 #reading in GB
 GB_fn <- "output/GB_wide/GB_cropped_for_missing.tsv"
 if(!file.exists(GB_fn)){
@@ -83,7 +112,7 @@ index <- 0
 
 for(feature in five_most_phylo_features) {
   
-  feature <- five_most_phylo_features[1]
+#  feature <- five_most_phylo_features[2]
   index <- index + 1
 
   feature_df <-GB_df %>% 
@@ -91,70 +120,81 @@ for(feature in five_most_phylo_features) {
     rename(Feature = 2) %>% 
     mutate(tip.color = as.character(Feature)) %>% 
     mutate(tip.color = str_replace_all(tip.color, "1", color_vector[1])) %>% 
-    mutate(tip.color = str_replace_all(tip.color, "0", color_vector[2])) %>% 
-    mutate(tip.color = ifelse(is.na(tip.color), color_vector[3], tip.color))
+    mutate(tip.color = str_replace_all(tip.color, "0", color_vector[2])) 
   
+  #removing missing data
+  missing <- which(is.na(feature_df[,2]))
+  
+  missing_language_IDs <- feature_df[which(is.na(feature_df[,2])), 1][[1]]
+  tree_feature <- ape::drop.tip(tree, missing_language_IDs)
+  
+  feature_df <- feature_df[-missing,]
+  x <- feature_df[,2][[1]]
+
+  #generating plot title  
   plot_title <- GB_id_desc %>% 
     filter(Feature_ID == feature) %>% 
     dplyr::select(Grambank_ID_desc) %>% 
     as.matrix() %>% 
     as.vector() 
   
-  filename <- paste("output/phylosig/most_signal_", "_" , str_replace(plot_title, " ", "_"), ".tiff", sep = "")
-  filename_png <- paste("output/phylosig/most_signal_", "_" , str_replace(plot_title, " ", "_"), ".png", sep = "")
+    filename <- paste("output/spatiophylogenetic_modelling/most_signal_", "_" , str_replace(plot_title, " ", "_"), ".tiff", sep = "")
+  filename_png <- paste("output/spatiophylogenetic_modelling/most_signal_", "_" , str_replace(plot_title, " ", "_"), ".png", sep = "")
   
-  x <- feature_df[,2]
-  
-  #running the contrasting algorithm reconstruction. Note: for the analysis we are using the tree with the original branch lengths even if we're visualizing using the imputed branch lengths.
-  asr_most_signal<- ape::ace(x = x, phy = tree,method = "pic")
-  
+#running the contrasting algorithm reconstruction. Note: for the analysis we are using the tree with the original branch lengths even if we're visualizing using the imputed branch lengths.
+  asr_most_signal<- ape::ace(x = x, phy = tree_feature, method = "ML", type = "discrete", model = "ARD")
+
+  asr_most_signal %>% 
+    qs::qsave(paste0("output/spatiophylogenetic_modelling/most_signal_", "_" , str_replace(plot_title, " ", "_"), ".qs"))
+    
   tiff(file = filename, width = 15.27, height = 15.69, units = "in", res = 600)
   
-  plot.phylo(ladderize(tree  , right = F), 
+  plot.phylo(ladderize(tree_feature  , right = F), 
              col="grey", 
              tip.color = feature_df$tip.color, 
              type = "fan", 
              cex = 0.25,
-             label.offset = 0.02)
+             label.offset = 0.02,main = plot_title)
   
   lastPP<-get("last_plot.phylo",env=.PlotPhyloEnv)
   ss<-unique(x) %>% sort(decreasing = T)
   par(fg="black")
   colors<-setNames(color_vector[1:length(ss)],ss)
-  add.simmap.legend(colors=colors,
-                    vertical=T,
-                    x=--0.7,
-                    y=-1,
-                    prompt=F)
+#  add.simmap.legend(colors=colors,
+#                    vertical=T,
+#                    x=--1,
+#                    y=-1,
+#                    prompt=F)
   
-  nodelabels(node=1:tree$Nnode+Ntip(tree),
-             pie=asr_most_signal$ace,
+  nodelabels(node=1:tree_feature$Nnode+Ntip(tree_feature),
+             pie=asr_most_signal$lik.anc,
              piecol=color_vector, cex = 0.3)
   
   x <- dev.off()
   
   
-  png(file = filename_png, width = 15.27, height = 15.69, units = "in", res = 600)
+  png(file = filename_png, width = 15.27, height = 15.69, units = "in", res = 400)
   
-  plot.phylo(ladderize(tree  , right = F), 
+  plot.phylo(ladderize(tree_feature  , right = F), 
              col="grey", 
              tip.color = feature_df$tip.color, 
              type = "fan", 
              cex = 0.25,
-             label.offset = 0.02)
+             label.offset = 0.02,main = plot_title)
   
   lastPP<-get("last_plot.phylo",env=.PlotPhyloEnv)
   ss<-unique(x) %>% sort(decreasing = T)
   par(fg="black")
   colors<-setNames(color_vector[1:length(ss)],ss)
-  add.simmap.legend(colors=colors,
-                    vertical=T,
-                    x=--0.7,
-                    y=-1,
-                    prompt=F)
+
+  #  add.simmap.legend(colors=colors,
+  #                  vertical=T,
+  #                  x=--1,
+  #                  y=-1,
+  #                  prompt=F)
   
-  nodelabels(node=1:tree$Nnode+Ntip(tree),
-             pie=asr_most_signal$ace,
+  nodelabels(node=1:tree_feature$Nnode+Ntip(tree_feature),
+             pie=asr_most_signal$lik.anc,
              piecol=color_vector, cex = 0.3)
   
   x <- dev.off()
