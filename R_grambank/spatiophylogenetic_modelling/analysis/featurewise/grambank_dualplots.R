@@ -78,55 +78,6 @@ ellipses <- dual_summary %>%
   ungroup()
 
 
-#### Make Plot ####
-center_plot =   ggplot() +
-  geom_polygon(aes(x, y,
-                   fill = domain,
-                   group = Feature_ID),
-               data = ellipses,
-               alpha = 0.1,
-               color = NA) +
-  geom_point(data = dual_summary,
-             aes(x = mean_phylogenetic,
-                 y = mean_spatial,
-                 col = domain),
-             size = 0.5) +
-  # geom_ellipse(data = dual_summary, # remove this geom to remove the error ellipses
-  #   aes(x0 = mean_phylogenetic,
-  #                  y0 = mean_spatial,
-  #                  a = error_phylogenetic, ## I think this shouldn't be halved
-  #                  b = error_spatial,
-  #                  angle = 0,
-  #                  fill = domain),
-  #              alpha = 0.3,
-  #              color = NA) +
-  theme_light(base_size = 10) +
-  xlab("Variance explained by Phylogeny (log10)") +
-  ylab("Variance explained by Geography (log10)") +
-  scale_colour_manual(values = col_vector) +
-  scale_fill_manual(values = col_vector) +
-  scale_x_continuous(expand=c(0,0)) +
-  scale_y_continuous(expand=c(0,0)) +
-  # scale_x_log10(expand=c(0,0)) +
-  # scale_y_log10(expand=c(0,0)) +
-  coord_equal() +
-  #geom_abline(intercept = 1, slope = -1, linetype = "dashed", color = "#e6e6e6") +
-  geom_path(aes(x, y), data = data.frame(x = seq(0, 1, length.out = 100),
-                                         y = seq(1, 0, length.out = 100)),
-            linetype = "dashed", color = "#e6e6e6", size = 1.5) +
-  geom_polygon(aes(x=x, y=y), data=trinf, fill="#ffffff") +
-  theme(legend.position = "None",
-        legend.title = element_blank(),
-        panel.spacing = unit(2, "lines")) +
-  facet_wrap(~domain,nrow = 2, strip.position = "bottom")
-
-plot(center_plot)
-
-ggsave(plot = center_plot,
-       filename = "output/spatiophylogenetic_modelling/spatiophylogenetic_figure_panels_ellipses_log.jpg",
-       width = 210 / 2,
-       height = 210 / 2,
-       units = "mm")
 
 h_load("lemon")
 
