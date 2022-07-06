@@ -162,6 +162,37 @@ for(feature in features){
   
   cat(paste0("Finished running dual model on ", feature, " and the time is ", Sys.time(), ".\n"))
   
+  
+  
+  # #### Trial Model ####
+  # 
+  # # The trial model contains the phylogenetic and spatial precision models using the same
+  # # priors and scaled precision matrices. As well as a single effect for residuals (constrained to 1). In addition, there is also the categorical AUTOTYP-area included
+  
+  formula <-  eval(substitute(expr = this_feature ~
+                                f(spatial_id,
+                                  model = "generic0",
+                                  Cmatrix = spatial_prec_mat,
+                                  hyper = pcprior) +
+                                f(phylo_id,
+                                  model = "generic0",
+                                  Cmatrix = phylo_prec_mat,
+                                  hyper = pcprior)  +
+                                f(obs_id, model = "iid", hyper = obs_hyper) +
+                                f(AUTOTYP_area_id_iid_model, 
+                                  hyper = pcprior,
+                                  model = "iid"),
+                              list(this_feature=as.name(feature))))
+  
+  
+  trial_model<- INLA::inla(formula = formula,
+                           control.compute = list(waic = TRUE, cpo = TRUE, dic = TRUE), 
+                           family = "binomial",
+                           control.predictor=list(link=1),
+                           data = data)
+  
+  cat(paste0("Finished running trial on ", feature, " and the time is ", Sys.time(), ".\n"))
+  
 ############
   #######strip interesting information from the INLA objects
   #########
@@ -178,9 +209,22 @@ for(feature in features){
   cat(paste0("Finished running strip inla on dual  of ", feature, " and the time is ", Sys.time(), ".\n"))
   cat(paste0("Starting running strip inla on trial model of  ", feature, " and the time is ", Sys.time(), ".\n"))
   
+  cat(paste0("Starting running strip inla on trial model of  ", feature, " and the time is ", Sys.time(), ".\n"))
+  
+  trial_model_stripped <-try(expr = {strip_inla(trial_model)})
+  
+  if (class(trial_model_stripped) == "try-error") {
+    trial_model_stripped <- NULL
+  }
+  
+  cat(paste0("Finished running strip inla on trial model of  ", feature, " and the time is ", Sys.time(), ".\n"))
+  
+  
+  
 ## For each model we strip out the information we need to calculate heritability scores
   ## to save on storage space. 
-  model_outputs = list(dual_model_stripped)
+  model_outputs = list(dual_model_stripped, 
+                       trial_model_stripped)
   
   #### Save output ####
   saved_file =   paste0(OUTPUTDIR, feature, ".qs")
