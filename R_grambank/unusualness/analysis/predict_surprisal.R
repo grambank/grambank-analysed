@@ -19,62 +19,91 @@ if(!file.exists(surprisal_fn)){
 }
 gb <- read_tsv(file = surprisal_fn)
 
-#########################################
-## (5) Model unusualness in terms of genealogical, areal covariates, and endangerement status
-#########################################
-
 # Recode endangerment
 gb<-gb %>%
   mutate(Endangerement=ifelse(aes %in% c("threatened","moribund","nearly_extinct"),"endangered",aes))
 
-# Get spatial/phylogenetic covariance matrix
-spatial_covar_mat_fn <- "output/spatiophylogenetic_modelling/spatial_covar_mat.tsv"
-if(!file.exists(spatial_covar_mat_fn)){
-  source("spatiophylogenetic_modelling/analysis/make_vcvs.R")
-}
+# Keep only the optimal Estimator - kernel 15
+gb <- gb %>%
+  filter(Estimator=="Kernel 15")
 
-spatial_covar_mat <- read_tsv(spatial_covar_mat_fn, show_col_types = F) %>% 
-  column_to_rownames("Language_ID") %>% 
-  as.matrix()
+#########################################
+## (5) Model unusualness in terms of genealogical, areal covariates, and endangerement status
+#########################################
 
-phylo_covar_mat_fn <- "output/spatiophylogenetic_modelling/phylo_covar_mat.tsv"
-if(!file.exists(phylo_covar_mat_fn)){
-  source("spatiophylogenetic_modelling/analysis/make_vcvs.R")
-}
+# Get phylogenetic covariance matrix
+###################################
+tree_fn <- "output/spatiophylogenetic_modelling/processed_data/EDGE_pruned_tree.tree"
+if(!(file.exists(tree_fn))){
+  source("spatiophylogenetic_modelling/processing/pruning_EDGE_tree.R")}
+phylogenetic_tree = read.tree(tree_fn)
 
-phylo_covar_mat <- read_tsv(phylo_covar_mat_fn, show_col_types = F) %>% 
-  column_to_rownames("Language_ID") %>% 
-  as.matrix()
+# Subsetting languages in GB to those with matches in the tree and subsetting the tree to those with matches in gb
+phylogenetic_tree_tips_df <- phylogenetic_tree$tip.label %>% 
+  as.data.frame() %>% 
+  rename(Language_ID = ".")
 
+gb <- gb %>% 
+  inner_join(phylogenetic_tree_tips_df, by = "Language_ID")
 
-formula <- 
+phylo_covar_mat<-vcv.phylo(ape::keep.tip(phylogenetic_tree, gb$Language_ID))
+
+# Output this
+phylo_covar_mat  %>% 
+  qs::qsave("output/unusualness/tables/phylo_covar_mat.qs")
+###################################
+
+# Get spatial covariance matrix
+###################################
+
+# Source functions relevant to the spatial variance-covariance matrices
+source('spatiophylogenetic_modelling/analysis/varcov_spatial.R')
+
+kappa = 2 # smoothness parameter as recommended by Dinnage et al. (2020)
+sigma = c(1, 1.15) # Sigma parameter. First value is not used. 
+
+# Get the longitude and latitude data from the simulated datasets
+locations_df = read.delim('output/non_GB_datasets/glottolog-cldf_wide_df.tsv', sep = "\t") %>%
+  inner_join(gb, by = "Language_ID") #subset to matches in tree and in cropped in GB.
+
+spatial_covar_mat = varcov.spatial(locations_df[,c("Longitude", "Latitude")],
+                                   cov.pars = sigma,
+                                   kappa = kappa)$varcov
+
+# Add language names to the matrix
+rownames(spatial_covar_mat)<-gb$Language_ID
+colnames(spatial_covar_mat)<-gb$Language_ID
+
+spatial_covar_mat  %>% 
+  qs::qsave("output/unusualness/tables/spatial_covar_mat.qs")
+###################################
+
+# Duplicates Language_ID just for the sake of the requirements in brms
+gb$Language_ID2<-gb$Language_ID
 
 # Function that obtains a predictive model of surprisal
-model_surprisal<-function(df,s_cov,p_cov) {
+regression_surprisal<-function(df,s_cov,p_cov) {
   m<-brm(formula = Surprisal~
-           (1|AUTOTYP_area)+
-           (1 | gr(Language_ID, cov = p_cov))+
-           Endangerement,
+           (1|gr(Language_ID, cov = p_cov))+
+           (1|gr(Language_ID2, cov = s_cov)),
          data=df,
          data2=list(s_cov=s_cov,
                     p_cov=p_cov),
          chains = 4,
-         iter = 12000,
-         warmup = 5000,
+         iter = 6000,
+         warmup = 2000,
          cores = 4,
          control = list(adapt_delta=0.99),
          backend="cmdstanr")
   return(m)}
 
 
-pepy<-model_surprisal(gb[gb$Estimator=="Kernel 30",],s_cov=spatial_covar_mat,p_cov=phylo_covar_mat)
 
-# From now on we centered our analyses on two estimates: LCA and kernel-20
-gb_redux<-gb %>%
-  filter(Estimator %in% c("prob_lca","prob_ker_20"))
-
-# Get models
-models_surprisal<-plyr::dlply(gb_redux,"Estimator",model_surprisal)
+model_surprisal<-regression_surprisal(gb,
+                                      s_cov=spatial_covar_mat,
+                                      p_cov=phylo_covar_mat)
+# Estimate Bayesian  R2
+bayes_R2(model_surprisal)
 
 # Check summary
 summary(model_surprisal_lca)

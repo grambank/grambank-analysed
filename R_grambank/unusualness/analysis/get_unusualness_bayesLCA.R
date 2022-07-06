@@ -98,7 +98,9 @@ gb<-gb %>%
   add_kernel_probabilities(gb_dists,1) %>%
   add_kernel_probabilities(gb_dists,5) %>%
   add_kernel_probabilities(gb_dists,10) %>%
+  add_kernel_probabilities(gb_dists,15) %>%
   add_kernel_probabilities(gb_dists,20) %>%
+  add_kernel_probabilities(gb_dists,25) %>%
   add_kernel_probabilities(gb_dists,30) %>%
   add_kernel_probabilities(gb_dists,40)
   
@@ -201,7 +203,9 @@ gb$prob_lca<-unusualness_df$prob_lca
 
 # Standardize the resulting probabilities and compute surprisals
 gb <- gb %>%
-  pivot_longer(cols=c(prob_ker_1,prob_ker_5,prob_ker_10,prob_ker_20,prob_ker_30,prob_ker_40,prob_lca),names_to = "Estimator",values_to="Probability") %>%
+  pivot_longer(cols=c(prob_ker_1,prob_ker_5,prob_ker_10,prob_ker_15,
+                      prob_ker_20,prob_ker_25,
+                      prob_ker_30,prob_ker_40,prob_lca),names_to = "Estimator",values_to="Probability") %>%
   mutate(Surprisal=-log(Probability))
 
 # Re-label for clarity
@@ -210,8 +214,20 @@ gb$Estimator<-fct_recode(gb$Estimator,
                          "Kernel 1"="prob_ker_1",
                          "Kernel 5"="prob_ker_5",
                          "Kernel 10"="prob_ker_10",
+                         "Kernel 15"="prob_ker_15",
                          "Kernel 20"="prob_ker_20",
+                         "Kernel 25"="prob_ker_25",
                          "Kernel 30"="prob_ker_30",
                          "Kernel 40"="prob_ker_40")
+
+# Finally, inspect the skewness of each of the distributions
+library(moments)
+
+unusualness_sk<-gb %>%
+  group_by(Estimator) %>%
+  summarise(skewness=skewness(Surprisal))
+
+# Estimator yielding the most symmetric unusualness distribution (kernel 15)
+unusualness_sk[abs(unusualness_sk$skewness)==min(abs(unusualness_sk$skewness)),]
 
 gb %>% write_tsv(file = paste0(OUTPUTDIR_tables, "/surprisal.tsv"))
