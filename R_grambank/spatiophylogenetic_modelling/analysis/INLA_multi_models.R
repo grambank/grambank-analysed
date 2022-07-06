@@ -204,9 +204,8 @@ for(feature in features){
   }
   
   cat(paste0("Finished running strip inla on dual  of ", feature, " and the time is ", Sys.time(), ".\n"))
-  cat(paste0("Starting running strip inla on trial model of  ", feature, " and the time is ", Sys.time(), ".\n"))
-  
-  cat(paste0("Starting running strip inla on trial model of  ", feature, " and the time is ", Sys.time(), ".\n"))
+
+    cat(paste0("Starting running strip inla on trial model of  ", feature, " and the time is ", Sys.time(), ".\n"))
   
   trial_model_stripped <-try(expr = {strip_inla(trial_model)})
   
