@@ -126,10 +126,10 @@ INLA: data INLA_featurewise
 
 INLA_featurewise:
 	@echo "## Running INLA-analysis featurewise. #"
-	Rscript spatiophylogenetic_modelling/analysis/INLA_dual_model.R "real" 1 113
+	Rscript spatiophylogenetic_modelling/analysis/INLA_multi_models.R "real" 1 113
 
 INLA_simulation_binary_data:
-	Rscript spatiophylogenetic_modelling/analysis/INLA_dual_model.R "sim" 1 160
+	Rscript spatiophylogenetic_modelling/analysis/INLA_multi_models.R "sim" 1 160
 
 #step 7
 ## BRMS-analysis of unsualness scores
