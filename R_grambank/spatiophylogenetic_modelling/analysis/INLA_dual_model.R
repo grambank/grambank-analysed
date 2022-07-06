@@ -136,65 +136,7 @@ for(feature in features){
   
   cat(paste0("I'm on ", feature, " and the time is ", Sys.time(), ".\n"))
   
-  #### Phylo Only model ####
-  
-  ## The phylogenetic model contains a additive effects for the phylogenetic component
-  ## and a random effect for the residual variance which we have fixed to 1.
-  ## We additionally calculate WAIC scores for this and each model for comparative purposes. 
-  
-  formula <- eval(substitute(this_feature ~
-                               f(phylo_id,
-                                 model = "generic0",
-                                 Cmatrix = phylo_prec_mat,
-                                 hyper = pcprior) +
-                               f(obs_id, model = "iid", hyper = obs_hyper),
-                             list(this_feature=as.name(feature))))
-  
-  phylo_only_model<- INLA::inla(formula = formula,
-                                family = "binomial",
-                                control.compute = list(waic = TRUE, cpo = TRUE, dic = TRUE), 
-                                control.predictor=list(link=1),
-                                data = data)
-  
-  cat(paste0("Finished running phylo-only on ", feature, " and the time is ", Sys.time(), ".\n"))
-  
-  #### Spatial Only model ####
-  ## The spatial model is set up the same way as the phylogenetic model
-  ## only containing the spatial precision matrix. 
-  
-  formula <- eval(substitute(this_feature ~
-                               f(spatial_id,
-                                 model = "generic0",
-                                 Cmatrix = spatial_prec_mat,
-                                 hyper = pcprior) +
-                               f(obs_id, model = "iid", hyper = obs_hyper),
-                             list(this_feature=as.name(feature))))
-  
-  spatial_only_model<- INLA::inla(formula = formula,
-                                  control.compute = list(waic = TRUE, cpo = TRUE, dic = TRUE), 
-                                  family = "binomial",
-                                  control.predictor=list(link=1),
-                                  data = data)
-  
-  cat(paste0("Finished running spatial only on ", feature, " and the time is ", Sys.time(), ".\n"))
-  
-  #### AUTOTYP-area model ####
-  
-  formula = eval(substitute(this_feature ~ 
-                              f(AUTOTYP_area_id_iid_model, 
-                                hyper = pcprior,
-                                model = "iid"),
-                            list(this_feature=as.name(feature))))
-  
-  AUTOTYP_area_model <- INLA::inla(formula = formula,
-                                   control.compute = list(waic = TRUE, cpo = TRUE, dic = TRUE), 
-                                   family = "binomial",
-                                   control.predictor=list(link=1),
-                                   data = data)
-  
-  cat(paste0("Finished running AUTOTYP-area only on ", feature, " and the time is ", Sys.time(), ".\n"))
-  
-  
+
   # #### Dual Model ####
   # 
   # # The dual model contains the phylogenetic and spatial precision models using the same
@@ -218,72 +160,13 @@ for(feature in features){
                           control.predictor=list(link=1),
                           data = data)
   
-  cat(paste0("Finished running dual only on ", feature, " and the time is ", Sys.time(), ".\n"))
+  cat(paste0("Finished running dual model on ", feature, " and the time is ", Sys.time(), ".\n"))
   
-  # #### Trial Model ####
-  # 
-  # # The trial model contains the phylogenetic and spatial precision models using the same
-  # # priors and scaled precision matrices. As well as a single effect for residuals (constrained to 1). In addition, there is also the categorical AUTOTYP-area included
-  
-  formula <-  eval(substitute(expr = this_feature ~
-                                f(spatial_id,
-                                  model = "generic0",
-                                  Cmatrix = spatial_prec_mat,
-                                  hyper = pcprior) +
-                                f(phylo_id,
-                                  model = "generic0",
-                                  Cmatrix = phylo_prec_mat,
-                                  hyper = pcprior)  +
-                                f(obs_id, model = "iid", hyper = obs_hyper) +
-                                f(AUTOTYP_area_id_iid_model, 
-                                  hyper = pcprior,
-                                  model = "iid"),
-                              list(this_feature=as.name(feature))))
-  
-  
-  trial_model<- INLA::inla(formula = formula,
-                           control.compute = list(waic = TRUE, cpo = TRUE, dic = TRUE), 
-                           family = "binomial",
-                           control.predictor=list(link=1),
-                           data = data)
-  
-  cat(paste0("Finished running trial on ", feature, " and the time is ", Sys.time(), ".\n"))
-  
-  ############
+############
   #######strip interesting information from the INLA objects
   #########
   
-  cat(paste0("  ####\n  Finishing running the INLA models for ", feature,".\n",
-             "  Starting stripping the INLA-models for relevant data for later analysis.\n  ####\n"))
-  
-  cat(paste0("Starting running strip inla on phylo only  ", feature, " and the time is ", Sys.time(), ".\n"))
-  
-  phylogeny_only_stripped <- try(expr = {strip_inla(phylo_only_model)})
-  
-  if (class(phylogeny_only_stripped) == "try-error") {
-    phylogeny_only_stripped <- NULL
-  }
-  
-  cat(paste0("Finished running strip inla on phylo only  ", feature, " and the time is ", Sys.time(), ".\n"))
-  
-  cat(paste0("Starting running strip inla on spatial only of ", feature, " and the time is ", Sys.time(), ".\n"))
-  
-  spatial_only_stripped = try(expr = {strip_inla(spatial_only_model)})
-  
-  if (class(spatial_only_stripped ) == "try-error") {
-    spatial_only_stripped <- NULL
-  }
-  cat(paste0("Finished running strip inla on spatial only of ", feature, " and the time is ", Sys.time(), ".\n"))
-  
-  cat(paste0("Starting running strip inla on AUTOTYP_area_model of ", feature, " and the time is ", Sys.time(), ".\n"))
-  
-  AUTOTYP_area_stripped <- try(expr = {strip_inla(  AUTOTYP_area_model)})
-  
-  if (class(AUTOTYP_area_stripped ) == "try-error") {
-    AUTOTYP_area_stripped <- NULL
-  }
-  cat(paste0("Finished running strip inla on AUTOTYP_area_model of ", feature, " and the time is ", Sys.time(), ".\n"))
-  
+
   cat(paste0("Starting running strip inla on dual  of ", feature, " and the time is ", Sys.time(), ".\n"))
   
   dual_model_stripped = try(expr = {strip_inla(dual_model)})
@@ -295,23 +178,9 @@ for(feature in features){
   cat(paste0("Finished running strip inla on dual  of ", feature, " and the time is ", Sys.time(), ".\n"))
   cat(paste0("Starting running strip inla on trial model of  ", feature, " and the time is ", Sys.time(), ".\n"))
   
-  trial_model_stripped <-try(expr = {strip_inla(trial_model)})
-  
-  if (class(trial_model_stripped) == "try-error") {
-    trial_model_stripped <- NULL
-  }
-  
-  cat(paste0("Finished running strip inla on trial model of  ", feature, " and the time is ", Sys.time(), ".\n"))
-  
-  
-  ## For each model we strip out the information we need to calculate heritability scores
+## For each model we strip out the information we need to calculate heritability scores
   ## to save on storage space. 
-  model_outputs = list(
-    phylogeny_only_stripped,
-    spatial_only_stripped,
-    AUTOTYP_area_stripped,
-    dual_model_stripped, 
-    trial_model_stripped)
+  model_outputs = list(dual_model_stripped)
   
   #### Save output ####
   saved_file =   paste0(OUTPUTDIR, feature, ".qs")
