@@ -113,20 +113,29 @@ locations_df = read.delim('output/non_GB_datasets/glottolog-cldf_wide_df.tsv', s
 #check that the locations df and tree tips match
 x <- assertthat::assert_that(all(locations_df$Language_ID %in% tree$tip.label),  msg = "OH NO THE TREE AND LOCATIONS ARE DIFFERENT")
 
-spatial_covar_mat = varcov.spatial(locations_df[,c("Longitude", "Latitude")],
-                                   cov.pars = sigma,
-                                   kappa = kappa)$varcov
+for(n in 1:3){
+#  n <- 1
+  kappa <- kappa_vec[n]
+  sigma <- sigma_vec[[n]]
+  
+  spatial_covar_mat = varcov.spatial(locations_df[,c("Longitude", "Latitude")],
+                                     cov.pars = sigma,
+                                     kappa = kappa)$varcov
+  
+  ## Repeat the typical variance standardisation from above
+  typical_variance_spatial = exp(mean(log(diag(spatial_covar_mat))))
+  spatial_cov_std = spatial_covar_mat / typical_variance_spatial
+  spatial_prec_mat = solve(spatial_cov_std)
+  dimnames(spatial_prec_mat) = list(locations_df$Language_ID, locations_df$Language_ID)
+  
+  ## Save the precision matrices to be used in each script
+  precision_matrices = list(
+    phylogenetic_precision = phy_prec_mat,
+    spatial_precision = spatial_prec_mat
+  )
+  
+  fn <- paste0("output/spatiophylogenetic_modelling/processed_data/precision_matrices_kappa_",kappa, "_sigma_", sigma[2] ,".RDS")
+  saveRDS(precision_matrices, file = fn)
 
-## Repeat the typical variance standardisation from above
-typical_variance_spatial = exp(mean(log(diag(spatial_covar_mat))))
-spatial_cov_std = spatial_covar_mat / typical_variance_spatial
-spatial_prec_mat = solve(spatial_cov_std)
-dimnames(spatial_prec_mat) = list(locations_df$Language_ID, locations_df$Language_ID)
+}
 
-## Save the precision matrices to be used in each script
-precision_matrices = list(
-  phylogenetic_precision = phy_prec_mat,
-  spatial_precision = spatial_prec_mat
-)
-
-saveRDS(precision_matrices, "output/spatiophylogenetic_modelling/processed_data/precision_matrices.RDS")
