@@ -3,6 +3,17 @@ source('requirements.R')
 
 source("spatiophylogenetic_modelling/analysis/INLA_parameters.R")
 
+cat("\n###\nLoading covariance matrices...\n")
+
+precision_matrices_fn <- "output/spatiophylogenetic_modelling/processed_data/precision_matrices.RDS"
+if(!(file.exists(precision_matrices_fn))){
+  source("spatiophylogenetic_modelling/analysis/make_precisionmatrices.R")}
+
+precision_matrices = readRDS(precision_matrices_fn)
+phylo_prec_mat = precision_matrices$phylogenetic_precision
+spatial_prec_mat = precision_matrices$spatial_precision
+
+
 color_vector <-c("#593d9cff", "#f68f46ff", "#F9F9F9")
 
 #### Format Posterior Data ####
@@ -47,10 +58,18 @@ dual_summary = dual_posterior %>%
             error_phylogenetic = sd(phylogenetic),
             error_spatial = sd(spatial),
             domain = first(Main_domain),
-            cor = list(cor(cbind(phylogenetic, spatial))))
+            cor = list(cor(cbind(phylogenetic, spatial)))) %>%
+  arrange(desc(mean_phylogenetic))
 
 five_most_phylo_features <- dual_summary %>% 
   top_n(n = 5, wt = mean_phylogenetic) %>% 
+  arrange(desc(mean_phylogenetic)) %>% 
+  dplyr::select(Feature_ID) %>% 
+  as.matrix() %>% 
+  as.vector()
+
+two_least_phylo_features <- dual_summary %>% 
+  top_n(n = -2, wt = mean_phylogenetic) %>% 
   arrange(desc(mean_phylogenetic)) %>% 
   dplyr::select(Feature_ID) %>% 
   as.matrix() %>% 
@@ -110,7 +129,7 @@ GB_id_desc <- readr::read_tsv("output/GB_wide/parameters_binary.tsv", show_col_t
 
 index <- 0
 
-for(feature in five_most_phylo_features) {
+for(feature in c(five_most_phylo_features, two_least_phylo_features)) {
   
 #  feature <- five_most_phylo_features[2]
   index <- index + 1
@@ -130,6 +149,7 @@ for(feature in five_most_phylo_features) {
   
   feature_df <- feature_df[-missing,]
   x <- feature_df[,2][[1]]
+  names(x) <- feature_df$Language_ID
 
   #generating plot title  
   plot_title <- GB_id_desc %>% 
@@ -138,7 +158,7 @@ for(feature in five_most_phylo_features) {
     as.matrix() %>% 
     as.vector() 
   
-    filename <- paste("output/spatiophylogenetic_modelling/most_signal_", "_" , str_replace(plot_title, " ", "_"), ".tiff", sep = "")
+  filename <- paste("output/spatiophylogenetic_modelling/most_signal_", "_" , str_replace(plot_title, " ", "_"), ".tiff", sep = "")
   filename_png <- paste("output/spatiophylogenetic_modelling/most_signal_", "_" , str_replace(plot_title, " ", "_"), ".png", sep = "")
   
 #running the contrasting algorithm reconstruction. Note: for the analysis we are using the tree with the original branch lengths even if we're visualizing using the imputed branch lengths.
@@ -151,7 +171,8 @@ for(feature in five_most_phylo_features) {
   
   plot.phylo(ladderize(tree_feature  , right = F), 
              col="grey", 
-             tip.color = feature_df$tip.color, 
+             tip.color = feature_df$tip.color[match(tree_feature$tip.label,
+                                                    feature_df$Language_ID)], 
              type = "fan", 
              cex = 0.25,
              label.offset = 0.02,main = plot_title)
@@ -168,7 +189,7 @@ for(feature in five_most_phylo_features) {
   
   nodelabels(node=1:tree_feature$Nnode+Ntip(tree_feature),
              pie=asr_most_signal$lik.anc,
-             piecol=color_vector, cex = 0.3)
+             piecol=color_vector[2:1], cex = 0.3)
   
   x <- dev.off()
   
@@ -177,7 +198,8 @@ for(feature in five_most_phylo_features) {
   
   plot.phylo(ladderize(tree_feature  , right = F), 
              col="grey", 
-             tip.color = feature_df$tip.color, 
+             tip.color = feature_df$tip.color[match(tree_feature$tip.label,
+                                                    feature_df$Language_ID)], 
              type = "fan", 
              cex = 0.25,
              label.offset = 0.02,main = plot_title)
@@ -195,7 +217,7 @@ for(feature in five_most_phylo_features) {
   
   nodelabels(node=1:tree_feature$Nnode+Ntip(tree_feature),
              pie=asr_most_signal$lik.anc,
-             piecol=color_vector, cex = 0.3)
+             piecol=color_vector[2:1], cex = 0.3)
   
   x <- dev.off()
   
