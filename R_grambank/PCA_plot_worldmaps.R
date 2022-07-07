@@ -4,15 +4,17 @@ source("requirements.R")
 #script written by Hedvig Skirgård and Simon Greenhill
 
 OUTPUTDIR <- file.path('.',"output", 'PCA')
+if(!dir.exists(OUTPUTDIR)){
+  dir.create(OUTPUTDIR)
+}
 
 Language_meta_data_fn <- "output/non_GB_datasets/glottolog-cldf_wide_df.tsv"
 if(!file.exists(Language_meta_data_fn)){
   source("make_glottolog-cldf_table.R")
 }
 Language_meta_data  <- read_tsv(Language_meta_data_fn, show_col_types = F) %>% 
-  dplyr::select(Language_ID = Language_level_ID, Family_name, Name, Longitude, Latitude, Macroarea) %>% 
-  distinct(Language_ID, .keep_all = T) %>% 
-  mutate(Family_name = ifelse(is.na(Family_name), "Isolate", Family_name))
+  dplyr::select(Language_ID , Name, Longitude, Latitude, Macroarea) %>% 
+  distinct(Language_ID, .keep_all = T) 
 
 #reading in the dataframe with PCA values for each language
 GB_PCA_df <- read_tsv(file.path(OUTPUTDIR, 'PCA_language_values.tsv'), col_types = cols()) %>%
@@ -62,7 +64,7 @@ basemap <- ggplot(GB_PCA_df_long_shifted) +
         axis.text.y = element_blank(),
         axis.ticks = element_blank()
   ) +
-  coord_map(projection = "vandergrinten", ylim=c(-56,67)) +
+  coord_map(projection = "vandergrinten", ylim=c(-55,73)) +
   expand_limits(x = GB_PCA_df_long_shifted$Longitude, y = GB_PCA_df_long_shifted$Latitude)
 
 ## plot PC 1 - 4 on map
