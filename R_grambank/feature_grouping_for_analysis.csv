@@ -3,20 +3,20 @@ GB303,clause,valency,,
 GB149,verbal domain,argument marking (core),,
 GB070,nominal domain,argument marking (core),,
 GB071,pronoun,argument marking (core),,
-GB408,nominal domain,argument marking (core),G,Noun alingment
-GB409,nominal domain,argument marking (core),G,Noun alingment
-GB410,nominal domain,argument marking (core),G,Noun alingment
+GB408,nominal domain,argument marking (core),G,Dom alignment
+GB409,nominal domain,argument marking (core),G,Dom alignment
+GB410,nominal domain,argument marking (core),G,Dom alignment
 GB074,nominal domain,argument marking (non-core),G,Adposition place
 GB075,nominal domain,argument marking (non-core),G,Adposition place
 GB080,verbal domain,argument marking (non-core),,
 GB081,verbal domain,VP (other),,
 GB079,verbal domain,argument marking (non-core),,
-GB092,verbal domain,argument marking (core),G,Verb alignment
-GB093,verbal domain,argument marking (core),G,Verb alignment
-GB089,verbal domain,argument marking (core),G,Verb alignment
-GB090,verbal domain,argument marking (core),G,Verb alignment
-GB091,verbal domain,argument marking (core),G,Verb alignment
-GB094,verbal domain,argument marking (core),G,Verb alignment
+GB092,verbal domain,argument marking (core),G,1 agreement
+GB093,verbal domain,argument marking (core),,2 agreement
+GB089,verbal domain,argument marking (core),G,1 agreement
+GB090,verbal domain,argument marking (core),G,1 agreement
+GB091,verbal domain,argument marking (core),G,1 agreement
+GB094,verbal domain,argument marking (core),,2 agreement
 GB098,verbal domain,argument marking (core),,
 GB095,verbal domain,argument marking (core),,
 GB096,verbal domain,argument marking (core),,
@@ -33,12 +33,12 @@ GB069,nominal domain,non-verbal predication,,
 GB065,nominal domain,order in NP,A,
 GB059,nominal domain,class,,
 GB430,nominal domain,order in NP,,
-GB431,nominal domain,order in NP,,
+GB431,nominal domain,order in NP,A,Noun Poss. Place
 GB432,nominal domain,order in NP,,
-GB433,nominal domain,order in NP,,
+GB433,nominal domain,order in NP,A,Noun Poss. Place
 GB313,pronoun,deixis,,
 GB058,nominal domain,class,,
-GB155,verbal domain,valency,,
+GB155,verbal domain,valency,G,+A
 GB156,clause,valency,,
 GB028,pronoun,number,G,Incl/excl
 GB301,clause,number,,
@@ -113,10 +113,10 @@ GB185,nominal domain,number,,
 GB186,nominal domain,number,,
 GB044,nominal domain,number,G,Noun Sg/Pl
 GB042,nominal domain,number,,
-GB302,clause,valency,,
+GB302,clause,valency,G,-A
 GB304,clause,valency,,
 GB099,verbal domain,argument marking (core),,
-GB031,pronoun,number,G,Noun Sg/Pl
+GB031,pronoun,number,,
 GB030,pronoun,class,,
 GB400,verbal domain,TAME,,
 GB415,pronoun,number,,
@@ -182,10 +182,10 @@ GB110,verbal domain,TAME,,
 GB111,verbal domain,VP (other),,
 GB148,verbal domain,valency,,
 GB113,verbal domain,valency,A,+A
-GB147,verbal domain,valency,,
+GB147,verbal domain,valency,G,-A
 GB305,pronoun,valency,,
 GB306,pronoun,valency,,
-GB124,verbal domain,valency,,
+GB124,verbal domain,valency,G,-A
 GB401,verbal domain,valency,,
 GB129,verbal domain,verb complex,,
 GB127,verbal domain,non-verbal predication,,
