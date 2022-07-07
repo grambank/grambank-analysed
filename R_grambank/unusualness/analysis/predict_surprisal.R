@@ -28,7 +28,7 @@ gb <- gb %>%
   filter(Estimator=="Kernel 15")
 
 #########################################
-## (5) Model unusualness in terms of genealogical, areal covariates, and endangerement status
+## (5) Model unusualness in terms of genealogical and areal covariates
 #########################################
 
 # Get phylogenetic covariance matrix
@@ -102,9 +102,24 @@ regression_surprisal<-function(df,s_cov,p_cov) {
 model_surprisal<-regression_surprisal(gb,
                                       s_cov=spatial_covar_mat,
                                       p_cov=phylo_covar_mat)
-# Estimate Bayesian  R2
+
+# Check summary and estimate Bayesian  R2
+summary(model_surprisal)
 bayes_R2(model_surprisal)
 
-# Check summary
-summary(model_surprisal_lca)
-conditional_effects(model_surprisal_lca)
+#########################################
+## (6) Predictive model
+#########################################
+
+# Add predictions and residuals
+surprisal_predictions<-predict(model_surprisal)
+gb$Pred_Surprisal<-surprisal_predictions[,1]
+gb$Pred_Error<-surprisal_predictions[,2]
+gb$Res_Surprisal<-with(gb,Surprisal-Pred_Surprisal)
+gb$Z_Surprisal<-with(gb,Res_Surprisal/)
+
+
+# Plot this
+ggplot(gb,aes(x=Res_Surprisal))+geom_histogram()
+
+# Check the outliers
