@@ -4,14 +4,20 @@ source('requirements.R')
 ## Change this vector to change the colour palette of the plots
 col_vector <- c("#039e37", "purple4",  "#c23c3c", "turquoise3")
 
+#make outputdir
+if(!dir.exists("output/spatiophylogenetic_modelling/effect_plots")){
+  dir.create("output/spatiophylogenetic_modelling/effect_plots")
+}
+
 #### Format Posterior Data ####
 ## Feature Metadata
-parameters_binary <- read_csv("feature_grouping_for_analysis.csv", show_col_types = F)
+feature_groupings <- read_csv("feature_grouping_for_analysis.csv", show_col_types = F)
 
 ## Read in model posteriors
 model_output_files = list.files(path = "output/spatiophylogenetic_modelling/featurewise/",
                                 pattern = "*.qs",
                                 full.names = TRUE)
+model_output_files <- model_output_files[!str_detect(model_output_files, "kapp")]
 
 model_output = lapply(model_output_files, qread)
 names(model_output) = basename(model_output_files) %>%
@@ -36,7 +42,7 @@ colnames(dual_posterior) = c(
 )
 
 # join feature metadata to posterior
-dual_posterior = left_join(dual_posterior, parameters_binary, by ="Feature_ID")
+dual_posterior = left_join(dual_posterior, feature_groupings, by ="Feature_ID")
 
 # Summarise the posterior distributions
 dual_summary = dual_posterior %>%
@@ -85,7 +91,7 @@ ellipses <- dual_summary %>%
          y = ifelse(y > 1, 1, y)) %>%
   ungroup()
 
-h_load("lemon")
+#h_load("lemon")
 
 plot_function <- function(label = c("letter_plot_label", "domain", "Nichols_1995_prediction"), facet, fn = spatiophylogenetic_figure_panels_ellipses){
   #label <- "letter_plot_label"
@@ -130,8 +136,9 @@ center_plot =   ggplot(data = dual_summary,
 
 if(facet == T){
 center_plot  <- center_plot  +
-  lemon::facet_rep_wrap(~label,nrow = 2, repeat.tick.labels = T) + 
-  theme(legend.position = "None",
+#  lemon::facet_rep_wrap(~label,nrow = 2, repeat.tick.labels = T) + 
+    facet_wrap(~label,nrow = 2) + 
+    theme(legend.position = "None",
         strip.background = element_blank())
 }
 
@@ -150,7 +157,7 @@ if(str_detect(fn, "ichols")){
 plot(center_plot)
 
 ggsave(plot = center_plot,
-       filename = paste0("output/spatiophylogenetic_modelling/", fn, ".jpg"),
+       filename = paste0("output/spatiophylogenetic_modelling/effect_plots/", fn, ".jpg"),
        width = 230 / 2,
        height = 210 / 2,
        units = "mm")
@@ -162,3 +169,16 @@ plot_function(label = "letter_plot_label", facet = T, fn = "spatiophylogenetic_f
 plot_function(label = "domain", facet = T, fn = "spatiophylogenetic_figure_panels_ellipses_domain")
 
 plot_function(label = "Nichols_1995_prediction", facet = F, fn = "spatiophylogenetic_figure_panels_ellipses_nichols_prediction")
+
+#tables for supplementary
+
+parameters_binary <- data.table::fread(file.path("output", "GB_wide", "parameters_binary.tsv") ,
+                                    encoding = 'UTF-8', 
+                                    quote = "\"", header = TRUE, 
+                                    sep = "\t")  %>% 
+  rename(Feature_ID = ID)
+
+feature_groupings %>% 
+  full_join(parameters_binary, by = "Feature_ID") %>% 
+  dplyr::select(Feature_ID, boundness, Flexivity, "Gender/noun class","locus of marking", "word order", "informativity", Main_domain, Nichols_1995_label, Nichols_1995_prediction) %>% 
+write_tsv(file ="output/GB_wide/table_theo_scores_supp.tsv", na = "")
