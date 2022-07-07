@@ -138,16 +138,16 @@ for(feature in c(five_most_phylo_features, two_least_phylo_features)) {
     as.matrix() %>% 
     as.vector() 
   
-  filename <- paste(OUTPUTDIR, "/most_signal_phylo_", "_" , str_replace(plot_title, " ", "_"), ".tiff", sep = "")
-  filename_png <- paste(OUTPUTDIR, "/most_signal_phylo_", "_" , str_replace(plot_title, " ", "_"), ".png", sep = "")
+  filename <- paste(OUTPUTDIR, "/most_signal_phylo_",index, "_" , str_replace(plot_title, " ", "_"), ".tiff", sep = "")
+  filename_png <- paste(OUTPUTDIR, "/most_signal_phylo_",index, "_" , str_replace(plot_title, " ", "_"), ".png", sep = "")
   
 #running the contrasting algorithm reconstruction. Note: for the analysis we are using the tree with the original branch lengths even if we're visualizing using the imputed branch lengths.
   asr_most_signal<- ape::ace(x = x, phy = tree_feature, method = "ML", type = "discrete", model = "ARD")
 
   asr_most_signal %>% 
-    qs::qsave(paste0("output/spatiophylogenetic_modelling/effect_plots/most_signal_", "_" , str_replace(plot_title, " ", "_"), ".qs"))
+    qs::qsave(paste0("output/spatiophylogenetic_modelling/effect_plots/most_signal_",index , "_" , str_replace(plot_title, " ", "_"), ".qs"))
     
-  tiff(file = filename, width = 15.27, height = 15.69, units = "in", res = 600)
+  tiff(file = filename, width = 15.27, height = 15.69, units = "in", res = 400)
   
   plot.phylo(ladderize(tree_feature  , right = F), 
              col="grey", 
@@ -255,10 +255,13 @@ basemap <- ggplot(df_for_maps) +
   coord_map(projection = "vandergrinten", ylim=c(-56,67)) +
   theme(plot.margin=grid::unit(c(0,0,0,0), "mm"))
 
+index <- 0
+
 for(feature in five_most_spatial_features){
   
-  feature <- five_most_spatial_features[1]
+#  feature <- five_most_spatial_features[1]
 
+  index <- index + 1
   #generating plot title  
   plot_title <- GB_id_desc %>% 
     filter(Feature_ID == feature) %>% 
@@ -267,7 +270,7 @@ for(feature in five_most_spatial_features){
     as.vector() 
   
   #filename
-  filename <- paste(OUTPUTDIR, "/most_signal_spatial", "_" , str_replace(plot_title, " ", "_"), ".tiff", sep = "")
+  filename <- paste(OUTPUTDIR, "/most_signal_spatial_",index, "_" , str_replace(plot_title, " ", "_"), ".png", sep = "")
 
   feature_df <-df_for_maps %>% 
     filter(!is.na("Longitude")) %>% 
@@ -283,7 +286,7 @@ for(feature in five_most_spatial_features){
     geom_jitter(data = feature_df, mapping = aes(x = Longitude, y = Latitude),  color = feature_df$point.color, alpha = 0.6, width = 3) +
     ggtitle(plot_title)
   
-  ggsave(filename = filename)
+  ggsave(filename = filename, width = 9.3, height = 9.2, units = "in")
   
 }
 
