@@ -5,14 +5,13 @@ source("spatiophylogenetic_modelling/analysis/INLA_parameters.R")
 
 cat("\n###\nLoading covariance matrices...\n")
 
-precision_matrices_fn <- "output/spatiophylogenetic_modelling/processed_data/precision_matrices.RDS"
+precision_matrices_fn <- "output/spatiophylogenetic_modelling/processed_data/precision_matrices_kappa_2_sigma_1.15.RDS"
 if(!(file.exists(precision_matrices_fn))){
   source("spatiophylogenetic_modelling/analysis/make_precisionmatrices.R")}
 
 precision_matrices = readRDS(precision_matrices_fn)
 phylo_prec_mat = precision_matrices$phylogenetic_precision
 spatial_prec_mat = precision_matrices$spatial_precision
-
 
 color_vector <-c("#593d9cff", "#f68f46ff", "#F9F9F9")
 
@@ -24,6 +23,8 @@ parameters_binary <- read_csv("feature_grouping_for_analysis.csv", show_col_type
 model_output_files = list.files(path = "output/spatiophylogenetic_modelling/featurewise/",
                                 pattern = "*.qs",
                                 full.names = TRUE)
+
+model_output_files <- model_output_files[!str_detect(model_output_files, "kapp")]
 
 model_output = lapply(model_output_files, qread)
 names(model_output) = basename(model_output_files) %>%
