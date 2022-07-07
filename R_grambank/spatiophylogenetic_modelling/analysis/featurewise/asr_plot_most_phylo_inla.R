@@ -1,6 +1,11 @@
 ## This script visualises the output from a dual-process model for each Grambank feature
 source('requirements.R')
 
+OUTPUTDIR <- "output/spatiophylogenetic_modelling/spec_feature_plots"
+if(!dir.exists(OUTPUTDIR)){
+  dir.create(OUTPUTDIR)
+}
+
 source("spatiophylogenetic_modelling/analysis/INLA_parameters.R")
 
 cat("\n###\nLoading covariance matrices...\n")
@@ -88,32 +93,6 @@ tree <- ape::keep.tip(tree, lgs_in_analysis$Language_ID)
 glottolog_df <- read_tsv("output/non_GB_datasets/glottolog-cldf_wide_df.tsv") %>% 
   mutate(Family_ID = ifelse(is.na(Family_ID), "Isolate", Family_ID))
 
-h_load("randomcoloR")
-
-  
-tree_all_df <- tree$tip.label %>% 
-  as.data.frame() %>% 
-  rename("Language_ID" = ".") %>% 
-    left_join(glottolog_df)
-
-n <- length(unique(tree_all_df$Family_ID)) #counting how many distinct colors we need. Note that "NA" is also counted, and represents Isolates.
-
-color_vector_families <- randomcoloR::distinctColorPalette(n)
-
-tree_all_df$tip.color_vec <- color_vector_families[as.factor(tree_all_df$Family_ID)]
-
-png(file = "output/coverage_plots/EDGE_tree_full.png", width = 15.27, height = 15.69, units = "in", res = 600)
-
-plot.phylo(ladderize(tree  , right = F), 
-           col="grey", 
-           tip.color = tree_all_df$tip.color, 
-           type = "fan", 
-           cex = 0.3,
-           label.offset = 0.02)
-
-x <- dev.off()
-
-
 #reading in GB
 GB_fn <- "output/GB_wide/GB_cropped_for_missing.tsv"
 if(!file.exists(GB_fn)){
@@ -159,8 +138,8 @@ for(feature in c(five_most_phylo_features, two_least_phylo_features)) {
     as.matrix() %>% 
     as.vector() 
   
-  filename <- paste("output/spatiophylogenetic_modelling/most_signal_", "_" , str_replace(plot_title, " ", "_"), ".tiff", sep = "")
-  filename_png <- paste("output/spatiophylogenetic_modelling/most_signal_", "_" , str_replace(plot_title, " ", "_"), ".png", sep = "")
+  filename <- paste(OUTPUTDIR, "most_signal_", "_" , str_replace(plot_title, " ", "_"), ".tiff", sep = "")
+  filename_png <- paste(OUTPUTDIR, "most_signal_", "_" , str_replace(plot_title, " ", "_"), ".png", sep = "")
   
 #running the contrasting algorithm reconstruction. Note: for the analysis we are using the tree with the original branch lengths even if we're visualizing using the imputed branch lengths.
   asr_most_signal<- ape::ace(x = x, phy = tree_feature, method = "ML", type = "discrete", model = "ARD")
