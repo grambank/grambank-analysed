@@ -6,6 +6,10 @@ if(!dir.exists(OUTPUTDIR)){
   dir.create(OUTPUTDIR)
 }
 
+#description of featurs
+GB_id_desc <- readr::read_tsv("output/GB_wide/parameters_binary.tsv", show_col_types = F) %>% 
+  dplyr::select(Feature_ID = ID, Grambank_ID_desc, Name)
+
 source("spatiophylogenetic_modelling/analysis/INLA_parameters.R")
 
 cat("\n###\nLoading covariance matrices...\n")
@@ -65,7 +69,8 @@ dual_summary = dual_posterior %>%
             error_spatial = sd(spatial),
             domain = first(Main_domain),
             cor = list(cor(cbind(phylogenetic, spatial)))) %>%
-  arrange(desc(mean_phylogenetic))
+  arrange(desc(mean_phylogenetic)) %>% 
+  left_join(GB_id_desc, by = "Feature_ID")
 
 five_most_phylo_features <- dual_summary %>% 
   top_n(n = 5, wt = mean_phylogenetic) %>% 
@@ -104,8 +109,6 @@ if(!file.exists(GB_fn)){
 GB_df <- readr::read_tsv(file =   GB_fn,show_col_types = F) %>% 
   inner_join(lgs_in_analysis)
 
-GB_id_desc <- readr::read_tsv("output/GB_wide/parameters_binary.tsv", show_col_types = F) %>% 
-  dplyr::select(Feature_ID = ID, Grambank_ID_desc)
 
 index <- 0
 
@@ -300,11 +303,13 @@ comp_df <- GB_df %>%
   full_join(dual_summary, by = "Feature_ID") %>%
   dplyr::select(Feature_ID, one_prop, mean_phylogenetic, mean_spatial)
 
-psych::pairs.panels(comp_df[,-1])
-
-
-
-
-
-
-
+psych::pairs.panels(comp_df[,-1], 
+method = "pearson", # correlation method
+hist.col = "#a3afd1",# "#a9d1a3","",""),
+density = TRUE,  # show density plots
+ellipses = F, # show correlation ellipses
+cex.labels= 1,
+#           smoother= T,
+cor=T,
+lm=T,
+ci = T, cex.cor = 0.9,stars = T)
