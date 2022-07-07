@@ -69,7 +69,7 @@ map <- ggplot(scores_joined_for_plotting) +
   coord_map(projection = "vandergrinten", ylim=c(-56,67)) +
   expand_limits(x = scores_joined_for_plotting$Longitude, y = scores_joined_for_plotting$Latitude) 
 
-mh <- map + inset_element(h, right = 0.2, bottom = 0.0, left = 0.0, top = 0.3)
+mh <- map + inset_element(h, right = 0.3, bottom = 0.0, left = 0.0, top = 0.27)
 
 png("output/unusualness/plots/surprisal_worldmap.png", height = 5, width = 8, units = "in", res = 300)
 plot(mh)
