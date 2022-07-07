@@ -150,15 +150,28 @@ unusualness_ext %>%
 ggsave(file.path(OUTPUTDIR_plots,"unexpected_surprisal_lgs.png"),height=7,width=6)
 
 ## Test
-plyr::ddply(gb[gb$Estimator=="Bayesian LCA"&!is.na(gb$aes),],"AUTOTYP_area",function(x) data.frame(E=sum(x$Endangerement=="endangered")/sum(x$Endangerement %in% c("not_endangered","endangered")),
-                                                                                               U=mean(x$Surprisal),
-                                                                                               N=nrow(x))) %>%
-  ggplot(aes(x=U,y=E,label=AUTOTYP_area))+
-  annotate("rect",xmin = 52.5,xmax = 60,ymin=0.75,ymax=1.05,fill="tomato",alpha=0.1)+
-  geom_point(alpha=0.2,aes(size=5*N))+
-  geom_text_repel(size=5)+
-  theme_bw()+
-  theme(legend.position = "none")+
+#plot_df <-  plyr::ddply(gb[gb$Estimator=="Bayesian LCA"&!is.na(gb$aes),],"AUTOTYP_area",function(x) data.frame(E=sum(x$Endangerement=="endangered")/sum(x$Endangerement %in% c("not_endangered","endangered")),
+ #                                                                                              U=mean(x$Surprisal),
+  #                                                                                             N=nrow(x))) 
+  plot_df <- gb %>%
+    dplyr::select(Language_ID, Estimator, aes, AUTOTYP_area, Surprisal) %>% 
+  filter(Estimator == "Bayesian LCA") %>% 
+  filter(!is.na(aes)) %>% 
+  mutate(Endangerment=ifelse(aes=="not_endangered",0,1)) %>% 
+  group_by(AUTOTYP_area) %>% 
+  summarise(x = mean(Surprisal), 
+            N = mean(Endangerment), 
+            n_lgs = n()) 
+  
+  plot_df %>% 
+  ggplot(aes(y=N, x=x,label=AUTOTYP_area, size = n_lgs, color = AUTOTYP_area))+
+  annotate("rect",ymin = 0.7,ymax = 1.1,xmin=60,xmax=max(plot_df$x)+2,fill="tomato",alpha=0.1)+
+  geom_point(alpha = 0.6) +
+  geom_label_repel(size=6, box.padding = 0.5, fill = "white",  
+                   min.segment.length	= 0.1)+
+  theme_classic(base_size = 13)+
+  theme(legend.position = "none", 
+        axis.title = element_text(size = 18))+
   labs(x="Mean unexpectedness in region",y="Proportion of threatened/moribund/near extinct lgs in region")
 
 ggsave(file.path(OUTPUTDIR_plots,"endangerment_and_area.png"))
