@@ -18,7 +18,7 @@ precision_matrices = readRDS(precision_matrices_fn)
 phylo_prec_mat = precision_matrices$phylogenetic_precision
 spatial_prec_mat = precision_matrices$spatial_precision
 
-color_vector <-c("#593d9cff", "#f68f46ff", "#F9F9F9")
+color_vector <-c("#593d9cff", "#f68f46ff", "#d6d4d4")
 
 #### Format Posterior Data ####
 ## Feature Metadata
@@ -138,14 +138,14 @@ for(feature in c(five_most_phylo_features, two_least_phylo_features)) {
     as.matrix() %>% 
     as.vector() 
   
-  filename <- paste(OUTPUTDIR, "most_signal_", "_" , str_replace(plot_title, " ", "_"), ".tiff", sep = "")
-  filename_png <- paste(OUTPUTDIR, "most_signal_", "_" , str_replace(plot_title, " ", "_"), ".png", sep = "")
+  filename <- paste(OUTPUTDIR, "/most_signal_phylo_", "_" , str_replace(plot_title, " ", "_"), ".tiff", sep = "")
+  filename_png <- paste(OUTPUTDIR, "/most_signal_phylo_", "_" , str_replace(plot_title, " ", "_"), ".png", sep = "")
   
 #running the contrasting algorithm reconstruction. Note: for the analysis we are using the tree with the original branch lengths even if we're visualizing using the imputed branch lengths.
   asr_most_signal<- ape::ace(x = x, phy = tree_feature, method = "ML", type = "discrete", model = "ARD")
 
   asr_most_signal %>% 
-    qs::qsave(paste0("output/spatiophylogenetic_modelling/most_signal_", "_" , str_replace(plot_title, " ", "_"), ".qs"))
+    qs::qsave(paste0("output/spatiophylogenetic_modelling/effect_plots/most_signal_", "_" , str_replace(plot_title, " ", "_"), ".qs"))
     
   tiff(file = filename, width = 15.27, height = 15.69, units = "in", res = 600)
   
@@ -203,4 +203,105 @@ for(feature in c(five_most_phylo_features, two_least_phylo_features)) {
   
   
 }
+
+
+#making map plots to show the feature that has the most spatial effect in the model
+
+five_most_spatial_features <- dual_summary %>%
+  top_n(n = 5, wt = mean_spatial) %>% 
+  arrange(desc(mean_spatial)) %>% 
+  dplyr::select(Feature_ID) %>% 
+  as.matrix() %>% 
+  as.vector()
+
+#read in meta data
+Language_meta_data_fn <- "output/non_GB_datasets/glottolog-cldf_wide_df.tsv"
+if(!file.exists(Language_meta_data_fn)){
+  source("make_glottolog-cldf_table.R")
+}
+Language_meta_data  <- read_tsv(Language_meta_data_fn, show_col_types = F) %>% 
+  dplyr::select(Language_ID, Longitude, Latitude) 
+
+
+df_for_maps <- GB_df %>% 
+  inner_join(Language_meta_data, by = "Language_ID") %>% 
+  mutate(Longitude = if_else(Longitude <= -25, Longitude + 360, Longitude)) #shift for pacific
+
+#basemap
+#rendering a worldmap that is pacific centered
+world <- map_data('world', wrap=c(-25,335), ylim=c(-56,80), margin=T)
+lakes <- map_data("lakes", wrap=c(-25,335), col="white", border="gray", ylim=c(-55,65), margin=T)
+
+basemap <- ggplot(df_for_maps) +
+  geom_polygon(data=world, aes(x=long, y=lat, group=group),
+               colour="gray87",
+               fill="gray87", size = 0.5) +
+  geom_polygon(data=lakes, aes(x=long, y=lat, group=group),
+               colour="gray87",
+               fill="white", size = 0.3) +
+  theme(
+    # all of these lines are just removing default things like grid lines, axes etc
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    axis.line = element_blank(),
+    panel.border = element_rect(colour = "black", fill = NA),
+    panel.background = element_rect(fill = "white"),
+    axis.text.x = element_blank(),
+    axis.text.y = element_blank(),
+    axis.ticks = element_blank()
+  ) +
+  coord_map(projection = "vandergrinten", ylim=c(-56,67)) +
+  theme(plot.margin=grid::unit(c(0,0,0,0), "mm"))
+
+for(feature in five_most_spatial_features){
+  
+  feature <- five_most_spatial_features[1]
+
+  #generating plot title  
+  plot_title <- GB_id_desc %>% 
+    filter(Feature_ID == feature) %>% 
+    dplyr::select(Grambank_ID_desc) %>% 
+    as.matrix() %>% 
+    as.vector() 
+  
+  #filename
+  filename <- paste(OUTPUTDIR, "/most_signal_spatial", "_" , str_replace(plot_title, " ", "_"), ".tiff", sep = "")
+
+  feature_df <-df_for_maps %>% 
+    filter(!is.na("Longitude")) %>% 
+    dplyr::select(Language_ID, all_of(feature), Longitude, Latitude) %>% 
+    rename(Feature = 2) %>% 
+    mutate(point.color = as.character(Feature)) %>% 
+    mutate(point.color = str_replace_all(point.color, "1", color_vector[1])) %>% 
+    mutate(point.color = str_replace_all(point.color, "0", color_vector[2])) %>%      
+    mutate(point.color = ifelse(is.na(point.color), color_vector[3], point.color)) %>% 
+    arrange(Feature)
+  
+  basemap +
+    geom_jitter(data = feature_df, mapping = aes(x = Longitude, y = Latitude),  color = feature_df$point.color, alpha = 0.6, width = 3) +
+    ggtitle(plot_title)
+  
+  ggsave(filename = filename)
+  
+}
+
+#comparing phylo and spatial effects with prop of 1s
+
+comp_df <- GB_df %>% 
+  reshape2::melt(id.vars = "Language_ID") %>% 
+  group_by(variable) %>% 
+  summarise(one_prop = mean(value, na.rm = T)) %>% 
+  rename(Feature_ID = variable) %>% 
+  full_join(dual_summary, by = "Feature_ID") %>%
+  dplyr::select(Feature_ID, one_prop, mean_phylogenetic, mean_spatial)
+
+psych::pairs.panels(comp_df[,-1])
+
+
+
+
+
+
 
