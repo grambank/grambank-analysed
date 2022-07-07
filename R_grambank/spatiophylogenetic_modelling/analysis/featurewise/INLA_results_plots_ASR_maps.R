@@ -303,6 +303,8 @@ comp_df <- GB_df %>%
   full_join(dual_summary, by = "Feature_ID") %>%
   dplyr::select(Feature_ID, one_prop, mean_phylogenetic, mean_spatial)
 
+png("output/spatiophylogenetic_modelling/effect_plots/splom_dual.png")
+
 psych::pairs.panels(comp_df[,-1], 
 method = "pearson", # correlation method
 hist.col = "#a3afd1",# "#a9d1a3","",""),
@@ -313,3 +315,6 @@ cex.labels= 1,
 cor=T,
 lm=T,
 ci = T, cex.cor = 0.9,stars = T)
+
+x <- dev.off()
+
