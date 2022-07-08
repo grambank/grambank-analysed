@@ -3,9 +3,10 @@
 
 #script written by Sam Passmore
 source('requirements.R')
+source(file = "spatiophylogenetic_modelling/analysis/INLA_parameters.R")
 
 # load variational covariance matrix taken from geoR::varcov_spatial
-source('spatiophylogenetic_modelling/analysis/varcov_spatial.R')
+source('spatiophylogenetic_modelling/analysis/functions/varcov_spatial.R')
 
 #### Functions #### 
 #### # Calculate Haversine distance in kilometers between two points (as the crow flies taking into account curvature of the earth).
@@ -144,7 +145,7 @@ plot_df$distance_std = plot_df$distance / max(plot_df$distance)
 
 cols = RColorBrewer::brewer.pal(5, "Set1")
 
-jpeg('output/spatiophylogenetic_modelling/spatial_parameter_fig.jpg')
+png('output/spatiophylogenetic_modelling/spatial_parameter_fig.png', width = 10, height =  10, res = 400, units = "in")
 plot(x = plot_df$distance,
      y = 1 - plot_df$distance_std, 
      type = "l", 
@@ -158,10 +159,10 @@ for(i in 2:6){
 }
 abline(v = dist_pairs$distances, lty = "dashed")
 text(x = dist_pairs$distances,
-     y = 0.2 + c(0, 0.1, 0.2, 0.3, 0.4),
-     labels = paste0(ceiling(dist_pairs$distances), "Km"), 
+     y = 0.2 + c(0.2, 0.2, 0.2, 0.2, 0.2),
+     labels = paste0(ceiling(dist_pairs$distances), " km"), 
      srt = 90, 
-     cex = 0.75,pos = 4)
+     cex = 1,pos = 4)
 
 # Make legend
 legend_text = c("1 - Haversine",
@@ -173,5 +174,5 @@ legend_text = c("1 - Haversine",
 leg_cols = c("black", cols)
 legend(700, 1.0, 
        legend=legend_text,
-       col=leg_cols, lty=1, cex=0.8, lwd = 3)
-dev.off()
+       col=leg_cols, lty=1, cex=1, lwd = 3)
+x <- dev.off()
