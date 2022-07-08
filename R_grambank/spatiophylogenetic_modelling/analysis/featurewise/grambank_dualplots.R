@@ -55,6 +55,12 @@ dual_summary = dual_posterior %>%
             Nichols_1995_prediction = first(Nichols_1995_prediction),
             cor = list(cor(cbind(phylogenetic, spatial))))
 
+dual_summary %>% 
+  dplyr::select(Feature_ID, `Phylogenetic effect (mean)` = mean_phylogenetic, `Phylogenetic effect (Standard Deviation)`=error_phylogenetic, `Spatial effect (mean)`= mean_spatial, `Spatial effect (Standard Deviation)` = error_spatial) %>% 
+  mutate_if(is.numeric, round,3) %>% 
+  arrange(desc(`Phylogenetic effect (mean)`)) %>% 
+  write_tsv("output/spatiophylogenetic_modelling/featurewise/dual_summary_effects.tsv", na = "")
+
 trinf <- data.frame(x=c(0,1,1),y=c(1,0,1))
 
 ## make upper triangle work on log plot
