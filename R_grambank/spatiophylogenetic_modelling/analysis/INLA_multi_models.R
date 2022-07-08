@@ -1,7 +1,4 @@
 # This script tests the following:
-# Phylo only
-# Spatial only
-# AUTOTYP-area only
 # Dual model (spatial + phylo)
 # Trial (spatial + phylo + AUTOTYP-area)
 
@@ -20,11 +17,14 @@ if(length(args) != 0){
   start = args[2]
   end <- args[3]
   range <- start:end
+  prec_matrices <- args[4]
 } else { #if you're running this script chunkwise in Rstudio or similar instead of via command line, you'll read in the parameters this way:
   sim_or_real <- "real"
   start <- 1
   end <- 40
   range <- start:end
+  prec_matrices <- NULL
+  
 }
 
 if(sim_or_real == "sim"){
@@ -84,9 +84,13 @@ sink(file = paste0(OUTPUTDIR , "INLA_log_range_", start, "_", end,"_", time, ".t
 
 cat("\n###\nLoading covariance matrices...\n")
 
-precision_matrices_fn <- "output/spatiophylogenetic_modelling/processed_data/precision_matrices.RDS"
+if(is.null(prec_matrices)){
+precision_matrices_fn <- "output/spatiophylogenetic_modelling/processed_data/precision_matrices_kappa_2_sigma_1.15.RDS"
 if(!(file.exists(precision_matrices_fn))){
-  source("spatiophylogenetic_modelling/analysis/make_precisionmatrices.R")}
+  source("spatiophylogenetic_modelling/analysis/make_precisionmatrices.R")} 
+} else{
+  precision_matrices_fn <- paste0("output/spatiophylogenetic_modelling/processed_data/", prec_matrices)
+}
 
 precision_matrices = readRDS(precision_matrices_fn)
 phylo_prec_mat = precision_matrices$phylogenetic_precision
@@ -113,17 +117,10 @@ data$phylo_id = match(data$Language_ID, rownames(phylo_prec_mat))
 data$spatial_id = match(data$Language_ID, rownames(spatial_prec_mat))
 data$obs_id = 1:nrow(data)
 
-#subsetting what to loop over
-done_fns <- done_fns %>% 
-  as_tibble() %>% 
-  mutate(value = str_replace_all(value, ".qs", ""))
-
 #features to loop over
 features <- df %>% 
   dplyr::select(-Language_ID) %>% 
   colnames() 
-
-features <- setdiff(features, done_fns$value) 
 
 features <- features[range]
 
@@ -207,9 +204,8 @@ for(feature in features){
   }
   
   cat(paste0("Finished running strip inla on dual  of ", feature, " and the time is ", Sys.time(), ".\n"))
-  cat(paste0("Starting running strip inla on trial model of  ", feature, " and the time is ", Sys.time(), ".\n"))
-  
-  cat(paste0("Starting running strip inla on trial model of  ", feature, " and the time is ", Sys.time(), ".\n"))
+
+    cat(paste0("Starting running strip inla on trial model of  ", feature, " and the time is ", Sys.time(), ".\n"))
   
   trial_model_stripped <-try(expr = {strip_inla(trial_model)})
   
@@ -227,7 +223,8 @@ for(feature in features){
                        trial_model_stripped)
   
   #### Save output ####
-  saved_file =   paste0(OUTPUTDIR, feature, ".qs")
+  saved_file =   paste0(OUTPUTDIR, feature,"_",   substr(x = basename(precision_matrices_fn), 20, 37)
+, ".qs")
   
   qs::qsave(model_outputs, 
             file = saved_file)
@@ -239,7 +236,7 @@ for(feature in features){
   index <- index + 1
   
   cat(paste0("I've finished ", feature, " and the time is ", Sys.time(), ".\n That means I'm ", round((index/length(range)), 2)*100, "% done.\n"))
-  rm(model_outputs, phylo_only_model, spatial_only_model, dual_model)
+  rm(model_outputs, dual_model, trial_model)
 }
 
 sink(file = NULL)
