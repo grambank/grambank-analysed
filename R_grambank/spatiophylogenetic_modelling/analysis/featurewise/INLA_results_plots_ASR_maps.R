@@ -114,7 +114,7 @@ GB_df <- readr::read_tsv(file =   GB_fn,show_col_types = F) %>%
 #values for clade labels
 ln.offset = 1.05
 lab.offset = 1.09
-fsize = 0.9
+fsize = 3
 
 index <- 0
 
@@ -291,7 +291,7 @@ ln.offset = ln.offset , lab.offset = lab.offset,fsize=fsize,orientation="curved"
 
 if(beep == 1){
   h_load("beepr")
-  beep(4)
+  beep(2)
   }
 
 
