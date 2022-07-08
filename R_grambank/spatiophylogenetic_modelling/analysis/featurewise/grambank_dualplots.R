@@ -79,6 +79,14 @@ dual_summary <- dual_summary %>%
   mutate(letter_plot_label = str_replace(letter_plot_label, "pronoun", "c")) %>% 
   mutate(letter_plot_label = str_replace(letter_plot_label, "verbal domain", "d"))
 
+
+dual_summary_summary <- dual_posterior %>%
+  summarise(mean_phylogenetic = mean(phylogenetic),
+            mean_spatial = mean(spatial),
+            error_phylogenetic = sd(phylogenetic),
+            error_spatial = sd(spatial)) %>% 
+  t()
+
 ## ellipses
 ellipses <- dual_summary %>%
   rowwise() %>%
@@ -137,8 +145,11 @@ center_plot =   ggplot(data = dual_summary,
   geom_polygon(aes(x=x, y=y), data=trinf, fill="#F9F9F9") +
   theme(legend.title = element_blank(),
         panel.spacing = unit(2, "lines"), 
-        strip.text = element_text(size = 10)
-        ) 
+        strip.text = element_text(size = 10),
+        plot.margin = ggplot2::margin(t = 5,  # Top margin
+                             r = 12,  # Right margin
+                             b = 5,  # Bottom margin
+                             l = 5)) 
 
 if(facet == T){
 center_plot  <- center_plot  +
