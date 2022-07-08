@@ -149,6 +149,7 @@ png('output/spatiophylogenetic_modelling/spatial_parameter_fig.png', width = 10,
 plot(x = plot_df$distance,
      y = 1 - plot_df$distance_std, 
      type = "l", 
+     cex.lab= 1.5,
      ylab = "Covariance",
      xlab = "Haversine Distance (km)",
      ylim = c(0, 1),
@@ -159,10 +160,10 @@ for(i in 2:6){
 }
 abline(v = dist_pairs$distances, lty = "dashed")
 text(x = dist_pairs$distances,
-     y = 0.2 + c(0.2, 0.2, 0.2, 0.2, 0.2),
+     y = 0.1 + c(0, 0.1, 0.2, 0.3, 0.4),
      labels = paste0(ceiling(dist_pairs$distances), " km"), 
-     srt = 90, 
-     cex = 1,pos = 4)
+     srt = 0, 
+     cex = 1.8,pos = 4)
 
 # Make legend
 legend_text = c("1 - Haversine",
@@ -172,7 +173,8 @@ legend_text = c("1 - Haversine",
                 paste0("Spatial: k = ", parameters[4,1],"; s = ", parameters[4,2]))
 
 leg_cols = c("black", cols)
-legend(700, 1.0, 
+legend(5500, 1.0, 
        legend=legend_text,
-       col=leg_cols, lty=1, cex=1, lwd = 3)
+       col=leg_cols, lty=1, cex=1.6, lwd = 3, bty = "n")
+
 x <- dev.off()
