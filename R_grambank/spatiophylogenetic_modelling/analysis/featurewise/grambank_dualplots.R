@@ -153,8 +153,8 @@ center_plot =   ggplot(data = dual_summary,
 
 if(facet == T){
 center_plot  <- center_plot  +
-#  lemon::facet_rep_wrap(~label,nrow = 2, repeat.tick.labels = T) + 
-    facet_wrap(~label,nrow = 2) + 
+  lemon::facet_rep_wrap(~label,nrow = 2, repeat.tick.labels = T) + 
+#    facet_wrap(~label,nrow = 2) + 
     theme(legend.position = "None",
         strip.background = element_blank())
 }
