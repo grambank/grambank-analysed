@@ -109,15 +109,15 @@ GB_PCA_multiGrid_family <- ggarrange(
 GB_PCA_multiGrid_family <- GB_PCA_multiGrid_family + rremove("x.text")
 GB_PCA_multiGrid_family <- annotate_figure(
     GB_PCA_multiGrid_family,
-    bottom = text_grob("PC1", size = 18, vjust = -0.1),
+    bottom = text_grob("PC1", size = 18, vjust = 0.4),
     left = text_grob("PC2", size = 18, rot = 90, hjust = -1, vjust = 1)
 )
 
 filename <- file.path(OUTPUTDIR, "PCA_multigrid_major_families.tiff")
 filename_png <- file.path(OUTPUTDIR, "PCA_multigrid_major_families.png")
 cat(paste("writing", filename, "\n"))
-ggsave(filename, GB_PCA_multiGrid_family, width = 8, height = 8)
-ggsave(filename_png, GB_PCA_multiGrid_family, width = 8, height = 8)
+ggsave(filename, GB_PCA_multiGrid_family, width = 8, height = 10)
+ggsave(filename_png, GB_PCA_multiGrid_family, width = 8, height = 10)
 
 
 GB_PCA_all_families <- ggplot(GB_PCA_df, aes(x = PC1, y = PC2, color = Family_name), size = 2, alpha = 0.6, na.rm = FALSE)

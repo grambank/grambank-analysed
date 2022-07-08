@@ -1,5 +1,5 @@
 # Analysis of Grambank unusualness
-# Code by D. E. Blasi
+# Code by D E Blasi
 
 #########################################
 ## (1) Setup
@@ -98,6 +98,7 @@ gb<-gb %>%
   add_kernel_probabilities(gb_dists,1) %>%
   add_kernel_probabilities(gb_dists,5) %>%
   add_kernel_probabilities(gb_dists,10) %>%
+  add_kernel_probabilities(gb_dists,15) %>%
   add_kernel_probabilities(gb_dists,20) %>%
   add_kernel_probabilities(gb_dists,30) %>%
   add_kernel_probabilities(gb_dists,40)
@@ -114,17 +115,13 @@ gb<-gb %>%
 # I. they are highly correlated within them and 
 # II. reasonably independent from features in other bundles
 
-# Get gap statistic for each number of clusters
-#test <- factoextra::fviz_nbclust(t(gb[,gb_features]), FUN = hcut, method = "gap_stat")
-
-#test2 <- cluster::clusGap(t(gb[,gb_features]), FUN = hcut, method = "gap_stat", K.max = 30)
-
 # 9 clusters selected as optimal according to this criterion
 n_clusters<-9
 
 # Obtain a hierarchical clustering of the features with that number of clusters
 hier_gb<-hcut(t(gb[,gb_features]), k = n_clusters, stand = TRUE)
-fviz_dend(hier_gb, rect = TRUE)
+
+suppressWarnings(fviz_dend(hier_gb, rect = TRUE))
 
 # Assign cluster number to each GB feature
 hier_classes<-hier_gb$cluster
@@ -189,8 +186,9 @@ unusualness_df<-plyr::ldply(cluster_list,
                        .id="Cluster") %>%
   plyr::ddply("lg",function(x) data.frame(prob_lca=prod(x$prob)))
 
+unusualness_df$Language_ID <-gb$Language_ID
 
-unusualness_df %>% write_tsv(file = paste0(OUTPUTDIR_tables, "unusualness.tsv"))
+unusualness_df %>% write_tsv(file = paste0(OUTPUTDIR_tables, "/unusualness.tsv"))
 
 # Enrich GB data
 gb$prob_lca<-unusualness_df$prob_lca
@@ -201,7 +199,7 @@ gb$prob_lca<-unusualness_df$prob_lca
 
 # Standardize the resulting probabilities and compute surprisals
 gb <- gb %>%
-  pivot_longer(cols=c(prob_ker_1,prob_ker_5,prob_ker_10,prob_ker_20,prob_ker_30,prob_ker_40,prob_lca),names_to = "Estimator",values_to="Probability") %>%
+  pivot_longer(cols=c(prob_ker_1,prob_ker_5,prob_ker_10,prob_ker_15, prob_ker_20,prob_ker_30,prob_ker_40,prob_lca),names_to = "Estimator",values_to="Probability") %>%
   mutate(Surprisal=-log(Probability))
 
 # Re-label for clarity
@@ -210,6 +208,7 @@ gb$Estimator<-fct_recode(gb$Estimator,
                          "Kernel 1"="prob_ker_1",
                          "Kernel 5"="prob_ker_5",
                          "Kernel 10"="prob_ker_10",
+                         "Kernel 15"="prob_ker_15",
                          "Kernel 20"="prob_ker_20",
                          "Kernel 30"="prob_ker_30",
                          "Kernel 40"="prob_ker_40")
