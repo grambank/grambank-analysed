@@ -20,6 +20,9 @@ if(!file.exists(surprisal_fn)){
 }
 gb <- read_tsv(file = surprisal_fn, show_col_types = F) 
 
+gb$Endangerment <- ifelse(gb$aes == "not_endangered", "not_endangered", "endangered")
+gb$Endangerment <- ifelse(is.na(gb$aes), gb$Endangerment, NA)
+
 # Plot the pairwise relations between probabilities
 gb %>%
   dplyr::select(c(Surprisal,Estimator,Language_ID)) %>%
@@ -150,7 +153,7 @@ gb_lca<-gb[gb$Estimator=="Bayesian LCA"&!is.na(gb$aes),]
 
 ## Test
 #plot_df <-  plyr::ddply(gb[gb$Estimator=="Bayesian LCA"&!is.na(gb$aes),],"AUTOTYP_area",function(x) data.frame(E=sum(x$Endangerement=="endangered")/sum(x$Endangerement %in% c("not_endangered","endangered")),
- #                                                                                              U=mean(x$Surprisal),
+#                                                                                               U=mean(x$Surprisal),
   #                                                                                             N=nrow(x))) 
   plot_df <- gb %>%
     dplyr::select(Language_ID, Estimator, aes, AUTOTYP_area, Surprisal) %>% 
