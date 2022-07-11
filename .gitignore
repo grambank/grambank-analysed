@@ -34,3 +34,4 @@ R_grambank/output/GB_wide/*.tsv
 R_grambank/output/PCA*
 R_grambank/output/non_GB_datasets/glottolog-cldf_wide_df.tsv
 R_grambank/output/non_GB_datasets/glottolog_AUTOTYP_areas.tsv
+.Rproj.user
