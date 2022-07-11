@@ -363,10 +363,13 @@ for(feature in five_most_spatial_features){
   #generating plot title  
   plot_title <- GB_id_desc %>% 
     filter(Feature_ID == feature) %>% 
-    dplyr::select(Grambank_ID_desc) %>% 
+    dplyr::select(Name) %>% 
     as.matrix() %>% 
     as.vector() 
-
+  
+  plot_title <- paste0(feature, " ", plot_title) 
+  plot_title <- gsub('(.{1,60})(\\s|$)', '\\1\n', plot_title)
+  
   #filename
   filename <- paste(OUTPUTDIR, "/most_signal_spatial_",index, "_" , feature, ".png", sep = "")
 
