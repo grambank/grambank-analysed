@@ -103,6 +103,19 @@ Parameter_desc_binary <- tibble(
     "GB203a UQOrder_UQ-N",
     "GB203b UQOrder_N-UQ"
 ),
+Name = c("Is the order of the numeral and noun Num-N?", 
+        "Is the order of the numeral and noun N-Num?",
+        "Is the order of the adnominal demonstrative and noun Dem-N?",
+        "Is the order of the adnominal demonstrative and noun N-Dem?",
+        "Is the pragmatically unmarked order of adnominal possessor noun and possessed noun PSR-PSD?",
+        "Is the pragmatically unmarked order of adnominal possessor noun and possessed noun PSD-PSR?",
+        "Is the pragmatically unmarked order of S and V in intransitive clauses S-V?",
+        "Is the pragmatically unmarked order of S and V in intransitive clauses V-S?",
+        "Is the order of the adnominal property word (ANM) and noun ANM-N?",
+        "Is the order of the adnominal property word (ANM) and noun N-ANM?",
+        "Is the order of the adnominal collective universal quantifier (UQ) and noun UQ-N?",
+        "Is the order of the adnominal collective universal quantifier (UQ) and noun N-QU?" ),
+
 `OV vs VO types (excl affixes)`= c(
 "OV",
   "VO",
@@ -115,8 +128,7 @@ Parameter_desc_binary <- tibble(
   "OV",
   "VO",
   "OV",
-  "VO"
-),
+  "VO"),
 `OV VO score for counting`= c(
   0,
   1,
@@ -131,9 +143,9 @@ Parameter_desc_binary <- tibble(
   0,
   1
 ), 
-Binary_Multistate = c("binarised","binarised","binarised","binarised","binarised","binarised","binarised","binarised","binarised","binarised","binarised","binarised")
-) %>% full_join(parameters_multi, by = c("ID", "Grambank_ID_desc"))
-
+Binary_Multistate = c("binarised","binarised","binarised","binarised","binarised","binarised","binarised","binarised","binarised","binarised","binarised","binarised")) %>% 
+  
+  full_join(parameters_multi, by = c("ID", "Grambank_ID_desc"))
 
 Parameter_desc_binary %>% 
   mutate(Binary_Multistate= ifelse(ID %in% multistate_features, "Multi", Binary_Multistate)) %>% 
