@@ -20,7 +20,7 @@ if(!file.exists(surprisal_fn)){
   source("unusualness/analysis/get_unusualness_bayesLCA.R")
 }
 gb <- read_tsv(file = surprisal_fn, show_col_types = F) %>% 
-  dplyr::select(Language_ID, Surprisal,Estimator,Language_ID, Probability, aes, AUTOTYP_area, Macroarea, Family_ID) %>% 
+  dplyr::select(Language_ID, Surprisal,Estimator,Language_ID, Probability, Name, aes, AUTOTYP_area, Macroarea, Family_ID) %>% 
 mutate(Endangerment = ifelse(aes == "not_endangered", "not_endangered", "endangered")) %>% 
 mutate(Endangerment = ifelse(is.na(aes), NA, Endangerment)) 
 
@@ -209,13 +209,13 @@ gb %>%
   coord_flip()
 
 # Plot z-unusualness
-unusualness_ext %>%
-  mutate(Endagerement=fct_reorder(aes,surprisal_z)) %>%
-  ggplot(aes(y=surprisal_z,x=Endagerement))+
-  geom_boxplot()+
-  labs(x="Surprisal of Grambank language",y="Density")+
-  theme_minimal()+
-  scale_fill_manual(values = c("deepskyblue","tomato"))+
-  theme(legend.position="none")+
-  coord_flip()
+#unusualness_ext %>%
+#  mutate(Endagerement=fct_reorder(aes,surprisal_z)) %>%
+#  ggplot(aes(y=surprisal_z,x=Endagerement))+
+#  geom_boxplot()+
+#  labs(x="Surprisal of Grambank language",y="Density")+
+#  theme_minimal()+
+#  scale_fill_manual(values = c("deepskyblue","tomato"))+
+#  theme(legend.position="none")+
+#  coord_flip()
 
