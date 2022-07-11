@@ -14,14 +14,15 @@ if (!dir.exists(OUTPUTDIR_plots)) { dir.create(OUTPUTDIR_plots) }
 # Load pkgs
 source("requirements.R")
 
+#reading in data
 surprisal_fn <- paste0(OUTPUTDIR_tables, "/surprisal.tsv")
 if(!file.exists(surprisal_fn)){
   source("unusualness/analysis/get_unusualness_bayesLCA.R")
 }
-gb <- read_tsv(file = surprisal_fn, show_col_types = F) 
-
-gb$Endangerment <- ifelse(gb$aes == "not_endangered", "not_endangered", "endangered")
-gb$Endangerment <- ifelse(is.na(gb$aes), gb$Endangerment, NA)
+gb <- read_tsv(file = surprisal_fn, show_col_types = F) %>% 
+  dplyr::select(Language_ID, Surprisal,Estimator,Language_ID, Probability, aes, AUTOTYP_area, Macroarea, Family_ID) %>% 
+mutate(Endangerment = ifelse(aes == "not_endangered", "not_endangered", "endangered")) %>% 
+mutate(Endangerment = ifelse(is.na(aes), NA, Endangerment)) 
 
 # Plot the pairwise relations between probabilities
 gb %>%
@@ -155,26 +156,29 @@ gb_lca<-gb[gb$Estimator=="Bayesian LCA"&!is.na(gb$aes),]
 #plot_df <-  plyr::ddply(gb[gb$Estimator=="Bayesian LCA"&!is.na(gb$aes),],"AUTOTYP_area",function(x) data.frame(E=sum(x$Endangerement=="endangered")/sum(x$Endangerement %in% c("not_endangered","endangered")),
 #                                                                                               U=mean(x$Surprisal),
   #                                                                                             N=nrow(x))) 
-  plot_df <- gb %>%
-    dplyr::select(Language_ID, Estimator, aes, AUTOTYP_area, Surprisal) %>% 
-  filter(Estimator == "Bayesian LCA") %>% 
-  filter(!is.na(aes)) %>% 
-  mutate(Endangerment=ifelse(aes=="not_endangered",0,1)) %>% 
-  group_by(AUTOTYP_area) %>% 
+
+plot_df <- gb %>%
+  filter(Estimator == "Kernel 15") %>% 
+  filter(!is.na(Endangerment)) %>%
+  mutate(Endangerment = ifelse(Endangerment == "endangered", 1, Endangerment)) %>% 
+  mutate(Endangerment = ifelse(Endangerment == "not_endangered", 0, Endangerment)) %>% 
+  mutate(Endangerment = as.numeric(Endangerment)) %>% 
+       group_by(AUTOTYP_area) %>% 
   summarise(x = mean(Surprisal), 
             N = mean(Endangerment), 
             n_lgs = n()) 
   
-  plot_df %>%
+  plot_df %>% 
   ggplot(aes(y=N, x=x,label=AUTOTYP_area, size = n_lgs))+
-  annotate("rect",ymin = 0.7,ymax = max(plot_df$N) + 0.1,xmin=60,xmax=max(plot_df$x)+2,fill="tomato",alpha=0.1)+
+  annotate("rect",ymin = mean(plot_df$N),ymax = max(plot_df$N) + 0.1, xmin=mean(plot_df$x),xmax=max(plot_df$x) + 0.1,fill="tomato",alpha=0.1)+
   geom_point(alpha = 0.6) +
   geom_label_repel(size=6, box.padding = 0.3, fill = "white",  
                    min.segment.length	= 0.1)+
   theme_classic(base_size = 13)+
-  theme(legend.position = "none", 
-        axis.title = element_text(size = 18))+
-  labs(x="Mean unexpectedness in region",y="Proportion of threatened/moribund/near extinct lgs in region")
+  theme(legend.position = "none",
+        axis.text = element_text(size = 16),
+        axis.title = element_text(size = 18)) +
+  labs(x="Mean unusualness in region",y="Proportion of endangered lgs in region")
 
 ggsave(file.path(OUTPUTDIR_plots,"endangerment_and_area.png"), width = 10, height = 10)
 
