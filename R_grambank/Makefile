@@ -142,6 +142,9 @@ predict_unusualness:
 test:
 	Rscript -e 'testthat::test_dir("./tests", reporter="summary")'
 
+make_author_list:
+	python3 wrangle_author_list.py author_list.csv > author_list.html
+
 ## Display help
 help:
 	@echo "$$(tput bold)Available commands:$$(tput sgr0)"
