@@ -1,3 +1,27 @@
+#output directories
+*output*
+*output/GB_wide/*.tsv
+*output/spatiophylogenetic_modelling/*
+*output/PCA*
+*.log*
+*.qs*
+*.txt*
+*.RDS*
+
+
+#supplementary tables that should be pushed
+!*/
+!R_grambank/output/spatiophylogenetic_modelling/featurewise/dual_summary_effects.tsv
+
+#images
+**/*.png
+**/*.tiff
+*.jpg*
+*Rplots.pdf
+
+#EDGE tree
+R_grambank/spatiophylogenetic_modelling/phylogenies/EDGE6635-merged-relabelled.tree
+
 #aux files
 .DS_Store
 *Rproj*
@@ -5,17 +29,8 @@
 *Rhistory*
 *.Rproj.user
 
-#output directories
-*output*
-*.log*
-
-#supplementary tables that should be pushed
-!R_grambank/output/spatiophylogenetic_modelling/featurewise/dual_summary_effects.tsv
-
-#images
-**/*.png
-**/*.tiff
-*Rplots.pdf
-
-#EDGE tree
-R_grambank/spatiophylogenetic_modelling/phylogenies/EDGE6635-merged-relabelled.tree
+#specific to ignore
+R_grambank/output/GB_wide/*.tsv
+R_grambank/output/PCA*
+R_grambank/output/non_GB_datasets/glottolog-cldf_wide_df.tsv
+R_grambank/output/non_GB_datasets/glottolog_AUTOTYP_areas.tsv
