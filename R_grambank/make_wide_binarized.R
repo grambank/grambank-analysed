@@ -145,7 +145,7 @@ Name = c("Is the order of the numeral and noun Num-N?",
 ), 
 Binary_Multistate = c("binarised","binarised","binarised","binarised","binarised","binarised","binarised","binarised","binarised","binarised","binarised","binarised")) %>% 
   
-  full_join(parameters_multi, by = c("ID", "Grambank_ID_desc"))
+  full_join(parameters_multi, by = c("ID", "Grambank_ID_desc", "Name"))
 
 Parameter_desc_binary %>% 
   mutate(Binary_Multistate= ifelse(ID %in% multistate_features, "Multi", Binary_Multistate)) %>% 
