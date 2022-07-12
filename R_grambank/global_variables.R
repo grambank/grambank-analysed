@@ -40,16 +40,6 @@ LANGUAGES_COLSPEC = c(
   lineage = col_character()
 )
 
-PARAMETERS_COLSPEC = c(
-  ID = col_character(),
-  Name = col_character(),
-  Description = col_character(),
-  patron = col_character(),
-  name_in_french = col_character(),
-  Grambank_ID_desc = col_character(),
-  bound_morphology = col_character()
-)
-
 CODES_COLSPEC = c(
   ID = col_character(),
   Parameter_ID = col_character(),

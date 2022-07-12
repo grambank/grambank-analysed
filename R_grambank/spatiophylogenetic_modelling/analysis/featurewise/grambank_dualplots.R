@@ -210,5 +210,5 @@ parameters_binary <- data.table::fread(file.path("output", "GB_wide", "parameter
 
 feature_groupings %>% 
   full_join(parameters_binary, by = "Feature_ID") %>% 
-  dplyr::select(Feature_ID, boundness, Flexivity, "Gender/noun class","locus of marking", "word order", "informativity", Main_domain, Nichols_1995_label, Nichols_1995_prediction) %>% 
+  dplyr::select(Feature_ID, Fusion = boundness, Flexivity, "Gender/noun class","locus of marking", "word order", "informativity", Main_domain, Nichols_1995_label, Nichols_1995_prediction) %>% 
 write_tsv(file ="output/GB_wide/table_theo_scores_supp.tsv", na = "")

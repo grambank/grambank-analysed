@@ -4,32 +4,34 @@ source("requirements.R")
 
 cat("Creating plots comparing the loadings of components to theoretical scores.\n")
 
-GB_morph_counts <- read_tsv(file.path("output", "Bound_morph", "Bound_morph_score.tsv"), col_types = cols()) %>% 
-  dplyr::select(Language_ID, "Boundness" = mean_morph)
+
+
+GB_morph_counts <- read_tsv(file = "output/fusion_score/fusion_score.tsv") %>% 
+  dplyr::select(Language_ID, "Fusion" = mean_morph)
 
 #comparison to PC1
 PCA_df <- read_tsv(file.path("output", "PCA", 'PCA_language_values.tsv'), col_types = cols()) %>% 
   dplyr::select(Language_ID, PC1, PC2, PC3)
 
 df_morph_count_PCA <- GB_morph_counts %>% 
-  dplyr::select(Language_ID, "Boundness") %>% 
+  dplyr::select(Language_ID, "Fusion") %>% 
   full_join(PCA_df, by = "Language_ID")
 
 df_morph_count_PCA__plot <- df_morph_count_PCA %>% 
-  ggplot(aes(Boundness, PC1)) +
+  ggplot(aes(Fusion, PC1)) +
   geom_point(color = "turquoise3") +
   ggpubr::stat_cor(method = "pearson", p.digits = 2, geom = "label", color = "blue",
                    label.y.npc="top", label.x.npc = "left", alpha = 0.8) +
   geom_smooth(method='lm', formula = 'y ~ x') +
   theme_classic() +
   labs(title="",		
-       x ="Boundness score", y = "PC1")
+       x ="Fusion score", y = "PC1")
 
-tiff(file.path("output", "PCA", "PC1_bound_morph_cor_plot.tiff"), width = 5, height = 4,  units = "in", res = 300)
+tiff(file.path("output", "PCA", "PC1_fusion__morph_cor_plot.tiff"), width = 5, height = 4,  units = "in", res = 300)
 plot(df_morph_count_PCA__plot)
 x <- dev.off()
 
-png(file.path("output", "PCA", "PC1_bound_morph_cor_plot.png"), width = 5, height = 4,  units = "in", res = 300 )
+png(file.path("output", "PCA", "PC1_fusion__morph_cor_plot.png"), width = 5, height = 4,  units = "in", res = 300 )
 plot(df_morph_count_PCA__plot)
 x <- dev.off()
 

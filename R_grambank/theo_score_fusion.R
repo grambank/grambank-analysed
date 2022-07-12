@@ -2,7 +2,7 @@ source("requirements.R")
 
 #script written by Hedvig Skirgård
 
-OUTPUTDIR <- file.path('.', "output", "Bound_morph")		
+OUTPUTDIR <- file.path('.', "output", "fusion_score")		
 # create output dir if it does not exist.		
 if (!dir.exists(OUTPUTDIR)) { dir.create(OUTPUTDIR) }		
 
@@ -12,40 +12,40 @@ Language_meta_data <-read_csv(GRAMBANK_LANGUAGES, col_types=LANGUAGES_COLSPEC) %
   dplyr::select(Language_ID = Language_level_ID, Family_name, Name, Longitude, Latitude, Macroarea) %>% 
   distinct(Language_ID, .keep_all = T)
 
-#read in sheet with scores for whether a feature denotes boundness
-GB_bound_points <- data.table::fread(GRAMBANK_PARAMETERS,
+#read in sheet with scores for whether a feature denotes fusion
+GB_fusion_points <- data.table::fread(GRAMBANK_PARAMETERS,
                                                       encoding = 'UTF-8', 
                                                       quote = "\"", header = TRUE, 
                                                       sep = ",") %>% 
-  dplyr::select(Parameter_ID = ID, boundness,informativity) %>% 		
-  mutate(boundness = as.numeric(boundness)) 
+  dplyr::select(Parameter_ID = ID, Fusion = boundness,informativity) %>% 		
+  mutate(Fusion = as.numeric(Fusion)) 
 
 #remove features for which there is only a feature for the free or bound kind of marking, only keep those where there is one for each type of marking
 
-GB_bound_points_only_with_alternatives <- GB_bound_points %>% 
-  filter(!is.na(boundness))	%>% 
+GB_fusion_points_only_with_alternatives <- GB_fusion_points %>% 
+  filter(!is.na(Fusion))	%>% 
   filter(!is.na(informativity))	%>% 
   group_by(informativity) %>% 
 dplyr::summarise(count_informativity_categories = n()) %>% 
   filter(count_informativity_categories > 1) %>% 
-  inner_join(GB_bound_points,  by = "informativity") %>% 
-  dplyr::select(Parameter_ID, boundness)
+  inner_join(GB_fusion_points,  by = "informativity") %>% 
+  dplyr::select(Parameter_ID, Fusion)
 
 df_morph_count <- GB_wide %>%
   filter(na_prop <= 0.25 ) %>% #exclude languages with more than 25% missing data
   dplyr::select(-na_prop) %>% 
   reshape2::melt(id.vars = "Language_ID") %>% 
   dplyr::rename(Parameter_ID = variable) %>% 
-  inner_join(GB_bound_points_only_with_alternatives, by = "Parameter_ID") %>% 
-  filter(!is.na(boundness)) %>% 
+  inner_join(GB_fusion_points_only_with_alternatives, by = "Parameter_ID") %>% 
+  filter(!is.na(Fusion)) %>% 
   filter(!is.na(value)) %>% 
-  mutate(value_weighted = if_else(boundness == 0.5 & value == 1, 0.5, value )) %>% #replacing all instances of 1 for a feature that is weighted to 0.5 bound morph points to 0.5
-  mutate(value_weighted = if_else(boundness == 0, abs(value-1), value_weighted)) %>% # reversing the values of the features that refer to free-standing markers 
+  mutate(value_weighted = if_else(Fusion == 0.5 & value == 1, 0.5, value )) %>% #replacing all instances of 1 for a feature that is weighted to 0.5 bound morph points to 0.5
+  mutate(value_weighted = if_else(Fusion == 0, abs(value-1), value_weighted)) %>% # reversing the values of the features that refer to free-standing markers 
   group_by(Language_ID) %>% 
   dplyr::summarise(mean_morph = mean(value_weighted))
 
 df_morph_count  %>% 		
-  write_tsv(file.path(OUTPUTDIR, "bound_morph_score.tsv"))		
+  write_tsv(file.path(OUTPUTDIR, "fusion_score.tsv"))		
 
 GB_wide_morph_counts_summary <- df_morph_count %>% 		
   transform(bin = cut(mean_morph, 20)) %>% #grouping the mean scores into 20 bins		
@@ -71,7 +71,7 @@ GB_morph_counts_plot <- GB_wide_morph_counts_summary %>%
         axis.text.y = element_text(angle = 0, hjust = 1, vjust = 0.3, size = 16), 		
         legend.position = "None") +		
   labs(title="",		
-       x ="Boundness scores", y = "Number of languages") + 		
+       x ="Fusion scores", y = "Number of languages") + 		
   scale_fill_viridis(discrete = T)  		
 plot(GB_morph_counts_plot)
 
