@@ -1,12 +1,12 @@
 ## This script visualises the output from a dual-process model for each Grambank feature
 source('requirements.R')
 
-OUTPUTDIR <- "output/spatiophylogenetic_modelling/spec_feature_plots"
+OUTPUTDIR <- "output/spatiophylogenetic_modelling/spec_feature_plots/"
 if(!dir.exists(OUTPUTDIR)){
   dir.create(OUTPUTDIR)
 }
 
-beep = 1
+beep = 0
 
 #description of featurs
 GB_id_desc <- readr::read_tsv("output/GB_wide/parameters_binary.tsv", show_col_types = F) %>% 
@@ -97,7 +97,7 @@ tree = read.tree(tree_fn)
 #double check that subset to lgs in GB cropped dataset
 tree <- ape::keep.tip(tree, lgs_in_analysis$Language_ID)
 
-glottolog_df <- read_tsv("output/non_GB_datasets/glottolog-cldf_wide_df.tsv") %>% 
+glottolog_df <- read_tsv("output/non_GB_datasets/glottolog-cldf_wide_df.tsv", show_col_types = F) %>% 
   mutate(Family_ID = ifelse(is.na(Family_ID), "Isolate", Family_ID))
 
 #reading in GB
@@ -145,28 +145,32 @@ for(feature in c(three_most_phylo_features)) {
   #generating plot title  
   plot_title <- GB_id_desc %>% 
     filter(Feature_ID == feature) %>% 
-    dplyr::select(Grambank_ID_desc) %>% 
+    dplyr::select(Name) %>% 
     as.matrix() %>% 
     as.vector() 
   
-  filename <- paste(OUTPUTDIR, "/most_signal_phylo_",index, "_" , str_replace(plot_title, " ", "_"), ".tiff", sep = "")
-  filename_png <- paste(OUTPUTDIR, "/most_signal_phylo_",index, "_" , str_replace(plot_title, " ", "_"), ".png", sep = "")
+  plot_title <- paste0(feature, " ", plot_title) 
+  plot_title <- gsub('(.{1,60})(\\s|$)', '\\1\n', plot_title)
+
+  filename <- paste(OUTPUTDIR, "/most_signal_phylo_",index, "_" , feature, ".tiff", sep = "")
+  filename_png <- paste(OUTPUTDIR, "/most_signal_phylo_",index, "_" , feature, ".png", sep = "")
   
 #running the contrasting algorithm reconstruction. Note: for the analysis we are using the tree with the original branch lengths even if we're visualizing using the imputed branch lengths.
   asr_most_signal<- ape::ace(x = x, phy = tree_feature, method = "ML", type = "discrete", model = "ARD")
 
   asr_most_signal %>% 
-    qs::qsave(paste0("output/spatiophylogenetic_modelling/effect_plots/most_signal_",index , "_" , str_replace(plot_title, " ", "_"), ".qs"))
+    qs::qsave(paste0(OUTPUTDIR, "asr_object_",index , "_" , feature, ".qs"))
     
   tiff(file = filename, width = 15.27, height = 15.69, units = "in", res = 400)
   
+  par(mar = c(1,6,1,1))
   plot.phylo(ladderize(tree_feature  , right = F), 
              col="grey", 
              tip.color = feature_df$tip.color[match(tree_feature$tip.label,
                                                     feature_df$Language_ID)], 
              type = "fan", 
              cex = 0.25,
-             label.offset = 0.02, main = plot_title, cex.main = 3)
+             label.offset = 0.02, main = plot_title, cex.main = 2)
   
   lastPP<-get("last_plot.phylo",env=.PlotPhyloEnv)
   ss<-unique(x) %>% sort(decreasing = T)
@@ -193,7 +197,7 @@ ln.offset = ln.offset , lab.offset = lab.offset,fsize=fsize,orientation="curved"
                   , mark.node=FALSE,
                   ln.offset= ln.offset,lab.offset = lab.offset,fsize = fsize,orientation="curved", cex = cex)
   
-  arc.cladelabels(text="Nucelar Trans New Guinea",node =   getMRCA(tree_feature, tip = c("gira1247", "domm1246"))
+  arc.cladelabels(text="Nuclear Trans New Guinea",node =   getMRCA(tree_feature, tip = c("gira1247", "domm1246"))
                   , mark.node=FALSE,
                   ln.offset= ln.offset,lab.offset = lab.offset,fsize = fsize,orientation="curved", cex = cex)
   
@@ -232,7 +236,7 @@ ln.offset = ln.offset , lab.offset = lab.offset,fsize=fsize,orientation="curved"
                                                     feature_df$Language_ID)], 
              type = "fan", 
              cex = 0.25,
-             label.offset = 0.02, main = plot_title, cex.main = 3)
+             label.offset = 0.02, main = plot_title, cex.main = 2)
   
   lastPP<-get("last_plot.phylo",env=.PlotPhyloEnv)
   ss<-unique(x) %>% sort(decreasing = T)
@@ -259,7 +263,7 @@ ln.offset = ln.offset , lab.offset = lab.offset,fsize=fsize,orientation="curved"
                   , mark.node=FALSE,
                   ln.offset= ln.offset,lab.offset = lab.offset,fsize = fsize,orientation="curved", cex = cex)
   
-  arc.cladelabels(text="Nucelar Trans New Guinea",node =   getMRCA(tree_feature, tip = c("gira1247", "domm1246"))
+  arc.cladelabels(text="Nuclear Trans New Guinea",node =   getMRCA(tree_feature, tip = c("gira1247", "domm1246"))
                   , mark.node=FALSE,
                   ln.offset= ln.offset,lab.offset = lab.offset,fsize = fsize,orientation="curved", cex = cex)
   
@@ -359,12 +363,15 @@ for(feature in five_most_spatial_features){
   #generating plot title  
   plot_title <- GB_id_desc %>% 
     filter(Feature_ID == feature) %>% 
-    dplyr::select(Grambank_ID_desc) %>% 
+    dplyr::select(Name) %>% 
     as.matrix() %>% 
     as.vector() 
   
+  plot_title <- paste0(feature, " ", plot_title) 
+  plot_title <- gsub('(.{1,60})(\\s|$)', '\\1\n', plot_title)
+  
   #filename
-  filename <- paste(OUTPUTDIR, "/most_signal_spatial_",index, "_" , str_replace(plot_title, " ", "_"), ".png", sep = "")
+  filename <- paste(OUTPUTDIR, "/most_signal_spatial_",index, "_" , feature, ".png", sep = "")
 
   feature_df <-df_for_maps %>% 
     filter(!is.na("Longitude")) %>% 

@@ -1,27 +1,40 @@
-#aux files
-.DS_Store
-R_grambank/.Rhistory
-*Rproj*
-*rdata*
-*Rhistory*
-.Rproj.user
-
 #output directories
 *output*
-.*spatiophylogenetic_modelling.*results.*
-*GB_wide*
-*non_GB_datasets*
-*coverage_plots*
-*R_grambank/MDS*
-*R_grambank/PCA*
-*R_grambank/UMAP*
-R_grambank/impute_missing_values.log
+*output/GB_wide/*.tsv
+*output/spatiophylogenetic_modelling/*
+*output/PCA*
+*.log*
+*.qs*
+*.txt*
+*.RDS*
+
+
+#supplementary tables that should be pushed
+!*/
+!R_grambank/output/spatiophylogenetic_modelling/featurewise/dual_summary_effects.tsv
 
 #images
 **/*.png
 **/*.tiff
+*.jpg*
 *Rplots.pdf
+
+#EDGE tree full raw mcct
 R_grambank/spatiophylogenetic_modelling/phylogenies/EDGE6635-merged-relabelled.tree
+
+#aux files
+.DS_Store
+*Rproj*
+*rdata*
+*Rhistory*
+*.Rproj.user
+
+#specific to ignore
+R_grambank/output/GB_wide/*.tsv
+R_grambank/output/PCA*
+R_grambank/output/non_GB_datasets/glottolog-cldf_wide_df.tsv
+R_grambank/output/non_GB_datasets/glottolog_AUTOTYP_areas.tsv
+.Rproj.user
 R_grambank/output/spatiophylogenetic_modelling/processed_data/jaeger_removed.csv
 R_grambank/output/spatiophylogenetic_modelling/featurewise/results_debug/*
 R_grambank/output/spatiophylogenetic_modelling/*mat.tsv
@@ -32,5 +45,4 @@ R_grambank/output/spatiophylogenetic_modelling/spatial_prec_mat.tsv
 R_grambank/output/spatiophylogenetic_modelling/featurewise/results/phylo_only/I
 *_log.txt
 R_grambank/output/spatiophylogenetic_modelling/*
-R_grambank/output
 R_grambank/wrangle_authors/author_list.html

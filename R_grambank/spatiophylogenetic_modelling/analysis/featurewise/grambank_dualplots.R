@@ -13,11 +13,15 @@ if(!dir.exists("output/spatiophylogenetic_modelling/effect_plots")){
 ## Feature Metadata
 feature_groupings <- read_csv("feature_grouping_for_analysis.csv", show_col_types = F)
 
+## Identify results by spatial decay
+# filename_suffix = "_kappa_2.5_sigma_3..qs"
+# filename_suffix = "_kappa_2_sigma_2.RD.qs"
+filename_suffix = "_kappa_2_sigma_1.15.qs"
+
 ## Read in model posteriors
 model_output_files = list.files(path = "output/spatiophylogenetic_modelling/featurewise/",
-                                pattern = "*.qs",
+                                pattern = filename_suffix,
                                 full.names = TRUE)
-model_output_files <- model_output_files[!str_detect(model_output_files, "kapp")]
 
 model_output = lapply(model_output_files, qread)
 names(model_output) = basename(model_output_files) %>%
@@ -25,7 +29,7 @@ names(model_output) = basename(model_output_files) %>%
 
 ## Extract the posterior distrubtions for each dual_process model from the hypersample
 dual_posterior = lapply(model_output, function(m) {
-  dd = m[[4]]$hyper_sample
+  dd = m[[1]]$hyper_sample
   binomial_error = pi^2 / 3
   # Calculate h^2
   posterior = (1 / dd) / (rowSums(1 / dd) + 1 + binomial_error)
@@ -40,6 +44,8 @@ colnames(dual_posterior) = c(
   "spatial",
   "phylogenetic"
 )
+
+dual_posterior$Feature_ID = str_extract(dual_posterior$Feature_ID, "GB[0-9]{3}")
 
 # join feature metadata to posterior
 dual_posterior = left_join(dual_posterior, feature_groupings, by ="Feature_ID")
@@ -104,8 +110,6 @@ ellipses <- dual_summary %>%
   mutate(x = ifelse(x > 1, 1, x),
          y = ifelse(y > 1, 1, y)) %>%
   ungroup()
-
-#h_load("lemon")
 
 plot_function <- function(label = c("letter_plot_label", "domain", "Nichols_1995_prediction"), facet, fn = spatiophylogenetic_figure_panels_ellipses){
   #label <- "letter_plot_label"
@@ -181,11 +185,20 @@ ggsave(plot = center_plot,
 
 }
 
-plot_function(label = "letter_plot_label", facet = T, fn = "spatiophylogenetic_figure_panels_ellipses")
+plot_function(label = "letter_plot_label", 
+              facet = T, 
+              fn = paste0("spatiophylogenetic_figure_panels_ellipses_", filename_suffix)
+)
 
-plot_function(label = "domain", facet = T, fn = "spatiophylogenetic_figure_panels_ellipses_domain")
+plot_function(label = "domain", 
+              facet = T, 
+              fn = paste0("spatiophylogenetic_figure_panels_ellipses_domain_", filename_suffix)
+)
 
-plot_function(label = "Nichols_1995_prediction", facet = F, fn = "spatiophylogenetic_figure_panels_ellipses_nichols_prediction")
+plot_function(label = "Nichols_1995_prediction", 
+              facet = F, 
+              fn = paste0("spatiophylogenetic_figure_panels_ellipses_nichols_prediction_", filename_suffix)
+)
 
 #tables for supplementary
 
@@ -197,5 +210,5 @@ parameters_binary <- data.table::fread(file.path("output", "GB_wide", "parameter
 
 feature_groupings %>% 
   full_join(parameters_binary, by = "Feature_ID") %>% 
-  dplyr::select(Feature_ID, boundness, Flexivity, "Gender/noun class","locus of marking", "word order", "informativity", Main_domain, Nichols_1995_label, Nichols_1995_prediction) %>% 
+  dplyr::select(Feature_ID, Fusion = boundness, Flexivity, "Gender/noun class","locus of marking", "word order", "informativity", Main_domain, Nichols_1995_label, Nichols_1995_prediction) %>% 
 write_tsv(file ="output/GB_wide/table_theo_scores_supp.tsv", na = "")

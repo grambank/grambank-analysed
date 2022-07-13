@@ -34,11 +34,11 @@ languages <- read_csv(GRAMBANK_LANGUAGES, col_types=LANGUAGES_COLSPEC) %>%
                 Longitude, 
                 Latitude, 
                 Macroarea) %>% 
+  filter(!is.na(Latitude)) %>% 
   distinct(Language_ID, .keep_all = T) 
 
 suppressWarnings(rownames(languages) <- languages$Language_ID)
 
-phylogeny = read.tree("output/spatiophylogenetic_modelling/processed_data/EDGE_pruned_tree.tree")
 
 # jitter points that are at exactly the same coordinates
 duplicate_coords = languages[
@@ -57,13 +57,7 @@ languages$Longitude[duplicate_rowid] =
   jitter(languages$Longitude[duplicate_rowid], 
          factor = 2)
 
-# reorder to match phylogeny
-languages = languages[match(phylogeny$tip.label, languages$Language_ID),]
-
 #### Distance matrices ####
-
-## Phylogenetic distance based on branch lengths
-phylo_dist = vcv.phylo(phylogeny)
 
 ## Spatial distance based on Haversine distances
 euclidean_dist = distm(languages[,c("Longitude", "Latitude")],
@@ -73,7 +67,8 @@ dimnames(euclidean_dist) = list(languages$Language_ID, languages$Language_ID)
 
 #### Make spatial matrix #####
 parameters = data.frame(kappa = kappa_vec,
-                        sigma =  sigma_vec)
+                        sigma =  sapply(sigma_vec, "[[", 2)
+)
 
 # Make the spatial covariance matrices from the set of parameters in parameters
 spatial_parameters = map2(parameters$kappa, 
@@ -154,7 +149,7 @@ plot(x = plot_df$distance,
      xlab = "Haversine Distance (km)",
      ylim = c(0, 1),
      xlim = c(0, 10000)) # focus on 10,000 km
-for(i in 2:6){
+for(i in 2:4){
   lines(x = plot_df$distance, 
         y = plot_df[,i], col = cols[i-1], lwd = 2)
 }
@@ -163,14 +158,13 @@ text(x = dist_pairs$distances,
      y = 0.1 + c(0, 0.1, 0.2, 0.3, 0.4),
      labels = paste0(ceiling(dist_pairs$distances), " km"), 
      srt = 0, 
-     cex = 1.8,pos = 4)
+     cex = 1.8, pos = 1)
 
 # Make legend
 legend_text = c("1 - Haversine",
                 paste0("Spatial: k = ", parameters[1,1],"; s = ", parameters[1,2]),
                 paste0("Spatial: k = ", parameters[2,1],"; s = ", parameters[2,2]),
-                paste0("Spatial: k = ", parameters[3,1],"; s = ", parameters[3,2]),
-                paste0("Spatial: k = ", parameters[4,1],"; s = ", parameters[4,2]))
+                paste0("Spatial: k = ", parameters[3,1],"; s = ", parameters[3,2]))
 
 leg_cols = c("black", cols)
 legend(5500, 1.0, 

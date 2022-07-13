@@ -100,8 +100,8 @@ output/PCA/PCA_macroarea.png:
 ## Comparing PCA to theoretical scores
 theoretical:
 	@echo "# Comparing PCA to theoretical scores. #"
-	Rscript bound_morph.R
-	Rscript compare_PCA_loadings_to_theory_scores.R
+	Rscript theo_scores_fusion.R
+	Rscript theo_scores_compare_PCA_loadings.R
 
 #step 3
 ## Unusualness language analysis and generate plots.
