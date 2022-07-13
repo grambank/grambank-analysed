@@ -143,7 +143,7 @@ test:
 	Rscript -e 'testthat::test_dir("./tests", reporter="summary")'
 
 make_author_list:
-	python3 wrangle_author_list.py author_list.csv > author_list.html
+	python3 wrangle_authors/wrangle_author_list.py wrangle_authors/author_list.csv > wrangle_authors/author_list.html
 
 ## Display help
 help:
