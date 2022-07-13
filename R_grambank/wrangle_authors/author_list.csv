@@ -1,7 +1,7 @@
 index,first name,family name prefix,last name part 2,last name,First affiliation,Second affiliation,Third affiliation,fourth affiliation,fifth affiliation,affiliation index,Author notes description,id
 1,Hedvig,,Skirgård,Skirgård,"Department of Linguistic and Cultural Evolution, Max Planck Institute for Evolutionary Anthropology; Leipzig, Germany.","ARC Centre of Excellence for the Dynamics of Language, College of Asia and the Pacific, Australian National University; Canberra, Australia.","Department of Linguistics, School of Culture, History and Language, College of Asia and the Pacific, Australian National University; Canberra, Australia.","Department of Language and Cognition, Max Planck Institute for Psycholinguistics; Nijmegen, the Netherlands",,"1, 2, 3, 4",Corresponding author; Equal first authors,HS
-2,Hannah J.,,Haynie,Haynie,"Department of Linguistics, University of Colorado Boulder; Boulder, USA.",,,,,,Equal first authors,HJH
-3,Damián E.,,Blasi,Blasi,"Department of Human Evolutionary Biology, Harvard University; Cambridge, USA.","Department of Linguistic and Cultural Evolution, Max Planck Institute for Evolutionary Anthropology; Leipzig, Germany.","Linguistic Convergence Laboratory, School of Linguistics, Faculty of Humanities, Higher School of Economics University; Moscow, Russia","Human Relation Area Files, Yale University; New Haven, USA.",,,Equal first authors,DB
+2,Hannah J.,,Haynie,Haynie,"Department of Linguistics, University of Colorado Boulder; Boulder, The United States of America.",,,,,,Equal first authors,HJH
+3,Damián E.,,Blasi,Blasi,"Department of Human Evolutionary Biology, Harvard University; Cambridge, The United States of America.","Department of Linguistic and Cultural Evolution, Max Planck Institute for Evolutionary Anthropology; Leipzig, Germany.","Linguistic Convergence Laboratory, School of Linguistics, Faculty of Humanities, Higher School of Economics University; Moscow, Russia","Human Relation Area Files, Yale University; New Haven, The United States of America.",,,Equal first authors,DB
 4,Harald,,Hammarström,Hammarström,"Department of Linguistics and Philology, Uppsala University; Uppsala, Sweden.","Department of Language and Cognition, Max Planck Institute for Psycholinguistics; Nijmegen, the Netherlands",,,,,Equal first authors,HH
 5,Jeremy,,Collins,Collins,"Department of Linguistics, Faculty of Arts, Radboud University; Nijmegen, The Netherlands.","Department of Language and Cognition, Max Planck Institute for Psycholinguistics; Nijmegen, the Netherlands",,,,,,JC
 6,Jay J.,,Latarche,Latarche,"Department of Linguistics, School of Languages, Cultures and Linguistics, School of Oriental and African Studies (SOAS), University of London; London, The United Kingdom.",,,,,,,JLA
@@ -10,13 +10,13 @@ index,first name,family name prefix,last name part 2,last name,First affiliation
 9,Alena ,,Witzlack-Makarevich,Witzlack-Makarevich,"Department of Linguistics, Faculty of Humanities, The Hebrew University of Jerusalem; Jerusalem, Israel",,,,,,,AWM
 10,Sam,,Passmore,Passmore,"Department of Anthropology and Archaeology, Faculty of Arts, University of Bristol; Bristol, The United Kingdom.","Faculty of Environment and Information Studies, Keio University SFC (Shonan Fujisawa Campus); Tokyo, Japan.","Department of Linguistic and Cultural Evolution, Max Planck Institute for Evolutionary Anthropology; Leipzig, Germany.",,,,,SPA
 11,Luke,,Maurits,Maurits,"Department of Comparative Cultural Psychology, Max Planck Institute for Evolutionary Anthropology; Leipzig: Germany.",,,,,,,LM
-12,Russell,,Dinnage,Dinnage,"Institute of Environment, Department of Biological Sciences, Florida International University, Miami, FL, USA.",,,,,,,RD
+12,Russell,,Dinnage,Dinnage,"Institute of Environment, Department of Biological Sciences, Florida International University, Miami, FL, The United States of America.",,,,,,,RD
 13,Michael,,Dunn,Dunn,"Department of Linguistics and Philology, Uppsala University; Uppsala, Sweden.","Department of Language and Cognition, Max Planck Institute for Psycholinguistics; Nijmegen, the Netherlands",,,,,,MD
 14,Ger,,Reesink,Reesink,"Department of Linguistics, Faculty of Arts, Radboud University; Nijmegen, The Netherlands.",,,,,,,GR
 15,Ruth,,Singer,Singer,"ARC Centre of Excellence for the Dynamics of Language, College of Asia and the Pacific, Australian National University; Canberra, Australia.","Research Unit for Indigenous Language, School of Languages and Linguistics, University of Melbourne; Melbourne, Australia.",,,,,,RSI
-16,Claire,,Bowern,Bowern,"Department of Linguistics, Yale University; New Haven, USA.",,,,,,,CB
-17,Patience,,Epps,Epps,"Department of Linguistics, University of Texas at Austin; Austin, USA.",,,,,,,PE
-18,Jane,,Hill,Hill,"School of Anthropology, University of Arizona; Tucson, USA.",,,,,,Deceased.,JH
+16,Claire,,Bowern,Bowern,"Department of Linguistics, Yale University; New Haven, The United States of America.",,,,,,,CB
+17,Patience,,Epps,Epps,"Department of Linguistics, University of Texas at Austin; Austin, The United States of America.",,,,,,,PE
+18,Jane,,Hill,Hill,"School of Anthropology, University of Arizona; Tucson, The United States of America.",,,,,,Deceased.,JH
 19,Outi,,Vesakoski,Vesakoski,"Department of Biology, Turku University; Turku, Finland.","Department of Finnish and Finno-Ugric languages, University of Turku, Turku, Finland",,,,,,OV
 20,Martine,,Robbeets,Robbeets,"Department of Archaeology, Max Planck Institute for the Science of Human History; Jena, Germany.",,,,,,,MR
 21,Noor Karolin,,Abbas,Abbas,"Department of Linguistics, School of Languages, Cultures and Linguistics, School of Oriental and African Studies (SOAS), University of London; London, The United Kingdom.",,,,,,,KA
@@ -27,11 +27,11 @@ index,first name,family name prefix,last name part 2,last name,First affiliation
 26,Swintha,,Danielsen,Danielsen,"Institute of Linguistics, Leipzig University; Leipzig, Germany.","Centro de Investigaciones Históricas y Antropológicas (CIHA); Santa Cruz de la Sierra, Bolivia.",,,,,,SD
 27,Luise,,Dorenbusch,Dorenbusch,"Department of Linguistic and Cultural Evolution, Max Planck Institute for Evolutionary Anthropology; Leipzig, Germany.","Institute of Linguistics, Leipzig University; Leipzig, Germany.",,,,,,LD
 28,Ella,,Dorn,Dorn,"Department of Linguistics, School of Languages, Cultures and Linguistics, School of Oriental and African Studies (SOAS), University of London; London, The United Kingdom.",,,,,,,ED
-29,John,,Elliott,Elliott,"Department of Linguistics, University of Hawaiʻi at Mānoa; Honolulu, USA,",,,,,,,JE
+29,John,,Elliott,Elliott,"Department of Linguistics, University of Hawaiʻi at Mānoa; Honolulu, The United States of America,",,,,,,,JE
 30,Giada,,Falcone,Falcone,"Department of Linguistics and Philology, Uppsala University; Uppsala, Sweden.",,,,,,,GF
 31,Jana,,Fischer,Fischer,"Institute for Scandinavian Studies, Frisian and General Linguistics, Department of General Linguistics, Christian-Albrechts-Universität zu Kiel; Kiel, Germany.","Department of Linguistic and Cultural Evolution, Max Planck Institute for Evolutionary Anthropology; Leipzig, Germany.",,,,,,JW
 32,Yustinus,,Ghanggo Ate,Ghanggo Ate,"ARC Centre of Excellence for the Dynamics of Language, College of Asia and the Pacific, Australian National University; Canberra, Australia.","STKIP Weetebula; Sumba Island, Indonesia",,,,2,,YGA
-33,Hannah,,Gibson,Gibson,"Department of Linguistics, School of Languages, Cultures and Linguistics, School of Oriental and African Studies (SOAS), University of London; London, The United Kingdom.","Department of Languages and Linguistics, University of Essex; Essex, UK.",,,,,,HG
+33,Hannah,,Gibson,Gibson,"Department of Linguistics, School of Languages, Cultures and Linguistics, School of Oriental and African Studies (SOAS), University of London; London, The United Kingdom.","Department of Languages and Linguistics, University of Essex; Essex, The United Kingdom.",,,,,,HG
 34,Hans-Philipp,,Göbel,Göbel,"Institute for Scandinavian Studies, Frisian and General Linguistics, Department of General Linguistics, Christian-Albrechts-Universität zu Kiel; Kiel, Germany.","Department of Linguistic and Cultural Evolution, Max Planck Institute for Evolutionary Anthropology; Leipzig, Germany.","Department of Linguistics, University of Cologne; Cologne, Germany.",,,,,HPG
 35,Jemima A.,,Goodall,Goodall,"Department of Linguistics, School of Languages, Cultures and Linguistics, School of Oriental and African Studies (SOAS), University of London; London, The United Kingdom.",,,,,,,JG
 36,Victoria,,Gruner,Gruner,"Department of Linguistic and Cultural Evolution, Max Planck Institute for Evolutionary Anthropology; Leipzig, Germany.",,,,,1,,VG
@@ -60,7 +60,7 @@ index,first name,family name prefix,last name part 2,last name,First affiliation
 59,Jaime,,Montoya Samamé,Montoya Samamé,"Pontificia Universidad Católica del Perú; Lima, Peru.",,,,,,,JM
 60,Michael,,Müller,Müller,"Department of Linguistic and Cultural Evolution, Max Planck Institute for Evolutionary Anthropology; Leipzig, Germany.",,,,,1,,MM
 61,Saliha ,,Muradoglu,Muradoglu,"ARC Centre of Excellence for the Dynamics of Language, College of Asia and the Pacific, Australian National University; Canberra, Australia.",,,,,2,,SM
-62,Kelsey,,Neely,Neely,"Department of Linguistics, University of Texas at Austin; Austin, USA.",,,,,,,KN
+62,Kelsey,,Neely,Neely,"Department of Linguistics, University of Texas at Austin; Austin, The United States of America.",,,,,,,KN
 63,Johanna,,Nickel,Nickel,"Institute for Scandinavian Studies, Frisian and General Linguistics, Department of General Linguistics, Christian-Albrechts-Universität zu Kiel; Kiel, Germany.","Department of Linguistic and Cultural Evolution, Max Planck Institute for Evolutionary Anthropology; Leipzig, Germany.",,,,,,JN
 64,Miina,,Norvik,Norvik,"Institute of Estonian and General Linguistics, University of Tartu, Tartu, Estonia","Department of Modern Languages, Uppsala University; Uppsala, Sweden.",,,,,,MN
 65,Cheryl Akinyi,,Oluoch,Oluoch,"Institute for Scandinavian Studies, Frisian and General Linguistics, Department of General Linguistics, Christian-Albrechts-Universität zu Kiel; Kiel, Germany.","Department of Linguistic and Cultural Evolution, Max Planck Institute for Evolutionary Anthropology; Leipzig, Germany.",,,,,,CAO
@@ -81,12 +81,12 @@ index,first name,family name prefix,last name part 2,last name,First affiliation
 80,Jill,,Sammet,Sammet,"Institute for Scandinavian Studies, Frisian and General Linguistics, Department of General Linguistics, Christian-Albrechts-Universität zu Kiel; Kiel, Germany.","Department of Linguistic and Cultural Evolution, Max Planck Institute for Evolutionary Anthropology; Leipzig, Germany.",,,,,,JSA
 81,Rhiannon,,Schembri,Schembri,"ARC Centre of Excellence for the Dynamics of Language, College of Asia and the Pacific, Australian National University; Canberra, Australia.",,,,,2,,RSC
 82,Lars,,Schlabbach,Schlabbach,"Institute for Scandinavian Studies, Frisian and General Linguistics, Department of General Linguistics, Christian-Albrechts-Universität zu Kiel; Kiel, Germany.","Department of Linguistic and Cultural Evolution, Max Planck Institute for Evolutionary Anthropology; Leipzig, Germany.",,,,,,LS
-83,Frederick W.P.,,Schmidt,Schmidt,"Department of Social Anthropology, University of Cambridge; Cambridge, UK.",,,,,,,FS
-84,Amalia,,Skilton,Skilton,"Department of Linguistics, Cornell University; Ithaca, New York, USA",,,,,,,AS
-85,Wikaliler Daniel,,Smith,Smith,"Department of Linguistics, University of Texas at Austin; Austin, USA.",,,,,,,WDS
+83,Frederick W.P.,,Schmidt,Schmidt,"Department of Social Anthropology, University of Cambridge; Cambridge, The United Kingdom.",,,,,,,FS
+84,Amalia,,Skilton,Skilton,"Department of Linguistics, Cornell University; Ithaca, New York, The United States of America",,,,,,,AS
+85,Wikaliler Daniel,,Smith,Smith,"Department of Linguistics, University of Texas at Austin; Austin, The United States of America.",,,,,,,WDS
 86,Hilário,de ,Sousa,de Sousa,"Department of Language and Cognition, Max Planck Institute for Psycholinguistics; Nijmegen, the Netherlands","Centre de recherches linguistiques sur l'Asie orientale (CRLAO), École des hautes études en sciences sociales (EHESS; Aubervilliers, France",,,,,,HDS
 87,Kristin ,,Sverredal,Sverredal,"Department of Linguistics and Philology, Uppsala University; Uppsala, Sweden.",,,,,,,KS
-88,Daniel ,,Valle,Valle,"Department of Modern Languages, University of Mississippi; Oxford, USA.",,,,,,,DV
+88,Daniel ,,Valle,Valle,"Department of Modern Languages, University of Mississippi; Oxford, The United States of America.",,,,,,,DV
 89,Javier,,Vera,Vera,"Escuela de Ingeniería Informática, Pontificia Universidad Católica de Valparaíso; Valparaíso, Chile.",,,,,,,JVE
 90,Judith,,Voß,Voß,"Institute for Scandinavian Studies, Frisian and General Linguistics, Department of General Linguistics, Christian-Albrechts-Universität zu Kiel; Kiel, Germany.","Department of Linguistic and Cultural Evolution, Max Planck Institute for Evolutionary Anthropology; Leipzig, Germany.",,,,,,JV
 91,Tim,,Witte,Witte,"Institute for Scandinavian Studies, Frisian and General Linguistics, Department of General Linguistics, Christian-Albrechts-Universität zu Kiel; Kiel, Germany.","Department of Linguistic and Cultural Evolution, Max Planck Institute for Evolutionary Anthropology; Leipzig, Germany.",,,,,,TWI
