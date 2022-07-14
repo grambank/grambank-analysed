@@ -182,6 +182,30 @@ plot_df <- gb %>%
 
 ggsave(file.path(OUTPUTDIR_plots,"endangerment_and_area.png"), width = 10, height = 10)
 
+#new plot idea
+
+
+plot_df <- gb %>%
+  filter(Estimator == "Kernel 15") %>% 
+  filter(!is.na(Endangerment))
+
+
+plot_df %>% 
+  ggplot(aes(x = Endangerment, y = Surprisal, color = Endangerment)) +
+  geom_boxplot() +
+  geom_jitter() +
+  theme_classic() +
+  theme(legend.position = "None")
+  
+
+ggsave(file.path(OUTPUTDIR_plots,"endangerment_surprisal_boxplot.png"), width = 10, height = 10)
+
+
+
+
+
+
+
 
 plyr::ddply(gb[gb$Estimator=="Bayesian LCA"&!is.na(gb$aes),],"Macroarea",function(x) data.frame(E=sum(x$Endangerement=="endangered")/sum(x$Endangerement %in% c("not_endangered","endangered")),
                                                                                             U=mean(x$Surprisal),
