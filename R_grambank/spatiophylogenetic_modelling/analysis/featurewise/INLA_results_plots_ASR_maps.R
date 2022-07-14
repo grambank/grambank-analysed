@@ -123,8 +123,9 @@ GB_df <- readr::read_tsv(file =   GB_fn,show_col_types = F) %>%
   inner_join(lgs_in_analysis, by = "Language_ID")
 
 #values for clade labels
-ln.offset = 1.1
-lab.offset = 1.09
+dat.offset = 1.02
+ln.offset = 1.06
+lab.offset = 1.11
 fsize = 3
 cex = 1.8
 
@@ -221,169 +222,142 @@ for(feature in c(three_most_phylo_features)) {
 #running the contrasting algorithm reconstruction. Note: for the analysis we are using the tree with the original branch lengths even if we're visualizing using the imputed branch lengths.
   # asr_most_signal<- ape::ace(x = x, phy = tree_feature, method = "ML", type = "discrete", model = "ARD")
 
-  # asr_most_signal %>%
-  #   qs::qsave(paste0(OUTPUTDIR, "asr_object_",index , "_" , feature, ".qs"))
+  pred_df %>%
+    qs::qsave(paste0(OUTPUTDIR, "asr_object_",index , "_" , feature, ".qs"))
 
   cols <- colour_ramp(viridis(500))
 
-  tiff(file = filename, width = 15.27, height = 15.69, units = "in", res = 400)
-
-  par(mar = c(1,6,1,1))
   root <- plogis(dual_model$summary.fixed$mean[1])
 
   tips <- pred_df$pred[1:length(tree$tip.label)]
   names(tips) <- pred_df$Language_ID[1:length(tree$tip.label)]
   nodes <- c(root, pred_df$pred[-1:-length(tree$tip.label)])
-  #names(nodes) <- c("Node1", pred_df$Language_ID[-1:-length(tree$tip.label)])
 
-  plot(tree, type = "fan", show.tip.label = FALSE)
+  tiff(file = filename, width = 15.27, height = 15.69, units = "in", res = 400)
 
-  p <- contMap(tree, tips,
-          anc.states = nodes,
-          method = "user",
-          type = "fan", ftype = "off",
-          plot = FALSE)
+    par(mar = c(1,6,1,1),
+        xpd = NA) ## xpd=NA prevents clipping in the margins (just turns off clipping entirely)
 
-  p <- setMap(p, viridis(500))
-  plot(p, type = "fan", ftype = "off")
+    p <- contMap(ladderize(tree), tips,
+            anc.states = nodes,
+            method = "user",
+            type = "fan", ftype = "off",
+            plot = FALSE)
 
-  lastPP <- get("last_plot.phylo", envir = .PlotPhyloEnv)
+    p <- setMap(p, viridis(500))
+    plot(p, type = "fan", ftype = "off",
+         mar = c(4, 4, 6, 4), legend = FALSE)
 
-  tip_points <- cbind(lastPP$xx[1:Ntip(tree)], lastPP$yy[1:Ntip(tree)],
-                      feature_df[match(tree$tip.label, feature_df$Language_ID), feature])
-  points(tip_points[tip_points[ , 3] == 1, 1:2] * 1.05, col = "black", pch = 19)
+    add.color.bar(75, p$cols, title = "Predicted Probability\n",
+                  prompt = FALSE, x = 0, y = 10, lwd = 12,
+                  fsize = 1.5)
 
+    lastPP <- get("last_plot.phylo", envir = .PlotPhyloEnv)
 
-  # plot.phylo(tree,
-  #            col="grey",
-  #            # tip.color = feature_df$tip.color[match(tree_feature$tip.label,
-  #            #                                        feature_df$Language_ID)],
-  #            type = "fan",
-  #            cex = 0.25,
-  #            label.offset = 0.02, main = plot_title, cex.main = 2,
-  #            show.tip.label = FALSE)
+    tip_points <- cbind(lastPP$xx[1:Ntip(tree)], lastPP$yy[1:Ntip(tree)],
+                        feature_df[match(tree$tip.label, feature_df$Language_ID), feature])
+    ## plot 'yes' values, blank is assumed 'no'
+    points(tip_points[tip_points[ , 3] == 1, 1:2] * dat.offset, col = "black", pch = 19)
+    ## plot missing data
+    points(tip_points[is.na(tip_points[ , 3]), 1:2] * dat.offset, col = "grey", pch = 19)
 
-  # lastPP<-get("last_plot.phylo",env=.PlotPhyloEnv)
-  # ss<-unique(x) %>% sort(decreasing = T)
-  # par(fg="black")
-  # colors<-setNames(color_vector[1:length(ss)],ss)
-#  add.simmap.legend(colors=colors,
-#                    vertical=T,
-#                    x=--1,
-#                    y=-1,
-#                    prompt=F)
-#
-#   nodelabels(node=1:tree_feature$Nnode+Ntip(tree_feature),
-#              pie=asr_most_signal$lik.anc,
-#              piecol=color_vector[2:1], cex = 0.3)
+    arc.cladelabels(text="Austronesian",node =   getMRCA(tree, tip = c("kana1286", "samo1305")), mark.node=FALSE,
+                    ln.offset = ln.offset , lab.offset = lab.offset,fsize=fsize,orientation="curved", cex = cex)
 
+    arc.cladelabels(text="Otomanguean",node =   getMRCA(tree, tip = c("mali1285", "yatz1235")), mark.node=FALSE,
+                    ln.offset= ln.offset,lab.offset = lab.offset,fsize = fsize,orientation="curved", cex = cex)
 
-  arc.cladelabels(text="Austronesian",node =   getMRCA(tree, tip = c("kana1286", "samo1305")), mark.node=FALSE,
-ln.offset = ln.offset , lab.offset = lab.offset,fsize=fsize,orientation="curved", cex = cex)
+    arc.cladelabels(text="Uto-Aztecan",node =   getMRCA(tree, tip = c("hopi1249", "isth1240")), mark.node=FALSE,
+                    ln.offset= ln.offset,lab.offset = lab.offset,fsize = fsize,orientation="curved", cex = cex)
 
-  arc.cladelabels(text="Otomanguean",node =   getMRCA(tree_feature, tip = c("mali1285", "yatz1235")), mark.node=FALSE,
-                  ln.offset= ln.offset,lab.offset = lab.offset,fsize = fsize,orientation="curved", cex = cex)
+    arc.cladelabels(text="Nuclear Trans New Guinea",node =   getMRCA(tree, tip = c("gira1247", "domm1246")), mark.node=FALSE,
+                    ln.offset= ln.offset,lab.offset = lab.offset,fsize = fsize,orientation="curved", cex = cex)
 
-    arc.cladelabels(text="Uto-Aztecan",node =   getMRCA(tree_feature, tip = c("hopi1249", "isth1240"))
-                  , mark.node=FALSE,
-                  ln.offset= ln.offset,lab.offset = lab.offset,fsize = fsize,orientation="curved", cex = cex)
+    arc.cladelabels(text="Afro-Asiatic",node =   getMRCA(tree, tip = c("glav1244", "xamt1239")), mark.node=FALSE,
+                    ln.offset= ln.offset,lab.offset = lab.offset,fsize = fsize,orientation="curved", cex = cex)
 
-  arc.cladelabels(text="Nuclear Trans New Guinea",node =   getMRCA(tree_feature, tip = c("gira1247", "domm1246"))
-                  , mark.node=FALSE,
-                  ln.offset= ln.offset,lab.offset = lab.offset,fsize = fsize,orientation="curved", cex = cex)
+    arc.cladelabels(text="Indo-European",node =   getMRCA(tree, tip = c("port1283", "mode1248")), mark.node=FALSE,
+                    ln.offset= ln.offset,lab.offset = lab.offset,fsize = fsize,orientation="curved", cex = cex)
 
-  arc.cladelabels(text="Afro-Asiatic",node =   getMRCA(tree_feature, tip = c("glav1244", "xamt1239"))
-                  , mark.node=FALSE,
-                  ln.offset= ln.offset,lab.offset = lab.offset,fsize = fsize,orientation="curved", cex = cex)
+    arc.cladelabels(text="Atlantic-Congo",node =   getMRCA(tree, tip = c("tswa1255", "noon1242")), mark.node=FALSE,
+                    ln.offset= ln.offset,lab.offset = lab.offset,fsize = fsize,orientation="curved", cex = cex)
 
-  arc.cladelabels(text="Indo-European",node =   getMRCA(tree_feature, tip = c("port1283", "mode1248"))
-                  , mark.node=FALSE,
-                  ln.offset= ln.offset,lab.offset = lab.offset,fsize = fsize,orientation="curved", cex = cex)
+    arc.cladelabels(text="Tibeto-Burman",node =   getMRCA(tree, tip = c("koir1240", "cent2004")), mark.node=FALSE,
+                    ln.offset= ln.offset,lab.offset = lab.offset,fsize = fsize,orientation="curved", cex = cex)
 
-  arc.cladelabels(text="Atlantic-Congo",node =   getMRCA(tree_feature, tip = c("tswa1255", "noon1242"))
-                  , mark.node=FALSE,
-                  ln.offset= ln.offset,lab.offset = lab.offset,fsize = fsize,orientation="curved", cex = cex)
+    arc.cladelabels(text="Austroasiatic",node =   getMRCA(tree, tip = c("seme1247", "aheu1239")), mark.node=FALSE,
+                    ln.offset= ln.offset,lab.offset = lab.offset,fsize = fsize,orientation="curved", cex = cex)
 
-  arc.cladelabels(text="Tibeto-Burman",node =   getMRCA(tree_feature, tip = c("koir1240", "cent2004"))
-                  , mark.node=FALSE,
-                  ln.offset= ln.offset,lab.offset = lab.offset,fsize = fsize,orientation="curved", cex = cex)
+    arc.cladelabels(text="Uralic",node =   getMRCA(tree, tip = c("livv1243", "lule1254")), mark.node=FALSE,
+                    ln.offset= ln.offset,lab.offset = lab.offset,fsize = fsize,orientation="curved", cex = cex)
 
-  arc.cladelabels(text="Austroasiatic",node =   getMRCA(tree_feature, tip = c("seme1247", "aheu1239"))
-                  , mark.node=FALSE,
-                  ln.offset= ln.offset,lab.offset = lab.offset,fsize = fsize,orientation="curved", cex = cex)
+    title(plot_title, cex.main = cex)
 
-  arc.cladelabels(text="Uralic",node =   getMRCA(tree_feature, tip = c("livv1243", "lule1254"))
-                  , mark.node=FALSE,
-                  ln.offset= ln.offset,lab.offset = lab.offset,fsize = fsize,orientation="curved", cex = cex)
-
-      x <- dev.off()
+  dev.off()
 
   png(file = filename_png, width = 15.27, height = 15.69, units = "in", res = 400)
 
 
-  plot.phylo(ladderize(tree_feature  , right = F),
-             col="grey",
-             tip.color = feature_df$tip.color[match(tree_feature$tip.label,
-                                                    feature_df$Language_ID)],
-             type = "fan",
-             cex = 0.25,
-             label.offset = 0.02, main = plot_title, cex.main = 2)
+    par(mar = c(1,6,1,1),
+        xpd = NA) ## xpd=NA prevents clipping in the margins (just turns off clipping entirely)
 
-  lastPP<-get("last_plot.phylo",env=.PlotPhyloEnv)
-  ss<-unique(x) %>% sort(decreasing = T)
-  par(fg="black")
-  colors<-setNames(color_vector[1:length(ss)],ss)
-  #  add.simmap.legend(colors=colors,
-  #                    vertical=T,
-  #                    x=--1,
-  #                    y=-1,
-  #                    prompt=F)
+    p <- contMap(ladderize(tree), tips,
+            anc.states = nodes,
+            method = "user",
+            type = "fan", ftype = "off",
+            plot = FALSE)
 
-  nodelabels(node=1:tree_feature$Nnode+Ntip(tree_feature),
-             pie=asr_most_signal$lik.anc,
-             piecol=color_vector[2:1], cex = 0.3)
+    p <- setMap(p, viridis(500))
+    plot(p, type = "fan", ftype = "off",
+         mar = c(4, 4, 6, 4),
+         legend = FALSE)
 
+    add.color.bar(75, p$cols, title = "Predicted Probability\n",
+                  prompt = FALSE, x = 0, y = 10, lwd = 12,
+                  fsize = 1.5)
 
-  arc.cladelabels(text="Austronesian",node =   getMRCA(tree_feature, tip = c("kana1286", "samo1305")), mark.node=FALSE,
-                  ln.offset = ln.offset , lab.offset = lab.offset,fsize=fsize,orientation="curved", cex = cex)
+    lastPP <- get("last_plot.phylo", envir = .PlotPhyloEnv)
 
-  arc.cladelabels(text="Otomanguean",node =   getMRCA(tree_feature, tip = c("mali1285", "yatz1235")), mark.node=FALSE,
-                  ln.offset= ln.offset,lab.offset = lab.offset,fsize = fsize,orientation="curved", cex = cex)
+    tip_points <- cbind(lastPP$xx[1:Ntip(tree)], lastPP$yy[1:Ntip(tree)],
+                        feature_df[match(tree$tip.label, feature_df$Language_ID), feature])
+    ## plot 'yes' values, blank is assumed 'no'
+    points(tip_points[tip_points[ , 3] == 1, 1:2] * dat.offset, col = "black", pch = 19)
+    ## plot missing data
+    points(tip_points[is.na(tip_points[ , 3]), 1:2] * dat.offset, col = "grey", pch = 19)
 
-  arc.cladelabels(text="Uto-Aztecan",node =   getMRCA(tree_feature, tip = c("hopi1249", "isth1240"))
-                  , mark.node=FALSE,
-                  ln.offset= ln.offset,lab.offset = lab.offset,fsize = fsize,orientation="curved", cex = cex)
+    arc.cladelabels(text="Austronesian",node =   getMRCA(tree, tip = c("kana1286", "samo1305")), mark.node=FALSE,
+                    ln.offset = ln.offset , lab.offset = lab.offset,fsize=fsize,orientation="curved", cex = cex)
 
-  arc.cladelabels(text="Nuclear Trans New Guinea",node =   getMRCA(tree_feature, tip = c("gira1247", "domm1246"))
-                  , mark.node=FALSE,
-                  ln.offset= ln.offset,lab.offset = lab.offset,fsize = fsize,orientation="curved", cex = cex)
+    arc.cladelabels(text="Otomanguean",node =   getMRCA(tree, tip = c("mali1285", "yatz1235")), mark.node=FALSE,
+                    ln.offset= ln.offset,lab.offset = lab.offset,fsize = fsize,orientation="curved", cex = cex)
 
-  arc.cladelabels(text="Afro-Asiatic",node =   getMRCA(tree_feature, tip = c("glav1244", "xamt1239"))
-                  , mark.node=FALSE,
-                  ln.offset= ln.offset,lab.offset = lab.offset,fsize = fsize,orientation="curved", cex = cex)
+    arc.cladelabels(text="Uto-Aztecan",node =   getMRCA(tree, tip = c("hopi1249", "isth1240")), mark.node=FALSE,
+                    ln.offset= ln.offset,lab.offset = lab.offset,fsize = fsize,orientation="curved", cex = cex)
 
-  arc.cladelabels(text="Indo-European",node =   getMRCA(tree_feature, tip = c("port1283", "mode1248"))
-                  , mark.node=FALSE,
-                  ln.offset= ln.offset,lab.offset = lab.offset,fsize = fsize,orientation="curved", cex = cex)
+    arc.cladelabels(text="Nuclear Trans New Guinea",node =   getMRCA(tree, tip = c("gira1247", "domm1246")), mark.node=FALSE,
+                    ln.offset= ln.offset,lab.offset = lab.offset,fsize = fsize,orientation="curved", cex = cex)
 
-  arc.cladelabels(text="Atlantic-Congo",node =   getMRCA(tree_feature, tip = c("tswa1255", "noon1242"))
-                  , mark.node=FALSE,
-                  ln.offset= ln.offset,lab.offset = lab.offset,fsize = fsize,orientation="curved", cex = cex)
+    arc.cladelabels(text="Afro-Asiatic",node =   getMRCA(tree, tip = c("glav1244", "xamt1239")), mark.node=FALSE,
+                    ln.offset= ln.offset,lab.offset = lab.offset,fsize = fsize,orientation="curved", cex = cex)
 
-  arc.cladelabels(text="Tibeto-Burman",node =   getMRCA(tree_feature, tip = c("koir1240", "cent2004"))
-                  , mark.node=FALSE,
-                  ln.offset= ln.offset,lab.offset = lab.offset,fsize = fsize,orientation="curved", cex = cex)
+    arc.cladelabels(text="Indo-European",node =   getMRCA(tree, tip = c("port1283", "mode1248")), mark.node=FALSE,
+                    ln.offset= ln.offset,lab.offset = lab.offset,fsize = fsize,orientation="curved", cex = cex)
 
-  arc.cladelabels(text="Austroasiatic",node =   getMRCA(tree_feature, tip = c("seme1247", "aheu1239"))
-                  , mark.node=FALSE,
-                  ln.offset= ln.offset,lab.offset = lab.offset,fsize = fsize,orientation="curved", cex = cex)
+    arc.cladelabels(text="Atlantic-Congo",node =   getMRCA(tree, tip = c("tswa1255", "noon1242")), mark.node=FALSE,
+                    ln.offset= ln.offset,lab.offset = lab.offset,fsize = fsize,orientation="curved", cex = cex)
 
-  arc.cladelabels(text="Uralic",node =   getMRCA(tree_feature, tip = c("livv1243", "lule1254"))
-                  , mark.node=FALSE,
-                  ln.offset= ln.offset,lab.offset = lab.offset,fsize = fsize,orientation="curved", cex = cex)
+    arc.cladelabels(text="Tibeto-Burman",node =   getMRCA(tree, tip = c("koir1240", "cent2004")), mark.node=FALSE,
+                    ln.offset= ln.offset,lab.offset = lab.offset,fsize = fsize,orientation="curved", cex = cex)
 
+    arc.cladelabels(text="Austroasiatic",node =   getMRCA(tree, tip = c("seme1247", "aheu1239")), mark.node=FALSE,
+                    ln.offset= ln.offset,lab.offset = lab.offset,fsize = fsize,orientation="curved", cex = cex)
 
-  x <- dev.off()
+    arc.cladelabels(text="Uralic",node =   getMRCA(tree, tip = c("livv1243", "lule1254")), mark.node=FALSE,
+                    ln.offset= ln.offset,lab.offset = lab.offset,fsize = fsize,orientation="curved", cex = cex)
+
+    title(plot_title, cex.main = cex)
+
+  dev.off()
 
 
 }
