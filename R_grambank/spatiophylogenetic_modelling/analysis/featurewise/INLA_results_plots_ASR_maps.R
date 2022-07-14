@@ -123,7 +123,7 @@ GB_df <- readr::read_tsv(file =   GB_fn,show_col_types = F) %>%
   inner_join(lgs_in_analysis, by = "Language_ID")
 
 #values for clade labels
-ln.offset = 1.05
+ln.offset = 1.1
 lab.offset = 1.09
 fsize = 3
 cex = 1.8
@@ -149,14 +149,16 @@ for(feature in c(three_most_phylo_features)) {
   data$spatial_id = match(data$Language_ID, rownames(spatial_prec_mat))
   data$obs_id = 1:nrow(data)
 
-  internal_nodes <- setdiff(rownames(phylo_prec_mat), GB_df$Language_ID)
-  int_node_df <- tibble(Language_ID = internal_nodes,
+  all_nodes <- rownames(phylo_prec_mat)
+  all_node_df <- tibble(Language_ID = all_nodes,
                         spatial_id = NA,
                         obs_id = NA)
 
-  int_node_df$phylo_id = match(int_node_df$Language_ID, rownames(phylo_prec_mat))
+  all_node_df$phylo_id = match(all_node_df$Language_ID, rownames(phylo_prec_mat))
+  all_node_df$what <- "predictions"
+  data$what <- "observed_data"
 
-  data <- bind_rows(data, int_node_df)
+  data <- bind_rows(data, all_node_df)
 
   formula <-  eval(substitute(expr = this_feature ~
                                 f(spatial_id,
@@ -178,13 +180,12 @@ for(feature in c(three_most_phylo_features)) {
   dual_model <- INLA::inla(formula = formula,
                           family = "binomial",
                           control.predictor=list(link = 1, compute = TRUE),
-                          control.mode = list(theta = start_pars$theta, restart = FALSE),
+                          control.mode = list(theta = start_pars, restart = FALSE),
                           data = data,
                           num.threads = 6)
 
-  preds <- dual_model$summary.fitted.values$`0.5quant`
-  pred_df <- tibble(Language_ID = data$Language_ID, pred = preds,
-                    other = 1 - preds)
+  preds <- dual_model$summary.fitted.values$`0.5quant`[data$what == "predictions"]
+  pred_df <- tibble(Language_ID = data$Language_ID[data$what == "predictions"], pred = preds)
 
   link_to_nodes <- makeNodeLabel(tree)
   link_to_nodes <- tibble(Language_ID = c(link_to_nodes$tip.label, link_to_nodes$node.label),
@@ -228,14 +229,39 @@ for(feature in c(three_most_phylo_features)) {
   tiff(file = filename, width = 15.27, height = 15.69, units = "in", res = 400)
 
   par(mar = c(1,6,1,1))
-  plot.phylo(tree,
-             col="grey",
-             # tip.color = feature_df$tip.color[match(tree_feature$tip.label,
-             #                                        feature_df$Language_ID)],
-             type = "fan",
-             cex = 0.25,
-             label.offset = 0.02, main = plot_title, cex.main = 2,
-             show.tip.label = FALSE)
+  root <- plogis(dual_model$summary.fixed$mean[1])
+
+  tips <- pred_df$pred[1:length(tree$tip.label)]
+  names(tips) <- pred_df$Language_ID[1:length(tree$tip.label)]
+  nodes <- c(root, pred_df$pred[-1:-length(tree$tip.label)])
+  #names(nodes) <- c("Node1", pred_df$Language_ID[-1:-length(tree$tip.label)])
+
+  plot(tree, type = "fan", show.tip.label = FALSE)
+
+  p <- contMap(tree, tips,
+          anc.states = nodes,
+          method = "user",
+          type = "fan", ftype = "off",
+          plot = FALSE)
+
+  p <- setMap(p, viridis(500))
+  plot(p, type = "fan", ftype = "off")
+
+  lastPP <- get("last_plot.phylo", envir = .PlotPhyloEnv)
+
+  tip_points <- cbind(lastPP$xx[1:Ntip(tree)], lastPP$yy[1:Ntip(tree)],
+                      feature_df[match(tree$tip.label, feature_df$Language_ID), feature])
+  points(tip_points[tip_points[ , 3] == 1, 1:2] * 1.05, col = "black", pch = 19)
+
+
+  # plot.phylo(tree,
+  #            col="grey",
+  #            # tip.color = feature_df$tip.color[match(tree_feature$tip.label,
+  #            #                                        feature_df$Language_ID)],
+  #            type = "fan",
+  #            cex = 0.25,
+  #            label.offset = 0.02, main = plot_title, cex.main = 2,
+  #            show.tip.label = FALSE)
 
   # lastPP<-get("last_plot.phylo",env=.PlotPhyloEnv)
   # ss<-unique(x) %>% sort(decreasing = T)
@@ -246,19 +272,13 @@ for(feature in c(three_most_phylo_features)) {
 #                    x=--1,
 #                    y=-1,
 #                    prompt=F)
-
-  tiplabels(pch = 19, col = cols(pred_df$pred[1:Ntip(tree)]))
-
-  tiplabels(pch = 21, col = "black", bg = c("white", "black")[feature_df$GB090[match(tree$tip.label, feature_df$Language_ID)] + 1],
-            offset = 3)
-
-
-  nodelabels(node=1:tree_feature$Nnode+Ntip(tree_feature),
-             pie=asr_most_signal$lik.anc,
-             piecol=color_vector[2:1], cex = 0.3)
+#
+#   nodelabels(node=1:tree_feature$Nnode+Ntip(tree_feature),
+#              pie=asr_most_signal$lik.anc,
+#              piecol=color_vector[2:1], cex = 0.3)
 
 
-  arc.cladelabels(text="Austronesian",node =   getMRCA(tree_feature, tip = c("kana1286", "samo1305")), mark.node=FALSE,
+  arc.cladelabels(text="Austronesian",node =   getMRCA(tree, tip = c("kana1286", "samo1305")), mark.node=FALSE,
 ln.offset = ln.offset , lab.offset = lab.offset,fsize=fsize,orientation="curved", cex = cex)
 
   arc.cladelabels(text="Otomanguean",node =   getMRCA(tree_feature, tip = c("mali1285", "yatz1235")), mark.node=FALSE,
