@@ -32,6 +32,29 @@ pcprior = list(prec = list(
   param = c(1, 0.1)) # This prior suggests that the probability that variance for the random effect is greater than 1 is 10%
 )
 
+#testing different priors
+prior_one_percent <-  list(prec = list(
+  prior="pc.prec",
+  param = c(1, 0.01)) # This prior suggests that the probability that variance for the random effect is greater than 1 is 10%
+)
+
+prior_ten_percent <-list(prec = list(
+  prior="pc.prec",
+  param = c(1, 0.1)) # This prior suggests that the probability that variance for the random effect is greater than 1 is 10%
+)
+
+prior_50_percent <-list(prec = list(
+  prior="pc.prec",
+  param = c(1, 0.5)) # This prior suggests that the probability that variance for the random effect is greater than 1 is 10%
+)
+
+prior_99_percent <-  list(prec = list(
+  prior="pc.prec",
+  param = c(1, 0.99)) # This prior suggests that the probability that variance for the random effect is greater than 1 is 10%
+)
+
+pcprior_vec <- c(prior_one_percent, prior_ten_percent , prior_50_percent, prior_99_percent)
+
 # We need to fix the residual variance to one, since it is not an identifiable quantity
 # within a binomial model. 
 obs_hyper <- list(prec = list(initial = log(1), fixed = TRUE))
