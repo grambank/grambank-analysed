@@ -4,6 +4,9 @@ strip_inla = function(object){
   # try to get the posterior of the ICC effect
   hyper_sample <-  try(get_hyper_sample(object))
   
+  summary.fixed <- object$summary.fixed
+  summary.fitted.values <- object$summary.fitted.values
+  
   # save the WAIC score
   waic = object$waic
   cpo =  object$cpo$cpo
@@ -21,7 +24,7 @@ strip_inla = function(object){
   mlik <- object$mlik
 
   list(hyper_sample = hyper_sample,
-       waic = waic, cpo = cpo, pit = pit, cpo_failure = cpo_failure, mlik = mlik, dic = dic)
+       waic = waic, cpo = cpo, pit = pit, cpo_failure = cpo_failure, mlik = mlik, dic = dic, summary.fixed = summary.fixed, summary.fitted.values = summary.fitted.values)
 }
 
 get_hyper_sample = function(object, n = 100){
@@ -30,3 +33,5 @@ get_hyper_sample = function(object, n = 100){
                        result = object)
 hyper_sample
 }
+
+
