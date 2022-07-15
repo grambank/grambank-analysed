@@ -18,13 +18,14 @@ if(length(args) != 0){
   end <- args[3]
   range <- start:end
   prec_matrices <- args[4]
+  pcprior_choice <- args[5]
 } else { #if you're running this script chunkwise in Rstudio or similar instead of via command line, you'll read in the parameters this way:
   sim_or_real <- "real"
   start <- 1
   end <- 40
   range <- start:end
   prec_matrices <- NULL
-  
+  pcprior_choice <- "default"
 }
 
 if(sim_or_real == "sim"){
@@ -98,6 +99,23 @@ spatial_prec_mat = precision_matrices$spatial_precision
 
 cat("\n###\nDone with covariance matrices.\n")
 
+#if a pcprior has not been specified from CLI, go with the default 
+if(pcprior_choice == "default"){
+  pcprior_vec <- c(prior_ten_percent)
+  cat(paste0("I'm using just one pc prior. It is: \n", 
+             pcprior_vec[[1]][2], "\n"
+  ))
+  } 
+
+if(pcprior_choice == "loop_all_priors"){
+  cat(paste0("I'm looping through all the suggested pc priors. These are: \n", 
+            pcprior_vec[[1]][2], "\n",
+            pcprior_vec[[2]][2], "\n",
+            pcprior_vec[[3]][2], "\n",
+            pcprior_vec[[4]][2], "\n"
+      ))
+  }
+
 #reading in AUTOTYP-area
 if (!file.exists("output/non_GB_datasets/glottolog_AUTOTYP_areas.tsv")) { s
   source("unusualness/processing/assigning_AUTOTYP_areas.R") }		
@@ -124,16 +142,22 @@ features <- df %>%
 
 features <- features[range]
 
+
+for(n in 1:length(pcprior_vec)){
+
+  pcprior <- pcprior_vec[[n]]
+#
+  pcprior <- pcprior_vec[[1]]$param
+   cat(paste0("###\nI'm running the analysis with pcprior = ", pcprior[2], ".\n###\n"))
+   
 index <- 0
 
 for(feature in features){
   #  feature <- features[1]
-  cat(paste0("  ####\n  Running the INLA models for ", feature,".\n",
-             "  ####\n"))
-  
   cat(paste0("I'm on ", feature, " and the time is ", Sys.time(), ".\n"))
-  
-
+  cat(paste0("Precision matrix = ", basename(precision_matrices_fn), ".\n"))
+  cat(paste0("pcprior = ", pcprior[2], ".\n"))
+          
   # #### Dual Model ####
   # 
   # # The dual model contains the phylogenetic and spatial precision models using the same
@@ -222,8 +246,9 @@ for(feature in features){
   model_outputs = list(dual_model_stripped, 
                        trial_model_stripped)
   
+  
   #### Save output ####
-  saved_file =   paste0(OUTPUTDIR, feature,"_",   substr(x = basename(precision_matrices_fn), 20, 37)
+  saved_file =   paste0(OUTPUTDIR, feature,"_",   substr(x = basename(precision_matrices_fn), 20, 37), "_pcprior",   pcprior[2]$param[2]
 , ".qs")
   
   qs::qsave(model_outputs, 
@@ -237,6 +262,7 @@ for(feature in features){
   
   cat(paste0("I've finished ", feature, " and the time is ", Sys.time(), ".\n That means I'm ", round((index/length(range)), 2)*100, "% done.\n"))
   rm(model_outputs, dual_model, trial_model)
-}
+} }
+
 
 sink(file = NULL)
