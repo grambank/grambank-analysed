@@ -144,10 +144,8 @@ features <- features[range]
 
 
 for(n in 1:length(pcprior_vec)){
-
-  pcprior <- pcprior_vec[[n]]
-#
-  pcprior <- pcprior_vec[[1]]$param
+#  n <- 1
+  pcprior <- pcprior_vec[[n]]$param
    cat(paste0("###\nI'm running the analysis with pcprior = ", pcprior[2], ".\n###\n"))
    
 index <- 0
@@ -248,8 +246,7 @@ for(feature in features){
   
   
   #### Save output ####
-  saved_file =   paste0(OUTPUTDIR, feature,"_",   substr(x = basename(precision_matrices_fn), 20, 37), "_pcprior",   pcprior[2]$param[2]
-, ".qs")
+  saved_file =   paste0(OUTPUTDIR, feature,"_",   substr(x = basename(precision_matrices_fn), 20, 37), "_pcprior",   pcprior[2], ".qs")
   
   qs::qsave(model_outputs, 
             file = saved_file)
