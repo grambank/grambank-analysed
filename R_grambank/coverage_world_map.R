@@ -1,5 +1,5 @@
-#PCA analysis over the imputed data. Here we use the imputed data from random forests to run PCA.
-source("requirements.R")
+source("fun_def_h_load.R")
+h_load(c("tidyverse"))
 
 #read in grambank data
 df_fn <- "output/GB_wide/GB_wide_strict.tsv"
