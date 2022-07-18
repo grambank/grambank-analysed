@@ -1,4 +1,5 @@
-library(tidyverse)
+source("fun_def_h_load.R")
+h_load("tidyverse")
 source("global_variables.R")
 
 #GB contains a small set of multistate features. They can be binarised, but they need to be done so in a particular way. This code renders a appropriately binarised version of the dataset.
