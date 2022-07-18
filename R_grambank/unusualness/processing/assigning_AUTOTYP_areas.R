@@ -1,7 +1,6 @@
-library(tidyverse)
 source("global_variables.R")
 source("fun_def_h_load.R")
-h_load("fields")
+h_load(c("fields", "tidyverse"))
 
 #Script written by Hedvig Skirgård
 
