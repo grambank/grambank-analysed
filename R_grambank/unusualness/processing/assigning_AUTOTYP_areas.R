@@ -1,4 +1,7 @@
-source("requirements.R")
+library(tidyverse)
+source("global_variables.R")
+source("fun_def_h_load.R")
+h_load("fields")
 
 #Script written by Hedvig Skirgård
 
@@ -43,7 +46,7 @@ rownames(lgs_with_unknown_area) <- glottolog_df$Language_ID
 # For missing, find area of closest language
 
 cat("Calculating the geographical distance between languages with known AUTOTYP-areas and those without a matched AUTOTYP-area.\n")
-atDist <- rdist.earth(lgs_with_known_area,lgs_with_unknown_area, miles = F)
+atDist <- rdist.earth(lgs_with_known_area,lgs_with_unknown_area, miles = FALSE)
 
 rm(lgs_with_known_area, lgs_with_unknown_area)
 
