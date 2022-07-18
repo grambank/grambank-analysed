@@ -4,8 +4,6 @@ source("requirements.R")
 
 cat("Creating plots comparing the loadings of components to theoretical scores.\n")
 
-
-
 GB_morph_counts <- read_tsv(file = "output/fusion_score/fusion_score.tsv") %>% 
   dplyr::select(Language_ID, "Fusion" = mean_morph)
 
@@ -45,7 +43,7 @@ feature_scores <- data.table::fread(file.path("output", "GB_wide", "parameters_b
                                     quote = "\"", header = TRUE, 
                                     sep = "\t") %>% 
     filter(Binary_Multistate != "multi") %>% 
-  dplyr::select(Parameter_ID = ID, Flexivity,`locus of marking`, `word order`, `Gender/noun class`, informativity) %>% 
+  dplyr::select(Parameter_ID = ID, Name, Flexivity,`locus of marking`, `word order`, `Gender/noun class`, informativity) %>% 
   mutate(`Gender/noun class` = as.numeric(`Gender/noun class`)) %>% 
   mutate(Flexivity = as.numeric(Flexivity)) %>% 
   mutate(`locus of marking` = as.numeric(`locus of marking`)) %>% 
@@ -61,7 +59,7 @@ GB_long_for_calc <- GB_wide  %>%
 lg_df_for_flex_count <- GB_long_for_calc %>% 
   filter(!is.na(Flexivity)) %>% 
   filter(!is.na(value)) %>% 
-  mutate(value_weighted = if_else(Flexivity == 0, abs(value-1), value)) %>% # reversing the values of the features that refer to free-standing markers 
+  mutate(value_weighted = if_else(Flexivity == 0, abs(value-1), value)) %>% #  reversing the values of the features that have a score of 0
   group_by(Language_ID) %>% 
   dplyr::summarise(`Flexivity` = mean(value_weighted), .groups = "drop_last")
 
@@ -69,7 +67,7 @@ lg_df_for_flex_count <- GB_long_for_calc %>%
 lg_df_for_HM_DM_count <- GB_long_for_calc %>% 
   filter(!is.na(`locus of marking`)) %>% 
   filter(!is.na(value)) %>% 
-  mutate(value_weighted = if_else(`locus of marking` == 0, abs(value-1), value)) %>% # reversing the values of the features that refer to free-standing markers 
+  mutate(value_weighted = if_else(`locus of marking` == 0, abs(value-1), value)) %>% # reversing the values of the features that have a score of 0
   group_by(Language_ID) %>% 
   dplyr::summarise(`locus of\nmarking` = mean(value_weighted), .groups = "drop_last")
 
@@ -77,7 +75,7 @@ lg_df_for_HM_DM_count <- GB_long_for_calc %>%
 lg_df_for_gender_nc_count <- GB_long_for_calc %>% 
   filter(!is.na(`Gender/noun class`)) %>% 
   filter(!is.na(value)) %>% 
-  mutate(value_weighted = if_else(`Gender/noun class` == 0, abs(value-1), value)) %>% # reversing the values of the features that refer to free-standing markers 
+  mutate(value_weighted = if_else(`Gender/noun class` == 0, abs(value-1), value)) %>% #  reversing the values of the features that have a score of 0
   group_by(Language_ID) %>% 
   dplyr::summarise(`Gender/\nnoun class` = mean(value_weighted), .groups = "drop_last")
 
