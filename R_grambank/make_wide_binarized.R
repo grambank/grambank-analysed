@@ -1,4 +1,6 @@
-source("requirements.R")
+library(tidyverse)
+source("global_variables.R")
+
 #GB contains a small set of multistate features. They can be binarised, but they need to be done so in a particular way. This code renders a appropriately binarised version of the dataset.
 
 GB_wide_strict <- read.delim(file.path("output", "GB_wide", "GB_wide_strict.tsv"), sep = "\t")

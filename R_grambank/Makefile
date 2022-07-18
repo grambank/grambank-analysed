@@ -33,9 +33,9 @@ submodules:
 
 data: submodules
 	@echo "# Preparing the dataset (including imputation and pruning of global tree. #"
-	@mkdir output/non_GB_datasets
-	@mkdir output/coverage_plots
-	@mkdir output/GB_wide
+	@mkdir -p output/non_GB_datasets
+	@mkdir -p output/coverage_plots
+	@mkdir -p output/GB_wide
 	@$(MAKE) -f $(THIS_MAKEFILE) output/non_GB_datasets/glottolog-cldf_wide_df.tsv
 	@$(MAKE) -f $(THIS_MAKEFILE) output/GB_wide/GB_wide_strict.tsv
 	@$(MAKE) -f $(THIS_MAKEFILE) output/GB_wide/GB_wide_binarized.tsv

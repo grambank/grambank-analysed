@@ -1,4 +1,6 @@
-source("requirements.R")
+library(tidyverse)
+source("global_variables.R")
+
 
 #The CLDF-format is long, but for PCA, imputation and distances it is better with wide formatted data. 
 # This script takes the CLDF dataset and makes it wide. 
