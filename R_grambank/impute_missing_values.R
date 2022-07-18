@@ -1,8 +1,10 @@
 #This is a script for imputing values with missForest in GB.
 
 #script written by Hedvig Skirgård
+library(tidyverse)
+library(missForest)
+source('global_variables.R')
 
-source('requirements.R')
 
 OUTPUTFILE <- file.path("output", "GB_wide", "GB_wide_imputed_binarized.tsv")
 
