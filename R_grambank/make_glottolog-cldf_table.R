@@ -1,4 +1,7 @@
-source("requirements.R")
+source("fun_def_h_load.R")
+h_load("tidyverse")
+source("global_variables.R")
+
 
 #This script takes the values and languages tables from the glottolog cldf-release and combines then and transforms them to a wide data format from a long. It does not take into account the parameter or code tables.
 

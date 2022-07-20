@@ -1,4 +1,5 @@
-source("requirements.R")
+source("fun_def_h_load.R")
+h_load(c("tidyverse", "ape"))
 
 #reading in glottolog
 glottolog_fn <- "output/non_GB_datasets/glottolog-cldf_wide_df.tsv"
