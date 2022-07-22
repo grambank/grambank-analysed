@@ -1,4 +1,5 @@
-source("requirements.R")
+source("fun_def_h_load.R")
+h_load(c("tidyverse"))
 
 #script written by Hedvig Skirgård
 

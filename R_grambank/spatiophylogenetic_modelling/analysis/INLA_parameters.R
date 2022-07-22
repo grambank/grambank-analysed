@@ -27,10 +27,33 @@ sigma_vec =  list(c(1, 1.15), c(1, 2), c(1, 3))
 # we use a penalising complexity prior which are particular suited to the
 # analyses of additive models. 
 # We should test the sensitivity of priors on the full data model
-pcprior = list(prec = list(
+#pcprior = list(prec = list(
+#  prior="pc.prec",
+#  param = c(1, 0.1)) # This prior suggests that the probability that variance for the random effect is greater than 1 is 10%
+#)
+
+#testing different priors
+prior_one_percent <-  list(prec = list(
+  prior="pc.prec",
+  param = c(1, 0.01)) # This prior suggests that the probability that variance for the random effect is greater than 1 is 1%
+)
+
+prior_ten_percent <-list(prec = list(
   prior="pc.prec",
   param = c(1, 0.1)) # This prior suggests that the probability that variance for the random effect is greater than 1 is 10%
 )
+
+prior_50_percent <-list(prec = list(
+  prior="pc.prec",
+  param = c(1, 0.5)) # This prior suggests that the probability that variance for the random effect is greater than 1 is 50%
+)
+
+prior_99_percent <-  list(prec = list(
+  prior="pc.prec",
+  param = c(1, 0.99)) # This prior suggests that the probability that variance for the random effect is greater than 1 is 99%
+)
+
+pcprior_vec <- c(prior_one_percent, prior_ten_percent , prior_50_percent, prior_99_percent)
 
 # We need to fix the residual variance to one, since it is not an identifiable quantity
 # within a binomial model. 
