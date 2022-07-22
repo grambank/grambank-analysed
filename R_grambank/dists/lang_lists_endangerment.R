@@ -17,7 +17,7 @@ bromham_supp_data <- readxl::read_xlsx("dists/Bromham_et_al_2022_supplementary_d
   dplyr::select(- `1=1-6a, 2=6b, 3=7, 4=8a, 5=8b, 6=9, 7=10`) %>% 
   reshape2::melt(id.vars ="ISO639P3code") %>% 
   left_join(glottolog_df, by = "ISO639P3code" ) %>% 
-  inner_join(GB, by = "Language_ID") %>% 
+  left_join(GB, by = "Language_ID") %>% 
   dplyr::select(Language_ID, variable, value) %>% 
   mutate(variable = as.character(variable)) %>% 
   tidyr::separate(col = variable, into = c("level", "period"), sep = "\\.", fill = "right") %>% 
