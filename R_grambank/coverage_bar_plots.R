@@ -31,6 +31,7 @@ df_for_family_plot <-  glottolog_cldf_df %>%
   filter(Family_ID != 'uncl1493')  %>% #removing unclassifiable
   filter(Family_ID != 'pidg1258')  %>% #removing pidgins
   full_join(GB_wide, by = "Language_ID") %>% 
+  filter(!is.na(Family_ID)) %>% 
   mutate(plot_value = if_else(!is.na(na_prop), "in Grambank", med_summarised)) %>%
   distinct(Language_level_ID, Family_ID, plot_value) 
 
@@ -80,7 +81,7 @@ df_for_family_plot %>%
   ungroup() %>%   
   complete(Family_name, plot_value, fill = list(n = 0)) %>% 
   reshape2::dcast(Family_name~plot_value, value.var = "n" ) %>% 
-  arrange(desc(`in Grambank`)) %>% 
+  arrange(desc(`in Grambank`)) %>%
   write_tsv("output/coverage_plots/coverage_table.tsv")
   
 #per continent
