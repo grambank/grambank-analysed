@@ -29,13 +29,23 @@ colnames(model_output) = str_replace_all(colnames(model_output),
 model_summary = 
   model_output %>% 
   group_by(feature, settings) %>% 
-  summarise(spatial_estimate = mean(Precision.for.spatial_id),
-            spatial_sd = sd(Precision.for.spatial_id),
-            phylogenetic_estimate = mean(Precision.for.phylo_id),
-            phylogenetic_sd = sd(Precision.for.phylo_id))
+  summarise(Spatial_estimate = mean(Precision.for.spatial_id),
+            Phylogenetic_estimate = mean(Precision.for.phylo_id),
+            )
 
+model_long = pivot_longer(model_summary, cols = c("Spatial_estimate", "Phylogenetic_estimate"))
 
-ggplot(model_summary, aes(x = settings, y = spatial_estimate, col = feature, group = feature)) + 
+p = 
+  ggplot(model_long, aes(x = settings, y = value, col = feature, group = feature)) + 
   geom_point() + 
   geom_line() + 
-  theme(legend.position = 'none')
+  ylim(c(0, 1)) + 
+  ylab("Spatial estimates") + 
+  xlab("Spatial parameters") + 
+  scale_x_discrete(labels = c('kappa = 2; sigma = 1.15',
+                              'kappa = 2; sigma = 2',
+                              'kappa = 2.5; sigma = 3')) + 
+  theme(legend.position = 'none') + 
+  facet_wrap(~name)
+
+p
