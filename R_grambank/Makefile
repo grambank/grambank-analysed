@@ -132,6 +132,12 @@ INLA_featurewise:
 INLA_simulation_binary_data:
 	Rscript spatiophylogenetic_modelling/analysis/INLA_multi_models.R "sim" 1 160
 
+INLA_featurewise_all_spatial_params_all_priors:
+	Rscript spatiophylogenetic_modelling/analysis/INLA_multi_models.R "real" 1 113 precision_matrices_kappa_2_sigma_1.15.RDS "loop_all_priors" 
+	Rscript spatiophylogenetic_modelling/analysis/INLA_multi_models.R "real" 1 113 precision_matrices_kappa_2_sigma_2.RDS "loop_all_priors" 
+	Rscript spatiophylogenetic_modelling/analysis/INLA_multi_models.R "real" 1 113 precision_matrices_kappa_2.5_sigma_3.RDS "loop_all_priors" 
+
+
 #step 7
 ## BRMS-analysis of unsualness scores
 predict_unusualness: 
