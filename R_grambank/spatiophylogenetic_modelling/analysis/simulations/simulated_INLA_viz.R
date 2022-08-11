@@ -1,6 +1,8 @@
 source("fun_def_h_load.R")
 h_load(pkg = c("qs", "unglue", "tidyverse"))
 
+#written by Russell Dinnage
+
 col_vector <- c("purple4", "turquoise3")
 
 OUTPUTDIR <- "output/spatiophylogenetic_modelling/simulation_plots/"
