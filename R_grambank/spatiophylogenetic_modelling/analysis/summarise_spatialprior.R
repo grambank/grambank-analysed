@@ -36,16 +36,20 @@ model_summary =
 model_long = pivot_longer(model_summary, cols = c("Spatial_estimate", "Phylogenetic_estimate"))
 
 p = 
-  ggplot(model_long, aes(x = settings, y = value, col = feature, group = feature)) + 
+  ggplot(model_long, aes(x = settings, y = value, group = feature)) + 
   geom_point() + 
   geom_line() + 
   ylim(c(0, 1)) + 
-  ylab("Spatial estimates") + 
-  xlab("Spatial parameters") + 
+  ylab("Spatiophylogenetic parameter estimates") + 
+  xlab("Matern spatial parameters") + 
   scale_x_discrete(labels = c('kappa = 2; sigma = 1.15',
                               'kappa = 2; sigma = 2',
                               'kappa = 2.5; sigma = 3')) + 
-  theme(legend.position = 'none') + 
+  theme(legend.position = 'none',
+        axis.text.x = element_text(angle = 45, hjust=1)) + 
   facet_wrap(~name)
 
-p
+ggsave(plot = p, 
+       filename = "output/spatiophylogenetic_modelling/spatialparameter_effects.png", 
+       width = 150, 
+       height = 100, units = "mm")
