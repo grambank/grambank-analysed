@@ -112,7 +112,7 @@ lg_df_all_scores <- lg_df_for_OV_VO_count %>%
   full_join(PCA_df, by = "Language_ID")  
 
 lg_df_all_scores %>% 
-  write_tsv("output/PCA/theo_scores.tsv", na = "")
+  write_delim("output/PCA/theo_scores.tsv", na = "", delim = "\t")
     
 ##SPLOM for overview
 tiff("output/PCA/splom_all_scores.tiff", height =30, width = 30, units = "cm", res = 400)
