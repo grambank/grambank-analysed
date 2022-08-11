@@ -16,7 +16,7 @@ params <- list.files("output/spatiophylogenetic_modelling/simulated_output", pat
               convert = TRUE)
 
 summary_mean <- qs_files %>%
-  map(qread) %>% 
+  purrr::map(qread) %>% 
   map_dfr(~tibble(only_phy = mean(.x[[1]]$icc_posterior),
                   only_spat = mean(.x[[2]]$icc_posterior),
                   both_spat = mean(.x[[3]]$icc_posterior[ , 1]),
