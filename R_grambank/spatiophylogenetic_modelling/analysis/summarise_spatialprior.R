@@ -35,8 +35,9 @@ model_summary =
 
 model_long = pivot_longer(model_summary, cols = c("Spatial_estimate", "Phylogenetic_estimate"))
 
-p = 
-  ggplot(model_long, aes(x = settings, y = value, group = feature)) + 
+col_vector <- c("purple4", "turquoise3")
+
+p =   ggplot(model_long, aes(x = settings, y = value, group = feature, color = name)) + 
   geom_point() + 
   geom_line() + 
   ylim(c(0, 1)) + 
@@ -45,7 +46,9 @@ p =
   scale_x_discrete(labels = c('kappa = 2; sigma = 1.15',
                               'kappa = 2; sigma = 2',
                               'kappa = 2.5; sigma = 3')) + 
-  theme(legend.position = 'none',
+  theme_classic() +
+  scale_color_manual(values = col_vector) +
+  theme(legend.position = 'None',
         axis.text.x = element_text(angle = 45, hjust=1)) + 
   facet_wrap(~name)
 
