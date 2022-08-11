@@ -12,11 +12,12 @@ if(!file.exists(theo_scores_fn)){
 }
 
 theo_scores_df <- read_tsv(theo_scores_fn, show_col_types = F) %>% 
-  inner_join(tree_tip_df) 
+  inner_join(tree_tip_df) %>% 
+  as.data.frame()
 
 rownames(theo_scores_df) <- theo_scores_df$Language_ID
 
 comp_data <- caper::comparative.data(phy = tree, data = theo_scores_df, names.col = "Language_ID")
 
-caper::pgls()
+test <- caper::pgls(PC1 ~ Fusion, data = comp_data)
 
