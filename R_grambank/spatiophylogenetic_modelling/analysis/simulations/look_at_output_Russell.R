@@ -1,6 +1,8 @@
 source("fun_def_h_load.R")
 h_load(pkg = c("qs", "unglue", "tidyverse"))
 
+col_vector <- c("purple4", "turquoise3")
+
 OUTPUTDIR <- "output/spatiophylogenetic_modelling/simulation_plots/"
 if(!dir.exists(OUTPUTDIR)){
   dir.create(OUTPUTDIR, showWarnings = FALSE)
@@ -12,7 +14,7 @@ params <- list.files("output/spatiophylogenetic_modelling/simulated_output", pat
               convert = TRUE)
 
 summary_mean <- qs_files %>%
-  map(qread) %>%
+  map(qread) %>% 
   map_dfr(~tibble(only_phy = mean(.x[[1]]$icc_posterior),
                   only_spat = mean(.x[[2]]$icc_posterior),
                   both_spat = mean(.x[[3]]$icc_posterior[ , 1]),
@@ -78,6 +80,7 @@ pdf(file = paste0(OUTPUTDIR,"sim_results_means_boxplots_only.pdf"))
 
 ggplot(plot_dat_mean, aes(lamb, value)) +
   geom_boxplot(aes(fill = Variable)) +
+  scale_fill_manual(values = col_vector) +
   facet_grid(prop ~ model, scales = "free",
              labeller = label_both) +
   ylab("Estimated Posterior Mean of 'Lambda'") +
