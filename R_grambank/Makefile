@@ -127,10 +127,10 @@ INLA: data INLA_featurewise
 
 INLA_featurewise:
 	@echo "## Running INLA-analysis featurewise. #"
-	Rscript spatiophylogenetic_modelling/analysis/INLA_multi_models.R "real" 1 113
+	Rscript spatiophylogenetic_modelling/analysis/INLA_multi_models.R "real" 1 113 precision_matrices_kappa_2_sigma_1.15.RDS "default"
 
 INLA_simulation_binary_data:
-	Rscript spatiophylogenetic_modelling/analysis/INLA_multi_models.R "sim" 1 160
+	Rscript spatiophylogenetic_modelling/analysis/INLA_multi_models.R "sim" 1 160 precision_matrices_kappa_2_sigma_1.15.RDS "default"
 
 INLA_featurewise_all_spatial_params_all_priors:
 	Rscript spatiophylogenetic_modelling/analysis/INLA_multi_models.R "real" 1 113 precision_matrices_kappa_2_sigma_1.15.RDS "loop_all_priors" 
