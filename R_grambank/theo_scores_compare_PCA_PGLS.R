@@ -24,7 +24,7 @@ comp_data <- caper::comparative.data(phy = tree, data = theo_scores_df, names.co
 
 #testing combinations
 
-theo_scores_cols <- c("word order"   ,       "Flexivity"      ,     "Gender/noun class", "locus of\nmarking"  ,
+theo_scores_cols <- c("word order"   ,       "Flexivity"      ,     "Gender/\nnoun class", "locus of\nmarking"  ,
                       "Fusion"        ,      "Informativity" )
 
 PCS <- c("PC1_scaled" ,         "PC2_scaled"     ,     "PC3_scaled"         )
