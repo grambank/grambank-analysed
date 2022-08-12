@@ -23,26 +23,38 @@ GB_languages <- read_tsv(GB_fn,col_types = cols()) %>%
 #reading in tree
 EDGE_tree <- ape::read.nexus("spatiophylogenetic_modelling/phylogenies/EDGE6635-merged-relabelled.tree")
 
-#subsetting the tips to those in Grambank and such that there is only one per language_level_id, i.e. merging dialects and the like.
+#keeping just one tip per language in the entire EDGE-tree
 to_keep <- EDGE_tree$tip.label %>% 
   as.data.frame() %>% 
   rename(tip.label = ".") %>% 
   separate(col = tip.label , into = c("Language_ID", "Name_EDGE"), remove = F, sep = 8) %>% 
   left_join(glottolog_df, by = "Language_ID") %>% 
-  inner_join(GB_languages, by = "Language_ID") %>% 
+  group_by(Language_level_ID) %>% 
+  sample_n(1)
+
+EDGE_tree <- ape::keep.tip(EDGE_tree, to_keep$tip.label)
+
+#renaming tip labels to glottocodes
+EDGE_tree$tip.label <- EDGE_tree$tip.label %>% 
+  as.data.frame() %>% 
+  rename(tip.label = ".") %>% 
+  separate(col = tip.label , into = c("Language_ID", "Name_EDGE"), remove = F, sep = 8) %>% 
+  left_join(glottolog_df, by = "Language_ID") %>% 
+  dplyr::select(Language_level_ID) %>% 
+  as.matrix() %>% 
+  as.vector()
+
+#subsetting the tips to those in Grambank
+to_keep <- EDGE_tree$tip.label %>% 
+  as.data.frame() %>% 
+  rename(Language_ID = ".") %>% 
+  left_join(glottolog_df, by = "Language_ID") %>% 
+  inner_join(GB_languages, by = "Language_ID") %>%
   group_by(Language_level_ID) %>% 
   sample_n(1)
 
 #actually rpuning the tree itself
-pruned_tree <- ape::keep.tip(EDGE_tree, to_keep$tip.label)
-
-#renaming tip labels to just glottocodes
-pruned_tree$tip.label <- pruned_tree$tip.label %>% 
-  as.data.frame() %>% 
-  rename(tip.label = ".") %>% 
-  separate(col = tip.label , into = c("Language_ID", "Name_EDGE"), sep = 8) %>% 
-  dplyr::select(Language_ID) %>% 
-  .[,1]
+pruned_tree <- ape::keep.tip(EDGE_tree, to_keep$Language_ID)
 
 outputdir <- "output/spatiophylogenetic_modelling/processed_data/"
 if(!dir.exists(outputdir)){dir.create(outputdir)}
