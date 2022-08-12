@@ -2,7 +2,7 @@
 n_total <- 2467
 n_imputed <- 1509
 n_overlap_imputed_and_jaeger_tree <- 1265
-n_overlap_imputed_and_EDGE_tree <- 1403
+n_overlap_imputed_and_EDGE_tree <- 1404
 
 GRAMBANK_LANGUAGES <- file.path("../grambank", "cldf", "languages.csv")
 GRAMBANK_VALUES <- file.path("../grambank", "cldf", "values.csv")
