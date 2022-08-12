@@ -24,7 +24,7 @@ comp_data <- caper::comparative.data(phy = tree, data = theo_scores_df, names.co
 
 #testing combinations
 
-theo_scores_cols <- c("word order"   ,       "Flexivity"      ,     "Gender/\nnoun class", "locus of\nmarking"  ,
+theo_scores_cols <- c("word order"   ,       "Flexivity"      ,     "Gender/noun class", "locus of\nmarking"  ,
                       "Fusion"        ,      "Informativity" )
 
 PCS <- c("PC1_scaled" ,         "PC2_scaled"     ,     "PC3_scaled"         )
@@ -71,7 +71,15 @@ results_df <- results_df  %>%
   full_join(PC3_df, by = c("theo_score", "PC", "coef", "p_value"))
 }
 
-results_df %>% 
+results_df <- results_df %>% 
   mutate(sig = ifelse(p_value < 0.05, "sig", "non_sig")) %>% 
-  write_tsv("output/PCA/PGLS_theo_scorse_correlations.tsv")
+  mutate(abs_coef = abs(coef))  
+
+results_df  %>% 
+  mutate(p_value = round(p_value, 5)) %>% 
+  mutate(coef = round(coef, 5)) %>% 
+  mutate(theo_score = str_replace_all(theo_score, "\n", "")) %>%
+  arrange(PC) %>% 
+    dplyr::select(PC, `Theoretical score` = theo_score, coef, `p-value (of t)` =p_value) %>% 
+  write_tsv("output/PCA/PGLS_theo_score_correlations.tsv")
 
