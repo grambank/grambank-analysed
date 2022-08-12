@@ -14,10 +14,13 @@ if(!file.exists(theo_scores_fn)){
 
 theo_scores_df <- read_tsv(theo_scores_fn, show_col_types = F) %>%
   inner_join(tree_tip_df,by = "Language_ID") %>% 
-  mutate(PC1_scaled = range01(PC1)) %>% #scaling each PC to between 0 and 1 to make it more comparable
-  mutate(PC2_scaled = range01(PC2)) %>% 
-  mutate(PC3_scaled = range01(PC3)) %>% 
-  as.data.frame()
+  column_to_rownames("Language_ID") %>% 
+  as.data.frame() 
+
+theo_scores_df <- apply(theo_scores_df,2, function(x) x/sd(x)) %>% as.data.frame()
+
+theo_scores_df <- theo_scores_df %>% 
+  rownames_to_column("Language_ID")
 
 #setting up the comparative data object for caper
 comp_data <- caper::comparative.data(phy = tree, data = theo_scores_df, names.col = "Language_ID")
@@ -46,9 +49,9 @@ results_df <- results_df %>%
 for(theo_score in theo_scores_cols){
 #  theo_score <- theo_scores_cols[1]
   cat("i'm on ", theo_score, ".\n")
-  output_PC1 <- eval(substitute(caper::pgls(formula = PC1_scaled ~ this_var, data = comp_data), list(this_var=as.name(theo_score)))) %>% summary()
-  output_PC2 <- eval(substitute(caper::pgls(formula = PC2_scaled ~ this_var, data = comp_data), list(this_var=as.name(theo_score))))  %>% summary()
-  output_PC3 <- eval(substitute(caper::pgls(formula = PC3_scaled ~ this_var, data = comp_data), list(this_var=as.name(theo_score))))  %>% summary()
+  output_PC1 <- eval(substitute(caper::pgls(formula = PC1 ~ this_var, data = comp_data), list(this_var=as.name(theo_score)))) %>% summary()
+  output_PC2 <- eval(substitute(caper::pgls(formula = PC2 ~ this_var, data = comp_data), list(this_var=as.name(theo_score))))  %>% summary()
+  output_PC3 <- eval(substitute(caper::pgls(formula = PC3 ~ this_var, data = comp_data), list(this_var=as.name(theo_score))))  %>% summary()
 
 PC1_df <- data.frame(PC = "PC1",
   theo_score = theo_score,
@@ -72,8 +75,7 @@ results_df <- results_df  %>%
 }
 
 results_df <- results_df %>% 
-  mutate(sig = ifelse(p_value < 0.05, "sig", "non_sig")) %>% 
-  mutate(abs_coef = abs(coef))  
+  mutate(sig = ifelse(p_value < 0.05, "sig", "non_sig")) 
 
 results_df  %>% 
   mutate(p_value = round(p_value, 5)) %>% 
