@@ -35,7 +35,7 @@ model_output_files = list.files(path = "output/spatiophylogenetic_modelling/feat
                                 pattern = "*.qs",
                                 full.names = TRUE)
 
-model_output_files <- model_output_files[!str_detect(model_output_files, "kapp")]
+model_output_files <- model_output_files[str_detect(model_output_files, "kappa_2_sigma_1.15")]
 
 model_output = lapply(model_output_files, qread)
 names(model_output) = basename(model_output_files) %>%
