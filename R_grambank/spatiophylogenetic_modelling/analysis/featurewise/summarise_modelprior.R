@@ -41,7 +41,7 @@ p =   ggplot(model_long, aes(x = prior, y = value, group = feature, color = name
   geom_line() + 
   ylim(c(0, 1)) + 
   ylab("Spatiophylogenetic parameter estimates") + 
-  xlab("Matern spatial parameters") + 
+  xlab("Penalizing Complexity Priors") + 
   scale_x_discrete(labels = c('PC Prior = 0.01',
                               'PC Prior = 0.1',
                               'PC Prior = 0.5',
