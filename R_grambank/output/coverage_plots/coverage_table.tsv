@@ -1,23 +1,23 @@
 Family_name	grammar exists	in Grambank	no grammar exists/unknown
-Austronesian	172	525	577
-Atlantic-Congo	461	313	629
-Sino-Tibetan	132	190	175
-Afro-Asiatic	134	119	124
+Austronesian	174	523	573
+Atlantic-Congo	468	313	622
+Sino-Tibetan	135	190	173
+Afro-Asiatic	136	119	122
 Isolates	16	101	65
 Pama-Nyungan	78	85	87
-Austroasiatic	10	81	66
-Indo-European	397	78	108
-Nuclear Trans New Guinea	67	65	185
+Austroasiatic	10	81	67
+Indo-European	399	78	104
+Nuclear Trans New Guinea	68	65	184
 Uto-Aztecan	9	44	16
 Arawakan	5	43	29
-Dravidian	21	33	25
-Otomanguean	63	32	86
+Dravidian	23	33	25
+Otomanguean	62	32	88
 Uralic	17	30	1
-Central Sudanic	9	25	30
+Central Sudanic	9	25	29
 Nakh-Daghestanian	11	22	1
 Pano-Tacanan	4	19	22
 Chibchan	2	18	7
-Tupian	29	18	24
+Tupian	28	18	25
 Algic	24	16	6
 Mande	40	16	19
 Tai-Kadai	48	16	31
@@ -33,7 +33,7 @@ Hmong-Mien	12	10	17
 Tucanoan	8	10	8
 Quechuan	27	9	8
 Sepik	5	9	22
-Tungusic	4	9	0
+Tungusic	3	9	1
 Worrorran	0	9	1
 Mongolic-Khitan	9	8	0
 Japonic	6	7	2
@@ -47,7 +47,7 @@ Goilalan	1	5	0
 Gunwinyguan	4	5	3
 Muskogean	2	5	0
 Nyulnyulan	0	5	5
-Songhay	4	5	1
+Songhay	5	5	0
 Surmic	5	5	1
 Timor-Alor-Pantar	14	5	4
 Totonacan	4	5	4
@@ -112,7 +112,7 @@ Maban	2	2	6
 Maiduan	1	2	1
 Mangarrayi-Maran	2	2	0
 Maningrida	2	2	0
-Miwok-Costanoan	4	2	5
+Miwok-Costanoan	4	2	7
 Nambiquaran	3	2	1
 North Bougainville	0	2	2
 Nubian	4	2	7
@@ -120,11 +120,10 @@ Pahoturi	0	2	0
 Piawi	0	2	0
 Rashad	0	2	0
 Sahaptian	2	2	1
-Sign Language	70	2	130
+Sign Language	71	2	137
 South Omotic	2	2	1
 Tamaic	1	2	1
 Taulil-Butam	0	2	0
-Tuu	4	2	2
 Wakashan	3	2	1
 Yokutsan	0	2	2
 Yuki-Wappo	0	2	0
@@ -193,7 +192,7 @@ Pomoan	4	1	2
 Saliban	2	1	0
 Senagi	1	1	0
 Sentanic	1	1	2
-Shastan	0	1	2
+Shastan	0	1	3
 Sko	4	1	5
 Southern Daly	1	1	0
 Suki-Gogodala	0	1	3
@@ -204,6 +203,7 @@ Ticuna-Yuri	0	1	1
 Tor-Orya	1	1	11
 Tsimshian	2	1	0
 Turama-Kikori	0	1	3
+Tuu	6	1	2
 Uru-Chipaya	1	1	0
 West Bird's Head	2	1	2
 West Bomberai	2	1	0
@@ -216,7 +216,7 @@ Yuat	0	1	4
 Yukaghir	1	1	2
 Zamucoan	2	1	0
 NA	0	1	0
-Arafundi	1	0	3
+Arafundi	1	0	4
 Bayono-Awbono	0	0	2
 Bulaka River	2	0	1
 Cahuapanan	2	0	0
