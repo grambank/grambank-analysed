@@ -9,14 +9,14 @@ edget_fn <- "output/spatiophylogenetic_modelling/processed_data/EDGE_pruned_tree
 if(!(file.exists(edget_fn))){
   source("spatiophylogenetic_modelling/processing/pruning_EDGE_tree.R")}
 edget = read.tree(edget_fn)
+
 data<-read_tsv("output/PCA/PCA_language_values.tsv", show_col_types = F)
+
+#subset data
 cnames<-data[data$Language_ID%in%edget$tip.label,]$Language_ID
 data<-data[data$Language_ID%in%cnames,]
-all(edget$tip.label%in%data$Language_ID)
+x <- all(edget$tip.label%in%data$Language_ID)
 data<-data[match(edget$tip.label, data$Language_ID),]
-
-# plot(data$PC2~ data$PC1, pch=20, col=scales::alpha("black",0.3), xlab="PC1", ylab="PC2")
-
 
 ############################
 ########## simple BM asr ###
