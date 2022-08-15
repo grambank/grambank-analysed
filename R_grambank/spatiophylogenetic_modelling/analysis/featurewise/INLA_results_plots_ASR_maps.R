@@ -136,12 +136,8 @@ for(feature in c(three_most_phylo_features)) {
   cat(paste0("I'm at feature ", feature, " which is index ", index, ".\n"))
 
   feature_df <-GB_df %>%
-    dplyr::select(Language_ID, all_of(feature)) #%>%
-  #   rename(Feature = 2) %>%
-  #   mutate(tip.color = as.character(Feature)) %>%
-  #   mutate(tip.color = str_replace_all(tip.color, "1", color_vector[1])) %>%
-  #   mutate(tip.color = str_replace_all(tip.color, "0", color_vector[2]))
-
+    dplyr::select(Language_ID, all_of(feature)) 
+  
   data <- GB_df %>%
     dplyr::select(Language_ID, all_of(feature))
   data$phylo_id = match(data$Language_ID, rownames(phylo_prec_mat))
@@ -173,7 +169,7 @@ for(feature in c(three_most_phylo_features)) {
 
   start_pars <- dual_hyperpar %>%
     filter(Feature_ID == feature) %>%
-    dplyr::select(-Feature_ID) %>%
+    dplyr::select(`Precision for spatial_id`, `Precision for phylo_id`) %>% 
     unlist()
 
   dual_model <- INLA::inla(formula = formula,
