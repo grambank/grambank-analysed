@@ -1,22 +1,11 @@
-
-rm(list=ls())
+source("requirements.R")
+h_load(pkg = c("ape", "phytools", "geiger", "phangorn", "data.table", "BAMMtools", "viridis", "pals"))
 
 ##########################
 ########## tree & data ###
 ##########################
 
-library(ape)
-library(phytools)
-library(geiger)
-library(phangorn)
 
-library(data.table)
-
-library(BAMMtools)
-library(viridis)
-library(pals)
-
-source("requirements.R")
 
 edget<-read.tree(file="spatiophylogenetic_modelling/processed_data/EDGE_pruned_tree.tree")
 data<-read_tsv("output/PCA/PCA_language_values.tsv")
