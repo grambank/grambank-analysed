@@ -91,13 +91,6 @@ three_most_phylo_features <- dual_summary %>%
   as.matrix() %>%
   as.vector()
 
-two_least_phylo_features <- dual_summary %>%
-  top_n(n = -2, wt = mean_phylogenetic) %>%
-  arrange(desc(mean_phylogenetic)) %>%
-  dplyr::select(Feature_ID) %>%
-  as.matrix() %>%
-  as.vector()
-
 #reading in tree
 tree_fn <- "output/spatiophylogenetic_modelling/processed_data/EDGE_pruned_tree.tree"
 if(!(file.exists(tree_fn))){
