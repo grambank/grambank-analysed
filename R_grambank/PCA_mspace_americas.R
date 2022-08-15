@@ -5,10 +5,11 @@ h_load(pkg = c("ape", "phytools", "geiger", "phangorn", "data.table", "BAMMtools
 ########## tree & data ###
 ##########################
 
-
-
-edget<-read.tree(file="spatiophylogenetic_modelling/processed_data/EDGE_pruned_tree.tree")
-data<-read_tsv("output/PCA/PCA_language_values.tsv")
+edget_fn <- "output/spatiophylogenetic_modelling/processed_data/EDGE_pruned_tree.tree"
+if(!(file.exists(edget_fn))){
+  source("spatiophylogenetic_modelling/processing/pruning_EDGE_tree.R")}
+edget = read.tree(edget_fn)
+data<-read_tsv("output/PCA/PCA_language_values.tsv", show_col_types = F)
 cnames<-data[data$Language_ID%in%edget$tip.label,]$Language_ID
 data<-data[data$Language_ID%in%cnames,]
 all(edget$tip.label%in%data$Language_ID)
