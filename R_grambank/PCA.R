@@ -1,8 +1,6 @@
 #PCA analysis over the imputed data. Here we use the imputed data from random forests to run PCA.
-library(readr)
-library(tidyverse)
-library(reshape2)
-library(nFactors)
+source("fun_def_h_load.R")
+h_load(pkg = c("tidyverse", "reshape2", "nFactors"))
 
 #script written by Hedvig Skirgård
 
