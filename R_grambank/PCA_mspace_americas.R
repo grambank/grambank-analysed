@@ -1,6 +1,8 @@
 source("requirements.R")
 h_load(pkg = c("ape", "phytools", "geiger", "phangorn", "data.table", "BAMMtools", "viridis", "pals"))
 
+#script written by Angela Chira.
+
 ##########################
 ########## tree & data ###
 ##########################
