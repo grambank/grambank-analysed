@@ -32,18 +32,17 @@ parameters_binary <- read_csv("feature_grouping_for_analysis.csv", show_col_type
 
 ## Read in model posteriors
 model_output_files = list.files(path = "output/spatiophylogenetic_modelling/featurewise/",
-                                pattern = "*.qs",
+                                pattern = ".*kappa_2_sigma_1.15_pcprior0.1.*.qs",
                                 full.names = TRUE)
 
-model_output_files <- model_output_files[str_detect(model_output_files, "kappa_2_sigma_1.15_pcprior0.1")]
-
 model_output = lapply(model_output_files, qread)
+
 names(model_output) = basename(model_output_files) %>%
   tools::file_path_sans_ext(.)
 
 ## Extract the posterior distrubtions for each dual_process model from the hypersample
 dual_posterior = lapply(model_output, function(m) {
-  dd = m[[4]]$hyper_sample
+  dd = m[[1]]$hyper_sample
   binomial_error = pi^2 / 3
   # Calculate h^2
   posterior = (1 / dd) / (rowSums(1 / dd) + 1 + binomial_error)
@@ -54,7 +53,7 @@ dual_posterior = lapply(model_output, function(m) {
 dual_posterior = map_df(dual_posterior, ~as.data.frame(.x), .id="id")
 
 dual_hyperpar = lapply(model_output, function(m) {
-  dd = apply(m[[4]]$hyper_sample, 2, function(x) median(log(x)))
+  dd = apply(m[[1]]$hyper_sample, 2, function(x) median(log(x)))
   dd
 })
 
