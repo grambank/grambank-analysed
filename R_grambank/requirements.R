@@ -8,97 +8,97 @@ source("fun_def_h_load.R")
 
 h_load(verbose = F, pkg = c(
 #pacman::p_load(
-  "spam",
-	"dplyr",
-  "ggplot2",
-  "tidyr",
-  "forcats",
-  "magrittr",
-  "purrr",
-  "stringr",
-  "tibble",
-  	"readr",
-	"fields",
-	"reshape2",
-	"broom",
-#	"plyr",
-	"broom.mixed",
-	"naniar",
-	"glue",
-	"forcats",
-	"magrittr",
-	"stringr",
-	"brms",
-	"purrr",
-	"rcompanion",
-  "qs",
+    "spam",
+    "dplyr",
+    "ggplot2",
+    "tidyr",
+    "forcats",
+    "magrittr",
+    "purrr",
+    "stringr",
+    "tibble",
+    "readr",
+    "fields",
+    "reshape2",
+    "broom",
+    #	"plyr",
+    "broom.mixed",
+    "naniar",
+    "glue",
+    "forcats",
+    "magrittr",
+    "stringr",
+    "brms",
+    "purrr",
+    "rcompanion",
+    "qs",
 
-	"MASS",
-	"matrixStats",
-	"cluster",
-  "MCMCglmm",
-"foreach",
-"geiger",
-
-
-	# "imputation
-"randomForest",
-	"missForest",
-
-	#plotting graphs
-  "ellipse",
-	"scales",
-	"RColorBrewer",
-  "car",
-	"ggpubr",
-	"ggplot2",
-#	cowplot",
-	"ggrepel",
-	"gplots",
-	"ggridges",
-	"grid",
-	"gridExtra",
-	"scales",
-#	"ggmap",
-	"nFactors",
-	"psych", #for scatterplot matrix
-	"viridis",
-	"rlang",
-	"devtools",
-	"patchwork",
-
-	#making maps
-  "maps",
-	"mapdata",
-#	"maptools",
-	"mapproj",
-
-#unsualness
-"e1071",
-"mvtnorm",
-"BayesLCA",
-"factoextra",
-"GGally",
+    "MASS",
+    "matrixStats",
+    "cluster",
+    "MCMCglmm",
+    "foreach",
+    "geiger",
 
 
-	#sensitivity testing spatial
-#	rnaturalearth",
-#	rnaturalearthdata",
-"ggforce",
-	"geosphere",
-"sf",
+    # "imputation
+    "randomForest",
+    "missForest",
 
-	# phylogenetic packages
-"ape",
-"phytools",
-	"caper",
-"synchrony",
-  "geiger",
-"synchrony",
+    #plotting graphs
+    "ellipse",
+    "scales",
+    "RColorBrewer",
+    "car",
+    "ggpubr",
+    "ggplot2",
+    #	cowplot",
+    "ggrepel",
+    "gplots",
+    "ggridges",
+    "grid",
+    "gridExtra",
+    "scales",
+    #	"ggmap",
+    "nFactors",
+    "psych", #for scatterplot matrix
+    "viridis",
+    "rlang",
+    "devtools",
+    "patchwork",
 
-	# testing
-	"assertthat",
-"testthat"
+    #making maps
+    "maps",
+    "mapdata",
+    #	"maptools",
+    "mapproj",
+
+    #unsualness
+    "e1071",
+    "mvtnorm",
+    "BayesLCA",
+    "factoextra",
+    "GGally",
+
+
+    #sensitivity testing spatial
+    #	rnaturalearth",
+    #	rnaturalearthdata",
+    "ggforce",
+    "geosphere",
+    "sf",
+
+    # phylogenetic packages
+    "ape",
+    "phytools",
+    "caper",
+    "synchrony",
+    "geiger",
+    "synchrony",
+
+    # testing
+    "assertthat",
+    "testthat"
 ))
 
 # quiet down, tidyverse:
