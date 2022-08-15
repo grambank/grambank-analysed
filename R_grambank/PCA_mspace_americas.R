@@ -47,7 +47,7 @@ ages.nodes <- ages$nodeage
 ages.tips <- ages$tip.age
 age.root <- max(ages.nodes) # age of root
 
-identical(names(ages.nodes), dfasr$Node)
+x <- identical(names(ages.nodes), dfasr$Node)
 dfasr$NodeAge<-ages.nodes
 
 
@@ -62,7 +62,7 @@ abline(v=age.intervals_log, col=rev(vector_col(age.intervals_linear)$cols))
 # plot(age.intervals_linear~ age.intervals_linear, col=rev(vector_col(age.intervals_linear)$cols))
 
 # PLOT -- 1 side: all, 1 side: Americas, same time scale
-dev.off()
+x <- dev.off()
 
 # par(mfrow=c(1,2))
 
