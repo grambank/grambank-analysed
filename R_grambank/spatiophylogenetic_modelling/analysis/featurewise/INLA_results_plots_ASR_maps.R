@@ -1,12 +1,15 @@
 ## This script visualises the output from a dual-process model for each Grambank feature
 source('requirements.R')
 
+source("spatiophylogenetic_modelling/analysis/INLA_parameters.R")
+pcprior <- prior_ten_percent
+
 OUTPUTDIR <- "output/spatiophylogenetic_modelling/spec_feature_plots/"
 if(!dir.exists(OUTPUTDIR)){
   dir.create(OUTPUTDIR)
 }
 
-beep = 0
+beep = 1
 
 #description of featurs
 GB_id_desc <- readr::read_tsv("output/GB_wide/parameters_binary.tsv", show_col_types = F) %>%
@@ -59,16 +62,19 @@ dual_hyperpar = lapply(model_output, function(m) {
 
 dual_hyperpar <- do.call(rbind, dual_hyperpar) %>%
   as.data.frame()
-dual_hyperpar$Feature_ID <- rownames(dual_hyperpar)
+dual_hyperpar$Feature_ID_model <- rownames(dual_hyperpar)
 
 colnames(dual_posterior) = c(
-  "Feature_ID",
+  "Feature_ID_model",
   "spatial",
   "phylogenetic"
 )
 
+dual_posterior$Feature_ID <- str_extract(dual_posterior$Feature_ID_model, "GB[0-9]{3}")
+dual_hyperpar$Feature_ID <- str_extract(dual_hyperpar$Feature_ID_model, "GB[0-9]{3}")
+
 # join feature metadata to posterior
-dual_posterior = left_join(dual_posterior, parameters_binary, by ="Feature_ID")
+dual_posterior = left_join(dual_posterior, parameters_binary, by ="Feature_ID") 
 
 # Summarise the posterior distributions
 dual_summary = dual_posterior %>%
