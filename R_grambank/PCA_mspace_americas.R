@@ -1,5 +1,5 @@
 source("requirements.R")
-h_load(pkg = c("ape", "phytools", "geiger", "phangorn", "data.table", "BAMMtools", "viridis", "pals"))
+h_load(pkg = c("ape", "phytools", "geiger", "phangorn", "data.table", "BAMMtools", "viridis", "pals", "magick"))
 
 #script written by Angela Chira.
 
@@ -311,7 +311,7 @@ abline(v=xplog[xplog<= (-1)*cmin], lwd=2.5, col="#E7242D" )  #col="#E7242D"
 dev.off()
 
 # create gif
-library(magick) # https://www.nagraj.net/notes/gifs-in-r/
+y# https://www.nagraj.net/notes/gifs-in-r/
 imgs <- list.files("output/PCA/mspaceamericasgif", full.names = T) ## list file names and read in
 # imgs<-imgs[grep(".pdf", imgs)]
 ordern<-seq(from =1 , to=length(imgs)) # order this by number not alphabetically
