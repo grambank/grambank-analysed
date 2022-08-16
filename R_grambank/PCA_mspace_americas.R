@@ -13,6 +13,7 @@ if(!(file.exists(edget_fn))){
 edget = read.tree(edget_fn)
 
 data<-read_tsv("output/PCA/PCA_language_values.tsv", show_col_types = F)
+allgb<-data
 
 #subset data
 cnames<-data[data$Language_ID%in%edget$tip.label,]$Language_ID
@@ -23,11 +24,18 @@ Language_meta_data <-  read_csv(GRAMBANK_LANGUAGES, col_types=LANGUAGES_COLSPEC)
   dplyr::select(Language_ID = Language_level_ID, Family_name, Name, Macroarea) %>% 
   distinct(Language_ID, .keep_all = T) %>% 
   mutate(Family_name = ifelse(is.na(Family_name), "Isolate", Family_name))
+alllang<-Language_meta_data
 Language_meta_data<-Language_meta_data[Language_meta_data$Language_ID%in%data$Language_ID,]
 Language_meta_data<-Language_meta_data[match(data$Language_ID, Language_meta_data$Language_ID),]
 data$Family_name<-Language_meta_data$Family_name
 data$Name<-Language_meta_data$Name
 data$Macroarea<-Language_meta_data$Macroarea
+
+# all grambank
+alllang<-alllang[alllang$Language_ID%in%allgb$Language_ID,]
+alllang<-alllang[match(alllang$Language_ID, alllang$Language_ID),]
+allgb$Macroarea<-alllang$Macroarea
+
 
 ############################
 ########## simple BM asr ###
@@ -90,7 +98,7 @@ nf<-layout(matlay, widths = c(2,2,2,2), heights =c(2,1,1,1),TRUE)
 # layout.show(nf)
 par(mar=c(5,5,2,3))
 
-plot(0, bty = 'n', pch = '', ylab = "PC2", xlab = "PC1", xlim= range(data$PC1), ylim = range(data$PC2), xaxt='n', yaxt='n',font.lab=2, cex.lab=1.3)
+plot(0, bty = 'n', pch = '', ylab = "PC2", xlab = "PC1", xlim= range(allgb$PC1), ylim = range(allgb$PC2), xaxt='n', yaxt='n',font.lab=2, cex.lab=1.3)
 mtext(text="a", side=3,adj=0, line=+0.3,cex=1.3)
 axis(1, lwd=2, tck=-0.01, cex.axis=1.1)
 axis(2, lwd=2, tck=-0.01, cex.axis=1.1) #lwd.tick=0
@@ -105,8 +113,11 @@ if(max(age.intervals)< max(dfasr$NodeAge)) age.intervals[age.intervals%in%max(ag
 
 # tips
 # points(data$PC2 ~ data$PC1, col=scales::alpha(col_plot[1],1), pch=20)
-points(data[!data$Macroarea%in%c("South America", "North America"),]$PC2 ~ data[!data$Macroarea%in%c("South America", "North America"),]$PC1, 
-       col=scales::alpha(col_plot[1],1), pch=20)
+# points(data[!data$Macroarea%in%c("South America", "North America"),]$PC2 ~ data[!data$Macroarea%in%c("South America", "North America"),]$PC1, 
+#        col=scales::alpha(col_plot[1],1), pch=20)
+
+points(allgb[!allgb$Macroarea%in%c("South America", "North America"),]$PC2 ~ allgb[!allgb$Macroarea%in%c("South America", "North America"),]$PC1, 
+       col=scales::alpha(col_plot[1],1), pch=20) # all languages in GB for present slice
 
 for(i in 1: (length(age.intervals)-1)) {
   
@@ -127,7 +138,7 @@ for(i in 1: (length(age.intervals)-1)) {
 
 
 # shine on Americas
-plot(0, bty = 'n', pch = '', ylab = "PC2", xlab = "PC1", xlim= range(data$PC1), ylim = range(data$PC2), xaxt='n', yaxt='n',font.lab=2, cex.lab=1.3)
+plot(0, bty = 'n', pch = '', ylab = "PC2", xlab = "PC1", xlim= range(allgb$PC1), ylim = range(allgb$PC2), xaxt='n', yaxt='n',font.lab=2, cex.lab=1.3)
 mtext(text="b", side=3,adj=0, line=+0.3, cex=1.3)
 axis(1, lwd=2, tck=-0.01, cex.axis=1.1)
 axis(2, lwd=2, tck=-0.01, cex.axis=1.1) #lwd.tick=0
@@ -141,13 +152,17 @@ age.intervals<-age.intervals_log
 if(max(age.intervals)< max(dfasr$NodeAge)) age.intervals[age.intervals%in%max(age.intervals)]<-max(dfasr$NodeAge)+1e-12
 
 # everything else
-yp<-c(dfasr[dfasr$Nodeam==0,]$PC2, data[!data$Macroarea%in%c("South America", "North America"),]$PC2)
-xp<-c(dfasr[dfasr$Nodeam==0,]$PC1, data[!data$Macroarea%in%c("South America", "North America"),]$PC1)
-points(yp ~ xp, col=scales::alpha("gray94",0.7), pch=20)
+# yp<-c(dfasr[dfasr$Nodeam==0,]$PC2, data[!data$Macroarea%in%c("South America", "North America"),]$PC2)
+# xp<-c(dfasr[dfasr$Nodeam==0,]$PC1, data[!data$Macroarea%in%c("South America", "North America"),]$PC1)
+yp<-c(dfasr[dfasr$Nodeam==0,]$PC2, allgb[!allgb$Macroarea%in%c("South America", "North America"),]$PC2)
+xp<-c(dfasr[dfasr$Nodeam==0,]$PC1, allgb[!allgb$Macroarea%in%c("South America", "North America"),]$PC1)
+points(yp ~ xp, col=scales::alpha("gray94",0.7), pch=20) 
 
 # tips in Americas
-points(data[data$Macroarea%in%c("South America", "North America"),]$PC2 ~ data[data$Macroarea%in%c("South America", "North America"),]$PC1, 
-       col=scales::alpha(col_plot[1],1), pch=20)
+# points(data[data$Macroarea%in%c("South America", "North America"),]$PC2 ~ data[data$Macroarea%in%c("South America", "North America"),]$PC1, 
+#        col=scales::alpha(col_plot[1],1), pch=20)
+points(allgb[allgb$Macroarea%in%c("South America", "North America"),]$PC2 ~ allgb[allgb$Macroarea%in%c("South America", "North America"),]$PC1, 
+       col=scales::alpha(col_plot[1],1), pch=20) # all gb
 
 for(i in 1: (length(age.intervals)-1)) {
   
@@ -175,6 +190,7 @@ hist(dfasr$NodeAge, col="gray50", border = "gray50", xaxt='n', yaxt='n', xlim=c(
      xlab="", main="", ylab="", breaks=200)
 clip(0, max(age.intervals_log), -50, -10)
 abline(v=age.intervals_log, col=rev(vector_col(age.intervals_linear)$cols), lwd=2.5)
+# abline(v=age.intervals_log, col=vector_col(age.intervals_linear)$cols, lwd=2.5)
 mtext(text="c", side=3,adj=0, line=+0.3,cex=1.3)
 axis(1, lwd=2, tck=-0.01, line=+1.5)
 text(x=-8,y=-110, labels="Time (kya)", cex=1.2)
@@ -187,7 +203,7 @@ dev.off()
 
 
 ##################
-# ## GIF IT  #####
+# ## GIF IT  ##### only what it is in the tree
 ##################
 
 col_plot<-vector_col(age.intervals_linear)$cols
