@@ -3,7 +3,7 @@
 source('requirements.R')
 
 model_files = list.files('output/spatiophylogenetic_modelling/featurewise/', 
-                         pattern = "GB[0-9]{3}_kappa_.*.qs", 
+                         pattern = "GB[0-9]{3}_kappa_.*_pcprior0.1.*.qs", 
                          full.names = TRUE)
 
 model_output_list = lapply(model_files, function(m){
