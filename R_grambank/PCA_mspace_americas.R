@@ -19,6 +19,15 @@ cnames<-data[data$Language_ID%in%edget$tip.label,]$Language_ID
 data<-data[data$Language_ID%in%cnames,]
 x <- all(edget$tip.label%in%data$Language_ID)
 data<-data[match(edget$tip.label, data$Language_ID),]
+Language_meta_data <-  read_csv(GRAMBANK_LANGUAGES, col_types=LANGUAGES_COLSPEC) %>%		
+  dplyr::select(Language_ID = Language_level_ID, Family_name, Name, Macroarea) %>% 
+  distinct(Language_ID, .keep_all = T) %>% 
+  mutate(Family_name = ifelse(is.na(Family_name), "Isolate", Family_name))
+Language_meta_data<-Language_meta_data[Language_meta_data$Language_ID%in%data$Language_ID,]
+Language_meta_data<-Language_meta_data[match(data$Language_ID, Language_meta_data$Language_ID),]
+data$Family_name<-Language_meta_data$Family_name
+data$Name<-Language_meta_data$Name
+data$Macroarea<-Language_meta_data$Macroarea
 
 ############################
 ########## simple BM asr ###
@@ -34,6 +43,13 @@ valuei<-data$PC3 ; names(valuei)<-data$Language_ID
 fasr_pc3<-fastAnc(edget,valuei,vars=TRUE,CI=TRUE) # ML - can also use Bayesian
 
 dfasr<-data.frame("Node"=names(fasr_pc1$ace),"PC1"= fasr_pc1$ace, "PC2"= fasr_pc2$ace, "PC3"= fasr_pc3$ace)
+amtips<-data[data$Macroarea%in%c("South America", "North America"),]$Language_ID
+is.monophyletic(edget, tips=amtips) # T
+nodeam<-getMRCA(edget, tip=amtips)
+
+dfasr$Nodeam<-0
+dfasr[dfasr$Node%in%getDescendants(edget,nodeam),]$Nodeam<-1
+table(dfasr$Nodeam)
 
 
 ###############################
@@ -66,7 +82,8 @@ x <- dev.off()
 
 # par(mfrow=c(1,2))
 
-pdf("output/PCA/mspace_americas.pdf", width=10, height=8)
+# pdf("output/PCA/mspace_americas.pdf", width=10, height=8)
+png("output/PCA/mspace_americas.png",  width=10, height=8, res=480, units='in')
 
 matlay<-matrix(c(1,3,2,3),nrow=2)
 nf<-layout(matlay, widths = c(2,2,2,2), heights =c(2,1,1,1),TRUE)
@@ -87,9 +104,9 @@ age.intervals<-age.intervals_log
 if(max(age.intervals)< max(dfasr$NodeAge)) age.intervals[age.intervals%in%max(age.intervals)]<-max(dfasr$NodeAge)+1e-12
 
 # tips
-points(data$PC2 ~ data$PC1, col=scales::alpha(col_plot[1],1), pch=20)
-
-# dfasr$NodeCol<-vector_col((-1)*dfasr$NodeAge)$cols
+# points(data$PC2 ~ data$PC1, col=scales::alpha(col_plot[1],1), pch=20)
+points(data[!data$Macroarea%in%c("South America", "North America"),]$PC2 ~ data[!data$Macroarea%in%c("South America", "North America"),]$PC1, 
+       col=scales::alpha(col_plot[1],1), pch=20)
 
 for(i in 1: (length(age.intervals)-1)) {
   
@@ -97,12 +114,11 @@ for(i in 1: (length(age.intervals)-1)) {
   cmax<-age.intervals[i+1]
   
   # each set of points once - does without rev(age.intervals)
-  pPC2<-dfasr[dfasr$NodeAge>=cmin & dfasr$NodeAge<cmax,]$PC2
-  pPC1<-dfasr[dfasr$NodeAge>=cmin & dfasr$NodeAge<cmax,]$PC1
-  
+  pPC2<-dfasr[dfasr$NodeAge>=cmin & dfasr$NodeAge<cmax & dfasr$Nodeam==0,]$PC2
+  pPC1<-dfasr[dfasr$NodeAge>=cmin & dfasr$NodeAge<cmax & dfasr$Nodeam==0,]$PC1
+
   colsp<-col_plot[i]
-  # colsp<-dfasr[dfasr$NodeAge>=cmin & dfasr$NodeAge<cmax,]$NodeCol
-  
+
   points( pPC2 ~ pPC1,pch=20, col=scales::alpha(colsp,0.9),cex=1.2)
   paste0("n = ",length(pPC1))
   
@@ -111,25 +127,6 @@ for(i in 1: (length(age.intervals)-1)) {
 
 
 # shine on Americas
-  Language_meta_data <-  read_csv(GRAMBANK_LANGUAGES, col_types=LANGUAGES_COLSPEC) %>%		
-    dplyr::select(Language_ID = Language_level_ID, Family_name, Name, Macroarea) %>% 
-    distinct(Language_ID, .keep_all = T) %>% 
-    mutate(Family_name = ifelse(is.na(Family_name), "Isolate", Family_name))
-  Language_meta_data<-Language_meta_data[Language_meta_data$Language_ID%in%data$Language_ID,]
-  Language_meta_data<-Language_meta_data[match(data$Language_ID, Language_meta_data$Language_ID),]
-  data$Family_name<-Language_meta_data$Family_name
-  data$Name<-Language_meta_data$Name
-  data$Macroarea<-Language_meta_data$Macroarea
-
-amtips<-data[data$Macroarea%in%c("South America", "North America"),]$Language_ID
-is.monophyletic(edget, tips=amtips) # T
-nodeam<-getMRCA(edget, tip=amtips)
-
-dfasr$Nodeam<-0
-dfasr[dfasr$Node%in%getDescendants(edget,nodeam),]$Nodeam<-1
-table(dfasr$Nodeam)
-
-# add to plot
 plot(0, bty = 'n', pch = '', ylab = "PC2", xlab = "PC1", xlim= range(data$PC1), ylim = range(data$PC2), xaxt='n', yaxt='n',font.lab=2, cex.lab=1.3)
 mtext(text="b", side=3,adj=0, line=+0.3, cex=1.3)
 axis(1, lwd=2, tck=-0.01, cex.axis=1.1)
@@ -151,8 +148,6 @@ points(yp ~ xp, col=scales::alpha("gray94",0.7), pch=20)
 # tips in Americas
 points(data[data$Macroarea%in%c("South America", "North America"),]$PC2 ~ data[data$Macroarea%in%c("South America", "North America"),]$PC1, 
        col=scales::alpha(col_plot[1],1), pch=20)
-
-# dfasr$NodeCol<-vector_col((-1)*dfasr$NodeAge)$cols
 
 for(i in 1: (length(age.intervals)-1)) {
   
@@ -206,17 +201,17 @@ if(!"mspaceamericasgif"%in%list.files("output/PCA/")) dir.create("output/PCA/msp
 i=length(age.intervals)-1
 j=1
 for(i in (length(age.intervals)-1):1 ) {
-
+  
   cmin<-age.intervals[i]
-
+  
   pPC2<-dfasr[dfasr$NodeAge>=cmin,]$PC2
   pPC1<-dfasr[dfasr$NodeAge>=cmin,]$PC1
-
+  
   #colsp<-col_plot[i]
   colsp<-dfasr[dfasr$NodeAge>=cmin,]$Nodeam
   colsp[colsp==0]<-"gray90"
   colsp[colsp==1]<-"darkmagenta"
-
+  
   png(paste0("output/PCA/mspaceamericasgif/image_",j, ".png"), width=8, height=6, res=300, units='in')
   # pdf(paste0("output/PCA/mspaceamericasgif/image_",j, ".pdf"), height=7, width=9)
   
@@ -261,7 +256,7 @@ for(i in (length(age.intervals)-1):1 ) {
   
   print(i)
   j<-j+1
-
+  
 }
 
 # # tips at last i
@@ -331,4 +326,3 @@ img_animated <- image_animate(img_joined, fps = 2) ## animate at 2 frames per se
 # img_animated # view animated image
 image_write(image = img_animated, path = "output/PCA/mspace_americas.gif") ## save to disk
 
-  
