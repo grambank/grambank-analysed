@@ -17,7 +17,7 @@ clean:
 	rm -r output/coverage_plots*
 	rm -r output/GB_wide*
 	rm -r output/PCA*
-	rm -r output/unusualness*
+#	rm -r output/unusualness*
 #	rm -r output/spatiophylogenetic_modelling*
 
 #step 0
