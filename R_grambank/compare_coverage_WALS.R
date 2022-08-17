@@ -1,5 +1,5 @@
 source("fun_def_h_load.R")
-h_load(c("tidyverse"))
+h_load(c("tidyverse", "scales", "grid"))
 
 #script written by Hedvig Skirgård
 
@@ -90,10 +90,10 @@ WALS_GB_coverage_overlay <- ggplot() +
   xlab("Languages") +
   ylab("Feature coverage") +
   theme(plot.title = element_text(size = 50, face = "bold", color = "black")) +
-  scale_y_continuous(labels = percent)  +
+  scale_y_continuous(labels = scales::percent)  +
   scale_x_continuous(breaks = c( 500, 1000, 1500, 2000)) +
-  annotation_custom(grid.text("WALS", x=0.17,  y=0.17, gp=gpar(col = "white", fontsize=50, fontface="bold")))  +
-  annotation_custom(grid.text("Grambank", x=0.40,  y=0.40, gp=gpar(col = "white", fontsize=50, fontface="bold")))  
+  annotation_custom(grid::grid.text("WALS", x=0.17,  y=0.17, gp=grid::gpar(col = "white", fontsize=50, fontface="bold")))  +
+  annotation_custom(grid::grid.text("Grambank", x=0.40,  y=0.40, gp=grid::gpar(col = "white", fontsize=50, fontface="bold")))  
 
 tiff(file.path(OUTPUTDIR, "WALS_GB_coverage_overlay.tiff"), height = 1100, width = 1600,    units = "px",  bg = "white")
 plot(WALS_GB_coverage_overlay)
