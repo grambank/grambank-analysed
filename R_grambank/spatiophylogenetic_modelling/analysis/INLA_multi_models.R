@@ -3,6 +3,9 @@
 # Trial (spatial + phylo + AUTOTYP-area)
 
 source("requirements.R")
+
+source("set_random_seed.R")
+
 beep <- 0
 if(beep == 1){
   h_load("beepr")

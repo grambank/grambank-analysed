@@ -1,8 +1,7 @@
 # Please run this script first to make sure you have all the necessary packages
 # installed for running the rest of the scripts in this R project
 
-set.seed(1421)
-
+source("set_random_seed.R")
 #installing packages
 #if (!suppressPackageStartupMessages(require("pacman"))) { install.packages("pacman") }
 source("fun_def_h_load.R")

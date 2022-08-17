@@ -1,5 +1,7 @@
 ### Precison matrix set-up for INLA analysis.
 
+source("set_random_seed.R")
+
 source("fun_def_h_load.R")
 h_load(pkg = c("ape", "adephylo", "MCMCglmm", "assertthat", "stringr", "tidyverse"))
 

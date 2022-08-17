@@ -1,6 +1,8 @@
 source("fun_def_h_load.R")
 h_load(c("tidyverse", "ape"))
 
+source("set_random_seed.R")
+
 #reading in glottolog
 glottolog_fn <- "output/non_GB_datasets/glottolog-cldf_wide_df.tsv"
 if(!file.exists(glottolog_fn)) {
