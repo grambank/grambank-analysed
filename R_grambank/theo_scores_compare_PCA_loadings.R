@@ -4,7 +4,7 @@ source("requirements.R")
 
 cat("Creating plots comparing the loadings of components to theoretical scores.\n")
 
-GB_morph_counts <- read_tsv(file = "output/fusion_score/fusion_score.tsv") %>% 
+GB_morph_counts <- read_tsv(file = "output/fusion_score/fusion_score.tsv", show_col_types = F) %>% 
   dplyr::select(Language_ID, "Fusion" = mean_morph)
 
 #comparison to PC1
