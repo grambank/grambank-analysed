@@ -1,5 +1,5 @@
 source("fun_def_h_load.R")
-h_load(c("tidyverse"))
+h_load(c("tidyverse", "viridis"))
 
 #read in grambank data
 df_fn <- "output/GB_wide/GB_wide_strict.tsv"
@@ -45,7 +45,7 @@ basemap <- ggplot(df_long_shifted) +
   geom_polygon(data=lakes, aes(x=long, y=lat, group=group),
                colour="gray87",
                fill="white", size = 0.3) +
-  scale_color_viridis( name='% of data', 
+  viridis::scale_color_viridis( name='% of data', 
                       breaks = 0.25*0:4, labels = percent(0.25*0:4), direction = -1) +
     theme(
     # all of these lines are just removing default things like grid lines, axes etc
