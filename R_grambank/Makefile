@@ -101,7 +101,7 @@ output/PCA/PCA_macroarea.png:
 ## Comparing PCA to theoretical scores
 theoretical:
 	@echo "# Comparing PCA to theoretical scores. #"
-	Rscript theo_scores_fusion.R
+	Rscript theo_score_fusion.R
 	Rscript theo_scores_compare_PCA_loadings.R
 
 #step 3
@@ -132,9 +132,15 @@ INLA_featurewise:
 INLA_simulation_binary_data:
 	Rscript spatiophylogenetic_modelling/analysis/INLA_multi_models.R "sim" 1 160 precision_matrices_kappa_2_sigma_1.15.RDS "default"
 
-INLA_featurewise_all_spatial_params_all_priors:
+INLA_featurewise_all_spatial_params_all_priors: INLA_featurewise_spatial_params_2_1_15_all_priors INLA_featurewise_spatial_params_2_2_all_priors INLA_featurewise_spatial_params_2_5_3_all_priors
+
+INLA_featurewise_spatial_params_2_1_15_all_priors:
 	Rscript spatiophylogenetic_modelling/analysis/INLA_multi_models.R "real" 1 113 precision_matrices_kappa_2_sigma_1.15.RDS "loop_all_priors" 
+
+INLA_featurewise_spatial_params_2_2_all_priors:
 	Rscript spatiophylogenetic_modelling/analysis/INLA_multi_models.R "real" 1 113 precision_matrices_kappa_2_sigma_2.RDS "loop_all_priors" 
+
+INLA_featurewise_spatial_params_2_5_3_all_priors:
 	Rscript spatiophylogenetic_modelling/analysis/INLA_multi_models.R "real" 1 113 precision_matrices_kappa_2.5_sigma_3.RDS "loop_all_priors" 
 
 
