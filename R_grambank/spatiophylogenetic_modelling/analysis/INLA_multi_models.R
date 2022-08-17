@@ -94,7 +94,9 @@ if(!(file.exists(precision_matrices_fn))){
   source("spatiophylogenetic_modelling/analysis/make_precisionmatrices.R")} 
 } else{
   precision_matrices_fn <- paste0("output/spatiophylogenetic_modelling/processed_data/", prec_matrices)
-}
+  if(!(file.exists(precision_matrices_fn))){
+    source("spatiophylogenetic_modelling/analysis/make_precisionmatrices.R")} 
+  }
 
 precision_matrices = readRDS(precision_matrices_fn)
 phylo_prec_mat = precision_matrices$phylogenetic_precision
