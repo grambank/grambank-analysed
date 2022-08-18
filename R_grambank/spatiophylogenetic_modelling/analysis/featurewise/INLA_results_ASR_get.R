@@ -7,21 +7,6 @@ three_most_phylo_features <- dual_summary %>%
   as.matrix() %>%
   as.vector()
 
-#reading in tree
-tree_fn <- "output/spatiophylogenetic_modelling/processed_data/EDGE_pruned_tree.tree"
-if(!(file.exists(tree_fn))){
-  source("spatiophylogenetic_modelling/processing/pruning_EDGE_tree.R")}
-tree = read.tree(tree_fn)
-
-#double check that subset to lgs in GB cropped dataset
-tree <- ape::keep.tip(tree, lgs_in_analysis$Language_ID)
-
-#values for clade labels
-dat.offset = 1.02
-ln.offset = 1.06
-lab.offset = 1.11
-fsize = 3
-cex = 1.8
 
 index <- 0
 
@@ -85,7 +70,7 @@ for(feature in c(three_most_phylo_features)) {
                           node_num = seq_len(Ntip(tree) + Nnode(tree)))
 
   pred_df <- pred_df %>%
-    left_join(link_to_nodes) %>%
+    left_join(link_to_nodes, by = "Language_ID") %>%
     arrange(node_num)
 
   #removing missing data
@@ -117,6 +102,9 @@ for(feature in c(three_most_phylo_features)) {
   pred_df %>%
     write_tsv(paste0(OUTPUTDIR, "/INLA_ASR_pred_df_",index , "_" , feature, ".tsv"))
 
+output <- list(pred_df = pred_def, plot_title = plot_title, filename = filename, filename_png = filename_png, feature_df = feature_df, dual_model = dual_model)
+
+qs::qsave(x = paste0(OUTPUTDIR, "/INLA_ASR_OBJ_", feature, ".qs"))  
 }
 
 if(beep == 1){
