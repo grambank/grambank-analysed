@@ -49,7 +49,7 @@ pair_upp <- function(data, mapping, method, ...){
   )
 }
 
-gb %>%
+p <- gb %>%
   dplyr::select(c(Surprisal,Estimator,Language_ID)) %>%
   pivot_wider(id_cols = Language_ID,names_from = Estimator,values_from = Surprisal) %>%
   GGally::ggpairs(columns=c("Bayesian LCA","Kernel 1","Kernel 5","Kernel 10","Kernel 15","Kernel 20","Kernel 25","Kernel 30","Kernel 40"),
@@ -62,4 +62,4 @@ gb %>%
   theme(panel.grid= element_blank(),
         axis.text = element_blank())
 
-ggsave(filename = paste0(OUTPUTDIR_plots, "/unsualenss_SLOM_compare_kernels.png"))
+ggsave(plot = p, filename = paste0(OUTPUTDIR_plots, "/unsualenss_SLOM_compare_kernels.png"))
