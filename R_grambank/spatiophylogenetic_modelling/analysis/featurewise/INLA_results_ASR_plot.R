@@ -1,3 +1,16 @@
+source("spatiophylogenetic_modelling/analysis/featurewise/INLA_results_most_prep.R")
+
+#values for clade labels
+dat.offset = 1.02
+ln.offset = 1.06
+lab.offset = 1.11
+fsize = 3
+cex = 1.8
+
+pred_df_fns <- list.files(path = "output/spatiophylogenetic_modelling/INLA_spec_results_plots/", 
+                            pattern = "pred")
+
+
 
 cols <- colour_ramp(viridis(500))
 
