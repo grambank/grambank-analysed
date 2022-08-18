@@ -31,8 +31,8 @@ color_vector <-c("#593d9cff", "#f68f46ff", "#d6d4d4")
 #### Format Posterior Data ####
 ## Read in model posteriors
 model_output_files = list.files(
-  #path = "output/spatiophylogenetic_modelling/featurewise/",
-  path = "/Users/skirgard/Nextcloud/Git_output/grambank-analysed/output_old/spatiophylogenetic_modelling/featurewise/",
+  path = "output/spatiophylogenetic_modelling/featurewise/",
+  #path = "/Users/skirgard/Nextcloud/Git_output/grambank-analysed/output_old/spatiophylogenetic_modelling/featurewise/",
   pattern = ".*kappa_2_sigma_1.15_pcprior0.1.*.qs",
   full.names = TRUE)
 
