@@ -21,13 +21,13 @@ gb <- read_tsv(file = surprisal_fn, show_col_types = F)
 # Plot the pairwise relations between probabilities
 pair_lower <- function(data, mapping, ...){
   p <- ggplot(data = data, mapping = mapping) + 
-    geom_smooth(method=loess, fill="deepskyblue", color="deepskyblue", ...)
+    geom_smooth(method=loess, fill="purple4", color="purple4", ...)
   p
 }
 
 pair_diag<- function(data, mapping, ...){
   p <- ggplot(data = data, mapping = mapping) + 
-    geom_density(fill="deepskyblue", color="deepskyblue", ...)
+    geom_density(fill="purple4", color="purple4", ...)
   p
 }
 
@@ -43,12 +43,11 @@ pair_upp <- function(data, mapping, method, ...){
     label = as.character(round(corr, 2)), 
     mapping = aes(),
     xP = 0.5, yP = 0.5,
-    color = 'deepskyblue',
-    size=6,
+    color = 'purple4',
+    size=8,
     ...
   )
 }
-
 
 gb %>%
   dplyr::select(c(Surprisal,Estimator,Language_ID)) %>%
@@ -63,4 +62,4 @@ gb %>%
   theme(panel.grid= element_blank(),
         axis.text = element_blank())
 
-ggsave(filename = paste0(OUTPUTDIR_plots, "/SLOM.png"))
+ggsave(filename = paste0(OUTPUTDIR_plots, "/unsualenss_SLOM_compare_kernels.png"))
