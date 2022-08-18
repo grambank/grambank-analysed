@@ -3,12 +3,12 @@ source('requirements.R')
 source("spatiophylogenetic_modelling/analysis/INLA_parameters.R")
 pcprior <- prior_ten_percent
 
-OUTPUTDIR <- "output/spatiophylogenetic_modelling/INLA_spec_results_plots/"
+OUTPUTDIR <- "output/spatiophylogenetic_modelling/INLA_spec_results_summaries/"
 if(!dir.exists(OUTPUTDIR)){
   dir.create(OUTPUTDIR)
 }
 
-beep = 1
+beep = 0
 
 #description of features
 GB_id_desc <- readr::read_tsv("output/GB_wide/parameters_binary.tsv", show_col_types = F) %>%
@@ -101,3 +101,13 @@ if(!file.exists(GB_fn)){
 }
 GB_df <- readr::read_tsv(file =   GB_fn,show_col_types = F) %>%
   inner_join(lgs_in_analysis, by = "Language_ID")
+
+#reading in tree
+tree_fn <- "output/spatiophylogenetic_modelling/processed_data/EDGE_pruned_tree.tree"
+if(!(file.exists(tree_fn))){
+  source("spatiophylogenetic_modelling/processing/pruning_EDGE_tree.R")}
+tree = read.tree(tree_fn)
+
+#double check that subset to lgs in GB cropped dataset
+tree <- ape::keep.tip(tree, lgs_in_analysis$Language_ID)
+
