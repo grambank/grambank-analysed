@@ -102,7 +102,7 @@ for(feature in c(three_most_phylo_features)) {
   pred_df %>%
     write_tsv(paste0(OUTPUTDIR, "/INLA_ASR_pred_df_",index , "_" , feature, ".tsv"))
 
-output <- list(pred_df = pred_def, plot_title = plot_title, filename = filename, filename_png = filename_png, feature_df = feature_df, dual_model = dual_model)
+output <- list(pred_df = pred_df, plot_title = plot_title, filename = filename, filename_png = filename_png, feature_df = feature_df, dual_model = dual_model)
 
 qs::qsave(x = paste0(OUTPUTDIR, "/INLA_ASR_OBJ_", feature, ".qs"))  
 }
