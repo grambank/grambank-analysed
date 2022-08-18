@@ -62,3 +62,5 @@ gb %>%
   theme_minimal()+
   theme(panel.grid= element_blank(),
         axis.text = element_blank())
+
+ggsave(filename = paste0(OUTPUTDIR_plots, "/SLOM.png"))
