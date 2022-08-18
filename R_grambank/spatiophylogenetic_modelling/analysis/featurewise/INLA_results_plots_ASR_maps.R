@@ -4,14 +4,14 @@ source('requirements.R')
 source("spatiophylogenetic_modelling/analysis/INLA_parameters.R")
 pcprior <- prior_ten_percent
 
-OUTPUTDIR <- "output/spatiophylogenetic_modelling/spec_feature_plots/"
+OUTPUTDIR <- "output/spatiophylogenetic_modelling/INLA_ASR/"
 if(!dir.exists(OUTPUTDIR)){
   dir.create(OUTPUTDIR)
 }
 
 beep = 1
 
-#description of featurs
+#description of features
 GB_id_desc <- readr::read_tsv("output/GB_wide/parameters_binary.tsv", show_col_types = F) %>%
   dplyr::select(Feature_ID = ID, Grambank_ID_desc, Name)
 
@@ -30,11 +30,10 @@ spatial_prec_mat = precision_matrices$spatial_precision
 color_vector <-c("#593d9cff", "#f68f46ff", "#d6d4d4")
 
 #### Format Posterior Data ####
-## Feature Metadata
-parameters_binary <- read_csv("feature_grouping_for_analysis.csv", show_col_types = F)
-
 ## Read in model posteriors
-model_output_files = list.files(path = "output/spatiophylogenetic_modelling/featurewise/",
+model_output_files = list.files(
+  path = "output/spatiophylogenetic_modelling/featurewise/",
+#  path = "/Users/skirgard/Nextcloud/Git_output/grambank-analysed/output_old/spatiophylogenetic_modelling/featurewise/",
                                 pattern = ".*kappa_2_sigma_1.15_pcprior0.1.*.qs",
                                 full.names = TRUE)
 
@@ -74,7 +73,7 @@ dual_posterior$Feature_ID <- str_extract(dual_posterior$Feature_ID_model, "GB[0-
 dual_hyperpar$Feature_ID <- str_extract(dual_hyperpar$Feature_ID_model, "GB[0-9]{3}")
 
 # join feature metadata to posterior
-dual_posterior = left_join(dual_posterior, parameters_binary, by ="Feature_ID") 
+dual_posterior = left_join(dual_posterior, GB_id_desc, by ="Feature_ID") 
 
 # Summarise the posterior distributions
 dual_summary = dual_posterior %>%
@@ -83,7 +82,7 @@ dual_summary = dual_posterior %>%
             mean_spatial = mean(spatial),
             error_phylogenetic = sd(phylogenetic),
             error_spatial = sd(spatial),
-            domain = first(Main_domain),
+#            domain = first(Main_domain),
             cor = list(cor(cbind(phylogenetic, spatial))),
             median_phylogenetic = median(phylogenetic),
             median_spatial = median(spatial)) %>%
@@ -178,6 +177,8 @@ for(feature in c(three_most_phylo_features)) {
                           control.mode = list(theta = start_pars, restart = FALSE),
                           data = data,
                           num.threads = 6)
+  
+  qs::qsave(x = dual_model, file = paste0(OUTPUTDIR, "/INLA_obj_",index , "_" , feature, ".qs"))
 
   preds <- dual_model$summary.fitted.values$`0.5quant`[data$what == "predictions"]
   pred_df <- tibble(Language_ID = data$Language_ID[data$what == "predictions"], pred = preds)
@@ -217,7 +218,7 @@ for(feature in c(three_most_phylo_features)) {
   # asr_most_signal<- ape::ace(x = x, phy = tree_feature, method = "ML", type = "discrete", model = "ARD")
 
   pred_df %>%
-    qs::qsave(paste0(OUTPUTDIR, "asr_object_",index , "_" , feature, ".qs"))
+    write_tsv(paste0(OUTPUTDIR, "/INLA_ASR_pred_df_",index , "_" , feature, ".tsv"))
 
   cols <- colour_ramp(viridis(500))
 
