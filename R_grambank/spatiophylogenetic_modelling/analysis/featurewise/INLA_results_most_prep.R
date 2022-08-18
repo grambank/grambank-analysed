@@ -3,7 +3,7 @@ source('requirements.R')
 source("spatiophylogenetic_modelling/analysis/INLA_parameters.R")
 pcprior <- prior_ten_percent
 
-OUTPUTDIR <- "output/spatiophylogenetic_modelling/INLA_ASR/"
+OUTPUTDIR <- "output/spatiophylogenetic_modelling/INLA_spec_results_plots/"
 if(!dir.exists(OUTPUTDIR)){
   dir.create(OUTPUTDIR)
 }

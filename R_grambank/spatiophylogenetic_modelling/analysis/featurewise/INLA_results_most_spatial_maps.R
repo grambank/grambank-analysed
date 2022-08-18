@@ -83,7 +83,7 @@ for(feature in five_most_spatial_features){
   basemap +
     geom_jitter(data = feature_df, mapping = aes(x = Longitude, y = Latitude),  color = feature_df$point.color, alpha = 0.6, width = 3) +
     ggtitle(plot_title) +
-    theme(plot.title = element_text(size = 25, face = "bold"))
+    theme(plot.title = element_text(size = 18, face = "bold"))
   
   ggsave(filename = filename, width = 9.3, height = 9.2, units = "in")
   
