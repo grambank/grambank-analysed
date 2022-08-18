@@ -104,7 +104,7 @@ for(feature in c(three_most_phylo_features)) {
 
 output <- list(pred_df = pred_df, plot_title = plot_title, filename = filename, filename_png = filename_png, feature_df = feature_df, dual_model = dual_model)
 
-qs::qsave(x = paste0(OUTPUTDIR, "/INLA_ASR_OBJ_", feature, ".qs"))  
+qs::qsave(x = output, file = paste0(OUTPUTDIR, "/INLA_ASR_OBJ_", feature, ".qs"))  
 }
 
 if(beep == 1){
