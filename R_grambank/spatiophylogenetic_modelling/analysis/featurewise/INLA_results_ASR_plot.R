@@ -1,18 +1,32 @@
 source("spatiophylogenetic_modelling/analysis/featurewise/INLA_results_most_prep.R")
 
-#values for clade labels
+#aestehtics choices for plotting
 dat.offset = 1.02
 ln.offset = 1.06
 lab.offset = 1.11
 fsize = 3
 cex = 1.8
 
-pred_df_fns <- list.files(path = "output/spatiophylogenetic_modelling/INLA_spec_results_plots/", 
-                            pattern = "pred")
-
-
-
 cols <- colour_ramp(viridis(500))
+
+#we're reading in INLA asr objects in qs-files that were outputted by INLA_results_ASR_get.R. We'll loop over each and extract the necessary information for plotting
+INLA_ASR_objects_fns <- list.files(path = "output/spatiophylogenetic_modelling/INLA_spec_results_summaries/", 
+                                   pattern = "INLA_ASR_OBJ_.*qs", full.names = T)
+
+
+for(fn in INLA_ASR_objects_fns){
+  #fn <- INLA_ASR_objects_fns[1]
+  
+  INLA_ASR_object <- qs::qread(fn)
+  
+  
+  dual_model <- INLA_ASR_object$dual_model
+  pred_df <- INLA_ASR_object$pred_df
+  filename <- INLA_ASR_object$filename
+  filename_png <- INLA_ASR_object$filename_png
+  plot_title <- INLA_ASR_object$plot_title
+  feature_df <- INLA_ASR_object$feature_df
+  feature <- colnames(feature_df)[2]
 
 root <- plogis(dual_model$summary.fixed$mean[1])
 
@@ -145,3 +159,4 @@ arc.cladelabels(text="Uralic",node =   getMRCA(tree, tip = c("livv1243", "lule12
 title(plot_title, cex.main = cex)
 
 dev.off()
+}
