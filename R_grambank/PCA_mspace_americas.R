@@ -322,7 +322,7 @@ abline(v=xplog[xplog<= (-1)*cmin], lwd=2.5, col="#E7242D" )  #col="#E7242D"
 dev.off()
 
 # create gif
-y# https://www.nagraj.net/notes/gifs-in-r/
+# https://www.nagraj.net/notes/gifs-in-r/
 imgs <- list.files("output/PCA/mspaceamericasgif", full.names = T) ## list file names and read in
 # imgs<-imgs[grep(".pdf", imgs)]
 ordern<-seq(from =1 , to=length(imgs)) # order this by number not alphabetically
