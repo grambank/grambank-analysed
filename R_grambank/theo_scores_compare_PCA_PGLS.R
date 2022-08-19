@@ -17,6 +17,7 @@ theo_scores_df <- read_tsv(theo_scores_fn, show_col_types = F) %>%
   column_to_rownames("Language_ID") %>% 
   as.data.frame() 
 
+#divide all theo scores by their standard deviation
 theo_scores_df <- apply(theo_scores_df,2, function(x) x/sd(x)) %>% as.data.frame()
 
 theo_scores_df <- theo_scores_df %>% 
