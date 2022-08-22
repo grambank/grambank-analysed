@@ -1,6 +1,6 @@
 source("requirements.R")
 
-p_load(haplotypes, 
+h_load(haplotypes, 
        optparse, 
        phangorn)
 
