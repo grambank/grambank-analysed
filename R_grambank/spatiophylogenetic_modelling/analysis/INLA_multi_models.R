@@ -160,6 +160,17 @@ for(feature in features){
   cat(paste0("I'm on ", feature, " and the time is ", Sys.time(), ".\n"))
   cat(paste0("Precision matrix = ", basename(precision_matrices_fn), ".\n"))
   cat(paste0("pcprior = ", pcprior[2], ".\n"))
+  
+  
+  saved_file =   paste0(OUTPUTDIR, feature,"_",   substr(x = basename(precision_matrices_fn), 20, 37), "_pcprior",   pcprior[2], ".qs")
+  
+  if(file.exists(saved_file)){
+    cat(paste0("The analysis file already exists!\n", 
+               saved_file, "\n
+               Moving on to next item.\n
+               "))
+    
+  }else{
           
   # #### Dual Model ####
   # 
@@ -221,6 +232,10 @@ for(feature in features){
   #######strip interesting information from the INLA objects
   #########
   
+  ## strip_inla function is located in another script. 
+  #For each model we strip out the information we need to calculate heritability scores
+  ## to save on storage space. 
+  
 
   cat(paste0("Starting running strip inla on dual  of ", feature, " and the time is ", Sys.time(), ".\n"))
   
@@ -244,17 +259,12 @@ for(feature in features){
   
   
   
-## For each model we strip out the information we need to calculate heritability scores
-  ## to save on storage space. 
+  #### Save output ####
   model_outputs = list(dual_model_stripped, 
                        trial_model_stripped)
   
-  
-  #### Save output ####
-  saved_file =   paste0(OUTPUTDIR, feature,"_",   substr(x = basename(precision_matrices_fn), 20, 37), "_pcprior",   pcprior[2], ".qs")
-  
-  qs::qsave(model_outputs, 
-            file = saved_file)
+    qs::qsave(model_outputs, 
+            file = saved_file) }
   
   if(beep == 1){
     beep()
