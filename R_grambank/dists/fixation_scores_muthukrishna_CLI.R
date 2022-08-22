@@ -96,15 +96,15 @@ fun_cfx <- function(df = Language_meta_data, group, cut_off = 0){
       write_tsv(file = file.path(OUTPUTDIR,  table_fn))
 }
 
-fun_cfx(df = Language_meta_data, group = "Family_ID", cut_off = 50)
+#fun_cfx(df = Language_meta_data, group = "Family_ID", cut_off = 50)
 
-fun_cfx(df = Language_meta_data, group = "Family_ID", cut_off = 20)
+#fun_cfx(df = Language_meta_data, group = "Family_ID", cut_off = 20)
 
-fun_cfx(df = Language_meta_data, group = "Family_ID", cut_off = 10)
+#fun_cfx(df = Language_meta_data, group = "Family_ID", cut_off = 10)
 
-fun_cfx(df = Language_meta_data, group = "Family_ID", cut_off = 5)
+#fun_cfx(df = Language_meta_data, group = "Family_ID", cut_off = 5)
 
-fun_cfx(df = Language_meta_data, group = "Family_ID", cut_off = 1)
+#fun_cfx(df = Language_meta_data, group = "Family_ID", cut_off = 1)
 
 
 
