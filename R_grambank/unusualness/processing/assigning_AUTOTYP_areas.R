@@ -12,7 +12,8 @@ cat("Matching all languages in Grambank to an AUTOTYP-area.\n")
 if (!file.exists("output/non_GB_datasets/glottolog-cldf_wide_df.tsv")) { source("make_glottolog-cldf_table.R") }		
 
 glottolog_df <- read_tsv("output/non_GB_datasets/glottolog-cldf_wide_df.tsv",col_types = cols()) %>% 
-dplyr::select(Language_ID, Longitude, Latitude)
+dplyr::select(Language_ID, Longitude, Latitude) %>% 
+  filter(!is.na(Longitude))
 
 ##Adding in areas of linguistic contact from AUTOTYP
 
