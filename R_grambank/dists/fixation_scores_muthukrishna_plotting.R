@@ -5,7 +5,7 @@ h_load(pkg = c("tidyverse", "reshape2", "ggplot2"))
 OUTPUTDIR <- "output/dists/"
 if (!dir.exists(OUTPUTDIR)) {dir.create(OUTPUTDIR)}
 
-cfx_macroarea_list <-   read_tsv("output/dists/cfx_Macroarea_cut_off_0_list.tsv")
+cfx_macroarea_list <-   read_tsv("output/dists/cfx_Macroarea_cut_off_0_list.tsv", show_col_types = F)
 
 cfx_macroarea_list %>% 
   ggplot(aes(x = Vars, y = Value_cfx)) +
