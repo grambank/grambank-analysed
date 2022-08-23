@@ -13,7 +13,7 @@ source("fun_def_h_load.R")
 
 h_load(pkg = c("tidyverse", "reshape2", "txtplot"))
 
-OUTPUTDIR <- "output/dist_fixation_scores/"
+OUTPUTDIR <- "output/dists/"
 if (!dir.exists(OUTPUTDIR)) {dir.create(OUTPUTDIR)}
 
 #reading in GB
@@ -44,7 +44,7 @@ Language_meta_data <- GB %>%
 
 #using Muthukrishna's et al's approach
 
-source("dist_fixation_scores/fun_def_Muthukrishna_2020_CultureFst.r")
+source("dists/fun_def_Muthukrishna_2020_CultureFst.r")
 
 fun_cfx <- function(df = Language_meta_data, group, cut_off = 0){
 
