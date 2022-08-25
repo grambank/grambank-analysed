@@ -1,7 +1,7 @@
 source("requirements.R")
 
 #comparing pc values per lang
-pca_langs <- read_tsv("output/PCA/pca_language_values.tsv", show_col_types = F) %>% 
+pca_langs <- read_tsv("output/PCA/PCA_language_values.tsv", show_col_types = F) %>% 
   dplyr::select(Language_ID, PC1, PC2, PC3)
 
 ppca_langs <- read_tsv("output/PCA/ppca_language_values.tsv", show_col_types = F) %>% 
