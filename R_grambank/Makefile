@@ -140,9 +140,17 @@ INLA_featurewise_spatial_params_2_1_15_all_priors:
 INLA_featurewise_spatial_params_2_2_all_priors:
 	Rscript spatiophylogenetic_modelling/analysis/INLA_multi_models.R "real" 1 113 precision_matrices_kappa_2_sigma_2.RDS "loop_all_priors" 
 
-INLA_featurewise_spatial_params_2_5_3_all_priors:
-	Rscript spatiophylogenetic_modelling/analysis/INLA_multi_models.R "real" 1 113 precision_matrices_kappa_2.5_sigma_3.RDS "loop_all_priors" 
+INLA_featurewise_spatial_params_2_5_3_all_priors_first_part:
+	Rscript spatiophylogenetic_modelling/analysis/INLA_multi_models.R "real" 1 37 precision_matrices_kappa_2.5_sigma_3.RDS "loop_all_priors" 
 
+INLA_featurewise_spatial_params_2_5_3_all_priors_second_part:
+	Rscript spatiophylogenetic_modelling/analysis/INLA_multi_models.R "real" 38 75 precision_matrices_kappa_2.5_sigma_3.RDS "loop_all_priors" 
+
+INLA_featurewise_spatial_params_2_5_3_all_priors_third_part:
+	Rscript spatiophylogenetic_modelling/analysis/INLA_multi_models.R "real" 75 100 precision_matrices_kappa_2.5_sigma_3.RDS "loop_all_priors" 
+
+INLA_featurewise_spatial_params_2_5_3_all_priors_fourth_part:
+	Rscript spatiophylogenetic_modelling/analysis/INLA_multi_models.R "real" 100 113 precision_matrices_kappa_2.5_sigma_3.RDS "loop_all_priors" 
 
 #step 7
 ## BRMS-analysis of unsualness scores
