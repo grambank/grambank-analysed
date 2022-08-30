@@ -50,11 +50,13 @@ cbbPalette <- c( "#E69F00", "#009E73", "#F0E442", "#D55E00", "#CC79A7","#000000"
 mds_plot <- mds_df %>% 
   left_join(Language_meta_data, by = c("Label" = "AUTOTYP_area")) %>% 
   distinct(Label, Macroarea, V1, V2, americas) %>% 
-  ggplot(aes(x = V1, y = V2, color = americas)) +
+  ggplot(aes(x = V1, y = V2, color = americas,  group = americas)) +
   geom_point() +
+  geom_density2d(bins = 12) +
   geom_label_repel(aes(label = Label)) +
   theme_minimal() +
-  coord_fixed() 
+  coord_fixed() +
+  theme(legend.title = element_blank())
 
 mds_plot
 
