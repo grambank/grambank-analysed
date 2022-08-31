@@ -45,7 +45,6 @@ PCA_summary_importance <- t(summary(GB_imputed_PCA)$importance) %>%
 tidied_pca <- GB_imputed_PCA$rotation %>%
     as.data.frame() %>% 
     rownames_to_column("Parameter_ID") %>%
-    dplyr::select(Parameter_ID, PC1, PC2, PC3, PC4) %>%
     reshape2::melt(id.vars = "Parameter_ID") %>% 
     dplyr::rename(PC = variable, Contribution = value) %>%
     left_join(PCA_summary_importance,  by = "PC") %>%
