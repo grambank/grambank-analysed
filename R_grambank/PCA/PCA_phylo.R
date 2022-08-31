@@ -30,7 +30,6 @@ ppca_obj <- phytools::phyl.pca(tree = tree, Y = GB_imputed,method ="BM", mode="c
 t(summary(ppca_obj)$importance) %>%
     as.data.frame() %>%
     rownames_to_column("PC") %>%
-    mutate(`Proportion of Variance` = round(`Proportion of Variance`, digits = 2)) %>%
     dplyr::select(`Proportion of Variance`, everything()) %>% 
   write_tsv("output/PCA/ppca_importance.tsv")
 
