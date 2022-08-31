@@ -102,6 +102,7 @@ output/PCA/PCA_macroarea.png:
 theoretical:
 	@echo "# Comparing PCA to theoretical scores. #"
 	Rscript theo_score_fusion.R
+	Rscript make_theo_scores.R
 	Rscript theo_scores_compare_PCA_loadings.R
 
 #step 3
