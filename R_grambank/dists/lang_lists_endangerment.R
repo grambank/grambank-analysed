@@ -26,6 +26,8 @@ bromham_supp_data <- readxl::read_xlsx("dists/Bromham_et_al_2022_supplementary_d
   group_by(Language_ID, period) %>% 
   summarise(level = weighted.mean(level, value))
 
+bromham_supp_data %>% write_tsv("output/non_GB_datasets/bromham_supp_data.tsv")
+
 
 glottolog_df$aes <- factor(glottolog_df$aes, levels = c("not_endangered", "shifting", "threatened", "moribund", "nearly_extinct", "extinct", NA))
 
