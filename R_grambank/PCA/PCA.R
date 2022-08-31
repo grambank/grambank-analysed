@@ -37,7 +37,6 @@ GB_PCA_df %>%
 PCA_summary_importance <- t(summary(GB_imputed_PCA)$importance) %>%
     as.data.frame() %>%
     rownames_to_column("PC") %>%
-    mutate(`Proportion of Variance` = round(`Proportion of Variance`, digits = 2)) %>%
     dplyr::select(`Proportion of Variance`, everything())
 
 
