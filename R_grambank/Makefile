@@ -87,16 +87,16 @@ pca:
 	@$(MAKE) -f $(THIS_MAKEFILE) theoretical
 
 output/PCA/PCA_df.tsv:
-	Rscript PCA.R
+	Rscript PCA/CA.R
 
 output/PCA/PCA_contributions_PCA1_PCA2.png: 
-	Rscript PCA_plot_contributions.R
+	Rscript PCA/PCA_plot_contributions.R
 
 output/PCA/PCA_RGB_worldmap.png: 
-	Rscript PCA_plot_worldmaps.R
+	Rscript PCA/PCA_plot_worldmaps.R
 
 output/PCA/PCA_macroarea.png: 
-	Rscript PCA_plot_scatter_plots.R
+	Rscript PCA/PCA_plot_scatter_plots.R
 
 ## Comparing PCA to theoretical scores
 theoretical:
