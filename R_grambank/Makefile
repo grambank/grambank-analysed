@@ -153,6 +153,12 @@ INLA_featurewise_spatial_params_2_5_3_all_priors_third_part:
 INLA_featurewise_spatial_params_2_5_3_all_priors_fourth_part:
 	Rscript spatiophylogenetic_modelling/analysis/INLA_multi_models.R "real" 100 113 precision_matrices_kappa_2.5_sigma_3.RDS "loop_all_priors" 
 
+
+#generate cultural fixation scores and do mds plots
+make_cultural_fixation_scores:
+	Rscript dists/fixation_scores_muthukrishna_autotyp.R
+	Rscript dists/fixation_scores_muthukrishna_mds.R
+
 #step 7
 ## BRMS-analysis of unsualness scores
 predict_unusualness: 
