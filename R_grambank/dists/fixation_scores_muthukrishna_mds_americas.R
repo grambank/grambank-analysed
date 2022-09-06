@@ -44,6 +44,9 @@ mds_df <- mds$points %>%
   as.data.frame() %>% 
   rownames_to_column("Label") 
 
+mds_df %>% 
+write_tsv("output/dists/cfx_mds_autotyp.tsv")
+
 # The palette with black:
 cbbPalette <- c( "#E69F00", "#009E73", "#F0E442", "#D55E00", "#CC79A7","#000000")
 
