@@ -17,7 +17,12 @@ OUTPUTDIR <- "output/dists/"
 if (!dir.exists(OUTPUTDIR)) {dir.create(OUTPUTDIR)}
 
 #reading in GB
-GB <- read.delim(file.path("output", "GB_wide", "GB_cropped_for_missing.tsv"), sep ="\t") 
+GB_fn <- "output/GB_wide/GB_cropped_for_missing.tsv"
+if(!file.exists(GB_fn)){
+  source("make_wide.R")
+  source("make_wide_binarized.R")
+  source("impute_missing_values.R")}
+GB <- read.delim(file = GB_fn, sep ="\t") 
 
 GB_matrix <- GB %>%
   column_to_rownames("Language_ID") %>%
@@ -25,12 +30,17 @@ GB_matrix <- GB %>%
 
 #reading in lg meta data
 #areas
-if (!file.exists("output/non_GB_datasets/glottolog_AUTOTYP_areas.tsv")) { source("unusualness/processing/assigning_AUTOTYP_areas.R") }		
+if (!file.exists("output/non_GB_datasets/glottolog_AUTOTYP_areas.tsv")) { 
+  source("unusualness/processing/assigning_AUTOTYP_areas.R") }		
 autotyp_area <- read_tsv("output/non_GB_datasets/glottolog_AUTOTYP_areas.tsv", col_types = cols()) %>%
   dplyr::select(Language_ID, AUTOTYP_area)
 
 #glottolog-cldf
-Language_meta_data <-  read_tsv("output/non_GB_datasets/glottolog-cldf_wide_df.tsv", col_types = cols()) %>% 
+glottolog_df_fn <- "output/non_GB_datasets/glottolog-cldf_wide_df.tsv"
+if(!file.exists(glottolog_df_fn)){
+  source("make_glottolog-cldf_table.R")
+}
+Language_meta_data <-  read_tsv(file = glottolog_df_fn, col_types = cols()) %>% 
   mutate(Language_level_ID = ifelse(is.na(Language_level_ID), Language_ID, Language_level_ID)) %>% 
   dplyr::select(-Language_ID) %>% 
   dplyr::select(Language_ID  = Language_level_ID, Family_ID, Name, Macroarea) %>% 
