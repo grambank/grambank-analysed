@@ -157,7 +157,7 @@ INLA_featurewise_spatial_params_2_5_3_all_priors_fourth_part:
 #generate cultural fixation scores and do mds plots
 make_cultural_fixation_scores:
 	Rscript dists/fixation_scores_muthukrishna_autotyp.R
-	Rscript dists/fixation_scores_muthukrishna_mds.R
+	Rscript dists/fixation_scores_muthukrishna_mds_americas.R
 
 #step 7
 ## BRMS-analysis of unsualness scores
