@@ -42,7 +42,8 @@ mds <- MASS::isoMDS(Label_matrix)
 
 mds_df <- mds$points %>% 
   as.data.frame() %>% 
-  rownames_to_column("Label") 
+  rownames_to_column("Label") %>% 
+  left_join(Language_meta_data, by = c("Label" = "AUTOTYP_area")) 
 
 mds_df %>% 
 write_tsv("output/dists/cfx_mds_autotyp.tsv")
@@ -51,7 +52,6 @@ write_tsv("output/dists/cfx_mds_autotyp.tsv")
 cbbPalette <- c( "#E69F00", "#009E73", "#F0E442", "#D55E00", "#CC79A7","#000000")
 
 mds_plot <- mds_df %>% 
-  left_join(Language_meta_data, by = c("Label" = "AUTOTYP_area")) %>% 
   distinct(Label, Macroarea, V1, V2, americas) %>% 
   ggplot(aes(x = V1, y = V2, color = americas,  group = americas)) +
   geom_point() +
