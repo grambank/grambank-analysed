@@ -38,6 +38,30 @@ g <- igraph::graph.data.frame(df_long, directed=FALSE)
 
 Label_matrix <- igraph::get.adjacency(g, attr="Value_cfx", sparse=FALSE)
 
+#melting and testing dists
+
+left <- Language_meta_data %>% 
+  dplyr::select(Var1 = AUTOTYP_area, americas_var1 = americas)
+
+right <- Language_meta_data %>% 
+  dplyr::select(Var2 = AUTOTYP_area, americas_var2 = americas)
+
+df_long_sided <- Label_matrix %>% 
+  reshape2::melt() %>% 
+  left_join(left) %>% 
+  left_join(right) %>% 
+  distinct() %>% 
+  filter(Var1 != Var2)
+
+df_long_sided %>% 
+  group_by(americas_var1, americas_var2) %>%
+  summarise(mean= mean(value)) %>% 
+  reshape2::dcast(americas_var1 ~ americas_var2) %>%
+  column_to_rownames("americas_var1") %>% 
+  as.matrix() %>% 
+  round(2)
+
+#MDS PLOT
 mds <- MASS::isoMDS(Label_matrix)
 
 mds_df <- mds$points %>% 
@@ -47,6 +71,9 @@ mds_df <- mds$points %>%
 
 mds_df %>% 
 write_tsv("output/dists/cfx_mds_autotyp.tsv")
+
+
+
 
 # The palette with black:
 cbbPalette <- c( "#E69F00", "#009E73", "#F0E442", "#D55E00", "#CC79A7","#000000")
