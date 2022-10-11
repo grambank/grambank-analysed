@@ -56,24 +56,6 @@ random_membership <- sample(1:2, size = 24, replace = T)
 
 igraph::modularity(g, membership = random_membership, weights = df_long$Value_cfx)
 
-#example from doc
-#
-g <- make_full_graph(5) %du% make_full_graph(5) %du% make_full_graph(5)
-g <- add_edges(g, c(1,6, 1,11, 6, 11))
-E(g) %>% length()
-
-dist <- matrix(1, nrow = 15, ncol = 15)
-
-wtc <- cluster_walktrap(g)
-membership_vec <- membership(wtc)
-
-#membership_random <- sample(1:2, size = 15, replace = T)
-#modularity(wtc)
-
-weights <- rep(0.5, 33)
-
-modularity(g, membership = membership_vec)
-
 
 #make network graph
 h_load("qgraph")
