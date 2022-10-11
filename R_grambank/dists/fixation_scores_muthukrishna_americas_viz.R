@@ -2,13 +2,7 @@ source("requirements.R")
 
 Language_meta_data <-  read_tsv("output/non_GB_datasets/glottolog-cldf_wide_df.tsv", show_col_types = F) %>% 
   dplyr::select(Language_ID, level, Family_ID, Name, Macroarea) %>% 
-  mutate(Family_ID = ifelse(is.na(Family_ID), "Isolate", Family_ID)) 
-#  filter(!is.na(Macroarea)) %>% 
-#  filter(level == "language") %>% 
-#    group_by(Family_ID, Macroarea) %>%
-#  summarise(n = n(), .groups = "drop") %>% 
-#  arrange(desc(n)) %>% 
-#  distinct(Family_ID, .keep_all = T)
+  mutate(Family_ID = ifelse(is.na(Family_ID), "Isolate", Family_ID))
 
 #sometimes languages in an autotyp-area are not classified all as the same macroarea. we take the macroarea per autotyp-area that is the most common. for example, N Coast Asia has 58 languages glottolog puts in Eurasia and 2 in North Americas. We assign N Coast Asia to Eurasia macroarea
 
@@ -29,26 +23,57 @@ Language_meta_data <- Language_meta_data  %>%
   left_join(macroarea_per_autotyp_area, by = "Language_ID") %>% 
   mutate(americas = ifelse(str_detect(Macroarea, "merica"), "americas", "not americas"))
 
+left <- Language_meta_data %>% 
+  dplyr::select(Var1 = AUTOTYP_area, americas_var1 = americas)
+
+right <- Language_meta_data %>% 
+  dplyr::select(Var2 = AUTOTYP_area, americas_var2 = americas)
+
 df_long <- read_tsv("output/dists/cfx_AUTOTYP_area_cut_off_0_list.tsv", show_col_types = F) %>% 
-  separate("Vars", into = c("Var1", "Var2"), sep = " - ")
+  separate("Vars", into = c("Var1", "Var2"), sep = " - ") 
 
 #recover symmetric distance matrix
 h_load("igraph")
 g <- igraph::graph.data.frame(df_long, directed=FALSE)
-plot(g)
 
-membership <- g[8] %>% names() %>% 
+cfx_dist_matrix_sym <- igraph::get.adjacency(g, attr="Value_cfx", sparse=FALSE)
+
+#calculating modularity
+
+membership_vec <- g[8] %>%
+  names() %>% 
   as.data.frame() %>% 
   rename("AUTOTYP_area" = ".") %>% 
   left_join(distinct(Language_meta_data, `AUTOTYP_area`, `americas`), by = "AUTOTYP_area") %>% 
-  mutate(americas_num = ifelse(americas == "americas", 1, 0)) %>% 
+  mutate(americas_num = ifelse(americas == "americas", 1, 2)) %>% 
   dplyr::select(americas_num) %>% 
   as.matrix() %>% 
   as.vector()
 
-igraph::modularity(g, membership = membership)
+igraph::modularity(g, membership = membership_vec, weights = df_long$Value_cfx)
 
-cfx_dist_matrix_sym <- igraph::get.adjacency(g, attr="Value_cfx", sparse=FALSE)
+random_membership <- sample(1:2, size = 24, replace = T)
+
+igraph::modularity(g, membership = random_membership, weights = df_long$Value_cfx)
+
+#example from doc
+#
+g <- make_full_graph(5) %du% make_full_graph(5) %du% make_full_graph(5)
+g <- add_edges(g, c(1,6, 1,11, 6, 11))
+E(g) %>% length()
+
+dist <- matrix(1, nrow = 15, ncol = 15)
+
+wtc <- cluster_walktrap(g)
+membership_vec <- membership(wtc)
+
+#membership_random <- sample(1:2, size = 15, replace = T)
+#modularity(wtc)
+
+weights <- rep(0.5, 33)
+
+modularity(g, membership = membership_vec)
+
 
 #make network graph
 h_load("qgraph")
@@ -85,21 +110,16 @@ plot(qgraph_plot)
 x <- dev.off()
 
 
-h_load("dbscan")
+#h_load("dbscan")
 
-hdbscan_obj <- dbscan::hdbscan(cfx_dist_matrix_sym, minPts = 2)
+#hdbscan_obj <- dbscan::hdbscan(cfx_dist_matrix_sym, minPts = 2)
 
-colnames(cfx_dist_matrix_sym) %>% 
-  as.data.frame() %>% 
-  mutate(HDBSCAN_cluster <- hdbscan_obj$cluster) %>% View()
+#colnames(cfx_dist_matrix_sym) %>% 
+#  as.data.frame() %>% 
+#  mutate(HDBSCAN_cluster <- hdbscan_obj$cluster) %>% View()
 
 #melting and testing dists
 
-left <- Language_meta_data %>% 
-  dplyr::select(Var1 = AUTOTYP_area, americas_var1 = americas)
-
-right <- Language_meta_data %>% 
-  dplyr::select(Var2 = AUTOTYP_area, americas_var2 = americas)
 
 df_long_sided <- cfx_dist_matrix_sym %>% 
   reshape2::melt() %>% 
@@ -122,12 +142,11 @@ mds <- MASS::isoMDS(cfx_dist_matrix_sym)
 mds_df <- mds$points %>% 
   as.data.frame() %>% 
   rownames_to_column("Label") %>% 
-  left_join(Language_meta_data, by = c("Label" = "AUTOTYP_area")) 
+  left_join(Language_meta_data, by = c("Label" = "AUTOTYP_area")) %>% 
+  distinct()
 
 mds_df %>% 
 write_tsv("output/dists/cfx_mds_autotyp.tsv")
-
-
 
 
 # The palette with black:
