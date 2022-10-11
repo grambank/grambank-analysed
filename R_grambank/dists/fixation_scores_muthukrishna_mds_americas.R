@@ -35,8 +35,39 @@ df_long <- read_tsv("output/dists/cfx_AUTOTYP_area_cut_off_0_list.tsv", show_col
 #recover symmetric distance matrix
 h_load("igraph")
 g <- igraph::graph.data.frame(df_long, directed=FALSE)
+plot(g)
 
-Label_matrix <- igraph::get.adjacency(g, attr="Value_cfx", sparse=FALSE)
+cfx_dist_matrix_sym <- igraph::get.adjacency(g, attr="Value_cfx", sparse=FALSE)
+
+h_load("qgraph")
+
+cfx_dist_matrix_sym_inverse <- 1 - cfx_dist_matrix_sym
+
+labels <- colnames(cfx_dist_matrix_sym) %>% str_replace_all(" ", "\n")  %>% str_replace_all("N\n", "N ")%>% str_replace_all("S\n", "S ")
+groups<-  colnames(cfx_dist_matrix_sym) %>% 
+  as.data.frame() %>% 
+  rename("AUTOTYP_area" = ".") %>% 
+  left_join(distinct(Language_meta_data, `AUTOTYP_area`, `americas`), by = "AUTOTYP_area") %>% 
+  mutate(americas_color = ifelse(americas == "americas", "orange", "turquoise3")) %>% 
+  dplyr::select(americas_color) %>% 
+  as.matrix() %>% 
+  as.vector()
+
+qgraph_plot <- qgraph(cfx_dist_matrix_sym_inverse, 
+       layout='spring', 
+       labels = labels, 
+       label.scale = F, 
+       shape = "rectangle", 
+       node.width = 1.5, 
+       node.height= 0.9, 
+       vTrans= 230, 
+       color = groups,
+       border.color = groups,
+       edge.color = "purple4")
+
+png(filename = "output/dists/cfx_network_plot.png", width = 10, height = 10, units = "in", res = 400)
+plot(qgraph_plot) 
+x <- dev.off()
 
 #melting and testing dists
 
@@ -46,7 +77,7 @@ left <- Language_meta_data %>%
 right <- Language_meta_data %>% 
   dplyr::select(Var2 = AUTOTYP_area, americas_var2 = americas)
 
-df_long_sided <- Label_matrix %>% 
+df_long_sided <- cfx_dist_matrix_sym %>% 
   reshape2::melt() %>% 
   left_join(left) %>% 
   left_join(right) %>% 
@@ -62,7 +93,7 @@ df_long_sided %>%
   round(2)
 
 #MDS PLOT
-mds <- MASS::isoMDS(Label_matrix)
+mds <- MASS::isoMDS(cfx_dist_matrix_sym)
 
 mds_df <- mds$points %>% 
   as.data.frame() %>% 
