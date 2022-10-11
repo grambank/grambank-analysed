@@ -22,7 +22,7 @@ h <- surprisal_df %>%
   annotate("segment",col="black", alpha = 0.6, x = limit, xend = limit, y = 0, yend = 50, size = 0.5, linetype = "dashed") +
   scale_fill_viridis('Surprisal', option="A", direction = -1) +
   guides(fill="none") +
-  xlab("Surprisal") + ylab("Number of Languages") +
+  xlab("Unusualness") + ylab("Number of Languages") +
   theme_classic() +
   theme(    axis.title = element_text(size = 8),
             panel.background = element_rect(fill = "transparent", colour = NA),  
