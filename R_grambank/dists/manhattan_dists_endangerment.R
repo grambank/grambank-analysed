@@ -4,7 +4,7 @@ OUTPUTDIR <- "output/dists/"
 if (!dir.exists(OUTPUTDIR)) {dir.create(OUTPUTDIR)}
 
 #reading in GB
-GB <- read.delim("output/GB_wide/GB_wide_imputed_binarized.tsv", sep ="\t")
+GB <- read.delim("output/GB_wide/GB_cropped_for_missing.tsv", sep ="\t")
 
 GB_matrix <- GB %>%
   column_to_rownames("Language_ID") %>%
@@ -22,13 +22,19 @@ colnames(GB_dist) <- rownames(GB_matrix)
 GB_dist[upper.tri(GB_dist, diag = T)] <- NA
 
 #all
-GB_dist %>% 
+GB_dist_list <- GB_dist %>% 
   reshape2::melt() %>%
-  filter(!is.na(value)) %>% 
-  group_by(value) %>% 
-  summarise(n = n()) %>% 
-  ggplot() +
-  geom_bar(aes(x = value, y = n), fill = "darkblue", stat = "identity") +
-  theme_classic()
+  filter(!is.na(value)) 
 
-ggsave("output/dists/plot_manhattan_dists.png")
+GB_dist_list$value %>% mean()
+
+GB_dist_list %>% 
+  group_by(value) %>% 
+  summarise(n = n()) %>%
+  ggplot() +
+  geom_point(aes(x = value, y = n, col = value)) +
+  theme_classic() +
+  theme(axis.title = element_blank(), 
+        legend.position = "None") 
+
+ggsave("output/dists/plot_manhattan_dists.png", height = 4, width = 5)
