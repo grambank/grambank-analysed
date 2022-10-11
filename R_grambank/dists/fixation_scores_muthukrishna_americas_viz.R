@@ -37,11 +37,23 @@ h_load("igraph")
 g <- igraph::graph.data.frame(df_long, directed=FALSE)
 plot(g)
 
+membership <- g[8] %>% names() %>% 
+  as.data.frame() %>% 
+  rename("AUTOTYP_area" = ".") %>% 
+  left_join(distinct(Language_meta_data, `AUTOTYP_area`, `americas`), by = "AUTOTYP_area") %>% 
+  mutate(americas_num = ifelse(americas == "americas", 1, 0)) %>% 
+  dplyr::select(americas_num) %>% 
+  as.matrix() %>% 
+  as.vector()
+
+igraph::modularity(g, membership = membership)
+
 cfx_dist_matrix_sym <- igraph::get.adjacency(g, attr="Value_cfx", sparse=FALSE)
 
+#make network graph
 h_load("qgraph")
 
-cfx_dist_matrix_sym_inverse <- 1 - cfx_dist_matrix_sym
+cfx_dist_matrix_sym_inverse <- (1 - cfx_dist_matrix_sym)^2
 
 labels <- colnames(cfx_dist_matrix_sym) %>% str_replace_all(" ", "\n")  %>% str_replace_all("N\n", "N ")%>% str_replace_all("S\n", "S ")
 groups<-  colnames(cfx_dist_matrix_sym) %>% 
@@ -60,14 +72,26 @@ qgraph_plot <- qgraph(cfx_dist_matrix_sym_inverse,
        shape = "rectangle", 
        node.width = 1.5, 
        node.height= 0.9, 
+       maximum = 0.5,
        vTrans= 230, 
        color = groups,
        border.color = groups,
        edge.color = "purple4")
 
+plot(qgraph_plot) 
+
 png(filename = "output/dists/cfx_network_plot.png", width = 10, height = 10, units = "in", res = 400)
 plot(qgraph_plot) 
 x <- dev.off()
+
+
+h_load("dbscan")
+
+hdbscan_obj <- dbscan::hdbscan(cfx_dist_matrix_sym, minPts = 2)
+
+colnames(cfx_dist_matrix_sym) %>% 
+  as.data.frame() %>% 
+  mutate(HDBSCAN_cluster <- hdbscan_obj$cluster) %>% View()
 
 #melting and testing dists
 
