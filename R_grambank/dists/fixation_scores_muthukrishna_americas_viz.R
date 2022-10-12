@@ -1,8 +1,7 @@
 source("requirements.R")
 
 Language_meta_data <-  read_tsv("output/non_GB_datasets/glottolog-cldf_wide_df.tsv", show_col_types = F) %>% 
-  dplyr::select(Language_ID, level, Family_ID, Name, Macroarea) %>% 
-  mutate(Family_ID = ifelse(is.na(Family_ID), "Isolate", Family_ID))
+  dplyr::select(Language_ID, level, Family_ID, Name, Macroarea) 
 
 #sometimes languages in an autotyp-area are not classified all as the same macroarea. we take the macroarea per autotyp-area that is the most common. for example, N Coast Asia has 58 languages glottolog puts in Eurasia and 2 in North Americas. We assign N Coast Asia to Eurasia macroarea
 
