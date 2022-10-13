@@ -36,6 +36,7 @@ df_long_shifted <- df %>%
   mutate(Longitude = if_else(Longitude <= -25, Longitude + 360, Longitude))
 
 df_long_shifted$prop <- 1 - df_long_shifted$na_prop 
+legend_breaks <- c(min(df_long_shifted$prop), 0.8, 0.85, 0.9, 0.95, 1)
 
 #basemap
 basemap <- ggplot(df_long_shifted) +
@@ -46,7 +47,7 @@ basemap <- ggplot(df_long_shifted) +
                colour="gray87",
                fill="white", size = 0.3) +
   viridis::scale_color_viridis( name='% of data', 
-                      breaks = 0.25*0:4, labels = percent(0.25*0:4), direction = -1) +
+                                breaks = legend_breaks, labels = percent(legend_breaks), begin = 0.5, end = 1) +
     theme(
     # all of these lines are just removing default things like grid lines, axes etc
     panel.grid.major = element_blank(),
