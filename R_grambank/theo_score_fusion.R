@@ -22,25 +22,25 @@ GB_fusion_points <- data.table::fread(GRAMBANK_PARAMETERS,
 
 #remove features for which there is only a feature for the free or bound kind of marking, only keep those where there is one for each type of marking
 
-GB_fusion_points_only_with_alternatives <- GB_fusion_points %>% 
-  filter(!is.na(Fusion))	%>% 
-  filter(!is.na(informativity))	%>% 
-  group_by(informativity) %>% 
-dplyr::summarise(count_informativity_categories = n()) %>% 
-  filter(count_informativity_categories > 1) %>% 
-  inner_join(GB_fusion_points,  by = "informativity") %>% 
-  dplyr::select(Parameter_ID, Fusion)
+# GB_fusion_points_only_with_alternatives <- GB_fusion_points %>% 
+#   filter(!is.na(Fusion))	%>% 
+#   filter(!is.na(informativity))	%>% 
+#   group_by(informativity) %>% 
+#   dplyr::summarise(count_informativity_categories = n()) %>% 
+#   filter(count_informativity_categories > 1) %>% 
+#   inner_join(GB_fusion_points,  by = "informativity") %>% 
+#   dplyr::select(Parameter_ID, Fusion)
 
 df_morph_count <- GB_wide %>%
   filter(na_prop <= 0.25 ) %>% #exclude languages with more than 25% missing data
   dplyr::select(-na_prop) %>% 
   reshape2::melt(id.vars = "Language_ID") %>% 
   dplyr::rename(Parameter_ID = variable) %>% 
-  inner_join(GB_fusion_points_only_with_alternatives, by = "Parameter_ID") %>% 
-  filter(!is.na(Fusion)) %>% 
+  inner_join(GB_fusion_points, by = "Parameter_ID") %>% 
+  filter(Fusion == 1) %>% 
   filter(!is.na(value)) %>% 
   mutate(value_weighted = if_else(Fusion == 0.5 & value == 1, 0.5, value )) %>% #replacing all instances of 1 for a feature that is weighted to 0.5 bound morph points to 0.5
-  mutate(value_weighted = if_else(Fusion == 0, abs(value-1), value_weighted)) %>% # reversing the values of the features that refer to free-standing markers 
+#  mutate(value_weighted = if_else(Fusion == 0, abs(value-1), value_weighted)) %>% # reversing the values of the features that refer to free-standing markers 
   group_by(Language_ID) %>% 
   dplyr::summarise(mean_morph = mean(value_weighted))
 
