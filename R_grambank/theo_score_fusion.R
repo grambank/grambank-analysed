@@ -37,7 +37,7 @@ df_morph_count <- GB_wide %>%
   reshape2::melt(id.vars = "Language_ID") %>% 
   dplyr::rename(Parameter_ID = variable) %>% 
   inner_join(GB_fusion_points, by = "Parameter_ID") %>% 
-  filter(Fusion == 1) %>% 
+  filter(Fusion != 0) %>% 
   filter(!is.na(value)) %>% 
   mutate(value_weighted = if_else(Fusion == 0.5 & value == 1, 0.5, value )) %>% #replacing all instances of 1 for a feature that is weighted to 0.5 bound morph points to 0.5
 #  mutate(value_weighted = if_else(Fusion == 0, abs(value-1), value_weighted)) %>% # reversing the values of the features that refer to free-standing markers 
