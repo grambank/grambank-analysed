@@ -4,3 +4,8 @@ source("requirements.R")
 
 h_load(verbose = F, pkg = c("fundiversity", "mFD"  ))
 
+OUTPUTDIR <- "output/functional_richness"
+
+if(!dir.exists(OUTPUTDIR)){
+  dir.create(OUTPUTDIR)
+}
