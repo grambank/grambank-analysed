@@ -31,8 +31,8 @@ summary(as.factor(languages$aes))
 
 gb <- languages %>% select('Language_ID', 'Family_ID') %>% left_join(gb, by="Language_ID")
 
-autotyp <- read.delim('data/glottolog_AUTOTYP_areas.tsv', na.strings="NA", header=TRUE) %>%
-  select(c("Language_ID", "AUTOTYP_area"))
+autotyp <- read.delim('output/non_GB_datasets/glottolog_AUTOTYP_areas.tsv', na.strings="NA", header=TRUE) %>%
+  dplyr::select(c("Language_ID", "AUTOTYP_area"))
 
 # merge in regions
 gb <- gb %>% left_join(autotyp)
