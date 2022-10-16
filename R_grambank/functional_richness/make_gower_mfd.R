@@ -22,4 +22,4 @@ gb.dist <- mFD::funct.dist(
     weight_type   = "equal",
     stop_if_NA    = TRUE)
 
-saveRDS(gb.dist, file = "gb.gower.RDS")
+saveRDS(gb.dist, file = "output/functional_richness/gb.gower.mfd.RDS")
