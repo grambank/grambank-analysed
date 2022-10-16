@@ -7,15 +7,17 @@ source("functional_richness/requirements_fr.R")
 # (1) Read data and auxiliary functions (taken almost verbatim from Simon)
 
 # see https://github.com/glottolog/glottolog/blob/master/config/aes_status.ini
+
+#assign numbers to aes-status, splitting them into two categories: endangered and not endangered.
 aes2numbers <- data.frame(
   aesid = c(2, 1, 1, 1, 1, 1),
   aes = c("not_endangered", "threatened", "shifting", "moribund", "nearly_extinct", "extinct")
 )
 
 
-gb <- read.delim('data/GB_wide_imputed_binarized.tsv', na.strings='NA')
-
-languages <- read.delim('data/glottolog-cldf_wide_df.tsv', na.strings='NA')
+gb <-read_tsv("output/GB_wide/GB_wide_imputed_binarized.tsv", show_col_types = F) 
+  
+languages <- read_tsv("output/non_GB_datasets/glottolog-cldf_wide_df.tsv", show_col_types = F)
 languages <- languages[languages$Language_ID %in% gb$Language_ID, ]
 
 # which languages have no endangerment?
