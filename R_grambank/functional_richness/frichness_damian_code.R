@@ -57,7 +57,7 @@ table(languages$aesid)
 #944 560 
 
 # (3) Run MDS on this data
-mds_gb<-gb %>% colnames()
+mds_gb<-gb %>% 
   dplyr::select(-Language_ID,-Family_ID,-AUTOTYP_area) %>%
   dist(method = "manhattan") %>%
   cmdscale(eig=TRUE, k=2)
