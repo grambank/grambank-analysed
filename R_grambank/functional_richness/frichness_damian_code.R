@@ -27,17 +27,22 @@ languages[is.na(languages$aes), ]$aes <- 'not_endangered'
 
 languages <- languages %>% left_join(aes2numbers, by='aes')
 
-summary(as.factor(languages$aes))
+table(languages$aes)
 
-gb <- languages %>% select('Language_ID', 'Family_ID') %>% left_join(gb, by="Language_ID")
+gb <- languages %>% dplyr::select('Language_ID', 'Family_ID') %>% left_join(gb, by="Language_ID")
 
 autotyp <- read.delim('output/non_GB_datasets/glottolog_AUTOTYP_areas.tsv', na.strings="NA", header=TRUE) %>%
   dplyr::select(c("Language_ID", "AUTOTYP_area"))
 
 # merge in regions
-gb <- gb %>% left_join(autotyp)
+gb <- gb %>% left_join(autotyp, by = "Language_ID")
 
-gb.dist <- readRDS('gb.gower.RDS')
+gb.gower.mfd_fn <- "output/functional_richness/gb.gower.mfd.RDS"
+if(!file.exists(gb.gower.mfd_fn)) {
+  source("functional_richness/make_gower_mfd.R")
+}
+
+gb.dist <- readRDS(gb.gower.mfd_fn)
 
 # drop languages we don't have
 gb <- gb[gb$Language_ID %in% attr(gb.dist, 'Labels'),]
@@ -47,13 +52,13 @@ languages<-languages %>%
   filter(Language_ID %in% gb$Language_ID)
 
 # Check distribution of endangerment
-table(languages$Endangerment)
+table(languages$aesid)
 #1   2 
 #944 560 
 
 # (3) Run MDS on this data
-mds_gb<-gb %>%
-  select(-Language_ID,-Family_ID,-AUTOTYP_area) %>%
+mds_gb<-gb %>% colnames()
+  dplyr::select(-Language_ID,-Family_ID,-AUTOTYP_area) %>%
   dist(method = "manhattan") %>%
   cmdscale(eig=TRUE, k=2)
 
@@ -62,7 +67,6 @@ languages$mds1<-mds_gb$points[,1]
 languages$mds2<-mds_gb$points[,2]
 
 # Plot this
-require(ggforce)
 
 mds_plots<-languages %>%
   left_join(gb,by="Language_ID") %>%
@@ -71,7 +75,7 @@ mds_plots<-languages %>%
                  color="NA",
                  fill="#cae6d3",
                  alpha=1)+
-  geom_point(color=ifelse(languages$Endangerment==1,"gray","black"),
+  geom_point(color=ifelse(languages$aesid==1,"gray","black"),
              alpha=0.6)+
   facet_wrap(~AUTOTYP_area,ncol=4)+
   theme(legend.position = "none",
@@ -84,16 +88,18 @@ mds_plots<-languages %>%
         panel.border = element_rect(color="black",fill="NA"))
 
 # Create subsets of language data
-langsNEndangered<-languages$Language_ID[languages$Endangerment==2]
+langsNEndangered<-languages$Language_ID[languages$aesid==2]
 
 languagesNEndangered<-languages %>%
-  filter(Endangerment==2) %>%
-  select(mds1,mds2)
+  filter(aesid==2) %>%
+  dplyr::select(mds1,mds2)  %>% 
+  as.data.frame() #making a tibble into a df only makes the next line not complain that you're setting rownames on a tibble
 
 rownames(languagesNEndangered)<-langsNEndangered
 
 languagesAll<-languages %>%
-  select(mds1,mds2)
+  dplyr::select(mds1,mds2) %>% 
+  as.data.frame() #making a tibble into a df only makes the next line not complain that you're setting rownames on a tibble
 
 rownames(languagesAll)<-languages$Language_ID
 
@@ -169,14 +175,12 @@ frich_plot<-frich_df %>%
   theme(legend.position = "none",
         axis.ticks.y=element_blank(),
         axis.line.y = element_blank(),
-        axis.text.y = element_text(margin = margin(r=-130),
-                                   hjust=0,vjust=-0.7))+
+#        axis.text.y = element_text(margin = ggplot2::margin(r=-130),
+#                                   hjust=0,vjust=-0.7)
+)+
   labs(x="",y="Functional richness")+
-  scale_fill_manual(values=c("#a1eda5","#71a674"))
-
-
-require(cowplot)
+  scale_fill_manual(values=c("#a1eda5","#71a674")) 
 
 mds_grid<-plot_grid(frich_plot,mds_plots,nrow=1,rel_widths = c(1,1.5))
 
-save_plot("frichness_paper.png",mds_grid,base_height = 7,base_width = 13)
+save_plot("output/functional_richness/frichness_paper.png",mds_grid,base_height = 7,base_width = 13)
