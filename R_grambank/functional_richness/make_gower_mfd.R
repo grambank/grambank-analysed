@@ -1,8 +1,7 @@
 source("functional_richness/requirements_fr.R")
 
-gb_mfd <- read.delim('output/GB_wide/GB_wide_imputed_binarized.tsv', na.strings='NA')
-rownames(gb_mfd) <- gb_mfd$Language_ID
-gb_mfd$Language_ID <- NULL
+gb_mfd <- read.delim('output/GB_wide/GB_wide_imputed_binarized.tsv', na.strings='NA') %>% 
+  column_to_rownames("Language_ID")
 
 # figure out trait categories
 
@@ -13,7 +12,6 @@ gb_mfd[gb_mfd == "0"] <- 'a'
 gb_mfd[gb_mfd == "1"] <- 'p'
 
 gb_mfd[] <- lapply(gb_mfd, function(x) as.factor(x))
-
 
 gb.dist <- mFD::funct.dist(
     sp_tr         = gb_mfd,
