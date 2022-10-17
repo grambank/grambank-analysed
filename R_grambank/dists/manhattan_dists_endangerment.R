@@ -56,10 +56,12 @@ GB_dist_list_binned %>%
   geom_bar(aes(x = bin_display, y = n, fill = order, color = order), stat = "identity") +
   theme_classic() +
   theme(legend.position = "None") +
+  theme(plot.margin = unit(c(0.5,0.5,0,0), "cm")) +
   xlab("Manhattan distances") +
   ylab("n") +
   viridis::scale_fill_viridis(discrete = F) +
   viridis::scale_color_viridis(discrete = F) +
-  theme(axis.text.x = element_text(angle = 65, hjust = 1)) 
+  theme(axis.text.x = element_text(angle = 0)) +
+  scale_x_discrete(breaks = GB_dist_list_binned$bin_display[c(1, 10, 20, 30, 40)])
 
 ggsave("output/dists/plot_manhattan_dists.png", height = 4, width = 5)
