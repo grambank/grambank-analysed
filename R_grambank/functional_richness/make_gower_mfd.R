@@ -1,5 +1,7 @@
 source("functional_richness/requirements_fr.R")
 
+#script written by Simon Greenhill.
+
 gb_mfd <- read.delim('output/GB_wide/GB_wide_imputed_binarized.tsv', na.strings='NA') %>% 
   column_to_rownames("Language_ID")
 

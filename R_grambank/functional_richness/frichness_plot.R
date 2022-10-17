@@ -1,7 +1,7 @@
 # Functional richness using PCoA
 # It requires running test.R from Simon first
 
-#script written by Damián Blasi.
+#script written by Simon Greenhill and Damián Blasi.
 
 # (0) Read libraries
 source("functional_richness/requirements_fr.R")

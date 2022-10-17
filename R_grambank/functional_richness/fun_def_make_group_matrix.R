@@ -1,3 +1,5 @@
+#Script written by Simon Greenhill.
+
 #Site-species matrix with sites as rows and species as columns if not provided,
 # This can be either a matrix, a data.frame, or a Matrix::Matrix() object.
 make_group_matrix <- function(df, grouping_var, remove=c(), threshold=3) {

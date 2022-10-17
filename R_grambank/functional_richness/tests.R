@@ -1,5 +1,7 @@
 library(testthat)
 
+#Script written by Simon Greenhill.
+
 # dput(gb[
 #     gb$Family_ID %in% c('nucl1708', 'koia1260', 'sepi1257', 'east2433'),
 #     c("Language_ID", 'Family_ID', 'GB020', "GB021", "GB022", "GB023", "GB028", 'AUTOTYP_area')
