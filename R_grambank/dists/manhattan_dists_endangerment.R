@@ -46,19 +46,20 @@ GB_dist_list_binned <- GB_dist_list %>%
   separate(bin, into = c("order", "second"), sep = ",", remove = F) %>% 
   mutate(order = str_replace_all(order, "\\(", "") %>% as.numeric() %>% round(digits = 0)) %>% 
   mutate(second = str_replace_all(second, "[\\(|\\[|\\]]", "") %>% as.numeric() %>% round(digits = 0)) %>% 
-  unite("order", "second",col = "bin_display", sep = " - ", remove = F, )
+  unite("order", "second",col = "bin_display", sep = "-", remove = F, )
  
 
 GB_dist_list_binned$bin_display <- fct_reorder(GB_dist_list_binned$bin_display, GB_dist_list_binned$order)
 
 GB_dist_list_binned %>% 
   ggplot() +
-  geom_bar(aes(x = bin_display, y = n, fill = order), stat = "identity") +
+  geom_bar(aes(x = bin_display, y = n, fill = order, color = order), stat = "identity") +
   theme_classic() +
   theme(legend.position = "None") +
-  xlab("Manhattan distance") +
+  xlab("Manhattan distances") +
   ylab("n") +
   viridis::scale_fill_viridis(discrete = F) +
+  viridis::scale_color_viridis(discrete = F) +
   theme(axis.text.x = element_text(angle = 65, hjust = 1)) 
 
 ggsave("output/dists/plot_manhattan_dists.png", height = 4, width = 5)
