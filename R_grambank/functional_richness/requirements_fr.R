@@ -2,7 +2,7 @@ source("requirements.R")
 
 #installing and loading extra packages for Simon and Damian's code for functional richness.
 
-h_load(verbose = F, pkg = c("fundiversity", "mFD" , "ggforce", "concaveman", "cowplot"))
+h_load(verbose = F, pkg = c("mFD" , "ggforce", "concaveman", "cowplot", "fundiversity"))
 
 OUTPUTDIR <- "output/functional_richness"
 
