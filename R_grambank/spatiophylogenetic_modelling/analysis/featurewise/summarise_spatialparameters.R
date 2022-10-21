@@ -37,19 +37,22 @@ model_long = pivot_longer(model_summary, cols = c("Spatial_estimate", "Phylogene
 
 col_vector <- c("purple4", "turquoise3")
 
+model_long$name <- str_replace_all(model_long$name, "_", " ")
+
 p =   ggplot(model_long, aes(x = settings, y = value, group = feature, color = name)) + 
   geom_point() + 
   geom_line() + 
   ylim(c(0, 1)) + 
   ylab("Spatiophylogenetic parameter estimates") + 
   xlab("Matern spatial parameters") + 
-  scale_x_discrete(labels = c('kappa = 2; sigma = 1.15',
-                              'kappa = 2; sigma = 2',
-                              'kappa = 2.5; sigma = 3')) + 
+  scale_x_discrete(labels = c('kappa = 2\nsigma = 1.15',
+                              'kappa = 2\nsigma = 2',
+                              'kappa = 2.5\nsigma = 3')) + 
   theme_classic() +
   scale_color_manual(values = col_vector) +
-  theme(legend.position = 'None',
-        axis.text.x = element_text(angle = 45, hjust=1)) + 
+  theme(legend.position = 'None'#,
+#        axis.text.x = element_text(angle = 45, hjust=1)
+) + 
   facet_wrap(~name)
 
 ggsave(plot = p, 
