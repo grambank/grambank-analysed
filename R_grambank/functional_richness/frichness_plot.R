@@ -38,15 +38,15 @@ autotyp <- read.delim('output/non_GB_datasets/glottolog_AUTOTYP_areas.tsv', na.s
 # merge in regions
 gb <- gb %>% left_join(autotyp, by = "Language_ID")
 
-gb.gower.mfd_fn <- "output/functional_richness/gb.gower.mfd.RDS"
-if(!file.exists(gb.gower.mfd_fn)) {
-  source("functional_richness/make_gower_mfd.R")
-}
+#gb.gower.mfd_fn <- "output/functional_richness/gb.gower.mfd.RDS"
+#if(!file.exists(gb.gower.mfd_fn)) {
+#  source("functional_richness/make_gower_mfd.R")
+#}
 
-gb.dist <- readRDS(gb.gower.mfd_fn)
+#gb.dist <- readRDS(gb.gower.mfd_fn)
 
 # drop languages we don't have
-gb <- gb[gb$Language_ID %in% attr(gb.dist, 'Labels'),]
+#gb <- gb[gb$Language_ID %in% attr(gb.dist, 'Labels'),]
 
 # (2) Check AES endangerment categories
 languages<-languages %>%
@@ -57,10 +57,12 @@ table(languages$aesid)
 #1   2 
 #944 560 
 
-# (3) Run MDS on this data
-mds_gb<-gb %>% 
+gb_dist_gower <- gb %>% 
   dplyr::select(-Language_ID,-Family_ID,-AUTOTYP_area) %>%
-  dist(method = "manhattan") %>%
+  cluster::daisy(metric = "gower", warnBin = F)
+
+# (3) Run MDS on this data
+mds_gb<-gb_dist_gower %>% 
   cmdscale(eig=TRUE, k=2)
 
 # Add the MDS projections to the languages data frame
