@@ -42,6 +42,7 @@ pair_upp <- function(data, mapping, method, ...){
   ggally_text(
     label = as.character(round(corr, 2)), 
     mapping = aes(),
+    label.size = 14,
     xP = 0.5, yP = 0.5,
     color = 'purple4',
     size=8,
