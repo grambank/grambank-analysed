@@ -31,7 +31,8 @@ gb$AUTOTYP_area <- fct_reorder(gb$AUTOTYP_area, gb$median_surprisal)
 
 gb %>% 
    ggplot() +
-  geom_density_ridges(aes(x = Surprisal, y = AUTOTYP_area, fill = median_surprisal), quantile_lines = T, quantile_fun = median, jittered_points = TRUE, point_size = 2, point_shape = 21  ,  position = position_points_jitter(height = 0))  +
+  geom_density_ridges(aes(x = Surprisal, y = AUTOTYP_area, fill = median_surprisal), bandwidth = 0.131,
+                      quantile_lines = T, quantile_fun = median, jittered_points = TRUE, point_size = 2, point_shape = 21  ,  position = position_points_jitter(height = 0))  +
   geom_label(data = median_df , aes(x = median_surprisal, y = AUTOTYP_area,
                                      label = round(median_surprisal, 2)), size = 3, nudge_x = 0, nudge_y = 0.4, alpha = 0.7, label.padding = unit(0.1, "lines")) +
   theme_classic() +
