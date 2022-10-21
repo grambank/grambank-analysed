@@ -36,16 +36,18 @@ model_long = pivot_longer(model_summary, cols = c("Spatial_estimate", "Phylogene
 
 col_vector <- c("purple4", "turquoise3")
 
+model_long$name <- str_replace_all(model_long$name, "_", " ")
+
 p =   ggplot(model_long, aes(x = prior, y = value, group = feature, color = name)) + 
   geom_point() + 
   geom_line() + 
   ylim(c(0, 1)) + 
   ylab("Spatiophylogenetic parameter estimates") + 
   xlab("Penalizing Complexity Priors") + 
-  scale_x_discrete(labels = c('PC Prior = 0.01',
-                              'PC Prior = 0.1',
-                              'PC Prior = 0.5',
-                              'PC Prior = 0.99')) +
+  scale_x_discrete(labels = c('0.01',
+                              '0.1',
+                              '0.5',
+                              '0.99')) +
   theme_classic() +
   scale_color_manual(values = col_vector) +
   theme(legend.position = 'None',
