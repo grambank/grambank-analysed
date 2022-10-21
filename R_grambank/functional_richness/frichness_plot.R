@@ -1,5 +1,4 @@
 # Functional richness using PCoA
-# It requires running test.R from Simon first
 
 #script written by Simon Greenhill and Damián Blasi.
 
@@ -80,6 +79,7 @@ mds_plots<-languages %>%
   geom_point(color=ifelse(languages$aesid==1,"gray","black"),
              alpha=0.6)+
   facet_wrap(~AUTOTYP_area,ncol=4)+
+  theme_bw() +
   theme(legend.position = "none",
         strip.background = element_blank(),
         strip.placement = "outside",
@@ -174,15 +174,17 @@ frich_plot<-frich_df %>%
            width=0.3,
            position="stack")+
   coord_flip()+
-  theme(legend.position = "none",
+  labs(x="",y="Functional richness")+
+  scale_fill_manual(values=c("#cae6d3","#71a674")) +
+  theme_bw() +
+  theme(  legend.position = "none",
         axis.ticks.y=element_blank(),
         axis.line.y = element_blank(),
-#        axis.text.y = element_text(margin = ggplot2::margin(r=-130),
-#                                   hjust=0,vjust=-0.7)
-)+
-  labs(x="",y="Functional richness")+
-  scale_fill_manual(values=c("#a1eda5","#71a674")) 
+        #        axis.text.y = element_text(margin = ggplot2::margin(r=-130),
+        #                                   hjust=0,vjust=-0.7)
+  )
+  
 
-mds_grid<-plot_grid(frich_plot,mds_plots,nrow=1,rel_widths = c(1,1.5))
+mds_grid <-plot_grid(frich_plot,mds_plots,nrow=1,rel_widths = c(1,1.5))
 
 save_plot("output/functional_richness/frichness_paper.png",mds_grid,base_height = 7,base_width = 13)
