@@ -31,6 +31,19 @@ right <- Language_meta_data %>%
 df_long <- read_tsv("output/dists/cfx_AUTOTYP_area_cut_off_0_list.tsv", show_col_types = F) %>% 
   separate("Vars", into = c("Var1", "Var2"), sep = " - ") 
 
+df_long %>% 
+left_join(left, by = "Var1") %>% 
+  left_join(right, by = "Var2") %>% 
+  distinct() %>% 
+  filter(Var1 != Var2) %>% 
+  mutate(Value_cfx = round(Value_cfx, 4)) %>% 
+  arrange(Value_cfx) %>% 
+  dplyr::select(Group_Var1 = "Var1", Group_Var2 = "Var2", `Cultural Fixation Score` = Value_cfx, Americas_Var1 = americas_var1, Americas_Var2 = americas_var2) %>% 
+  write_tsv("output/dists/cfx_list_autotyp_areas_SM.tsv", na = "")
+  
+  
+
+
 #recover symmetric distance matrix
 h_load("igraph")
 g <- igraph::graph.data.frame(df_long, directed=FALSE)
