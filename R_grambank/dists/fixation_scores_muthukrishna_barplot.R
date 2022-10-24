@@ -13,26 +13,13 @@ cfx_macroarea_list %>%
   theme_classic() +
   theme(text = element_text(angle = 70, hjust = 1, size = 20), 
         legend.position = "None", 
-        axis.title.x = element_blank())
+        axis.title.x = element_blank()) +
+  scale_fill_viridis()+
+  ylab("Cultural Fixation Score")
 
 mean(cfx_macroarea_list$Value_cfx)
 
 ggsave(filename = file.path(OUTPUTDIR, "cfx_barplot_macroarea.png"), height =  7.89, width =  8.61)
-
-cfx_AUTOTYP_area_list <-  read_tsv(file.path(OUTPUTDIR, "cfx_AUTOTYP_area_list.tsv"))
-
-cfx_AUTOTYP_area_list %>% 
-  ggplot(aes(x = Vars, y = Value_cfx)) +
-  geom_bar(aes(fill = 1 - Value_cfx), stat = "identity") +
-  theme_classic() +
-  theme(text = element_text(angle = 70, hjust = 1, size = 20), 
-        legend.position = "None", 
-        axis.title.x = element_blank())
-
-mean(cfx_AUTOTYP_area_list$Value_cfx)
-
-ggsave(filename = file.path(OUTPUTDIR, "cfx_barplot_AUTOTYP_area.png"), height =  7.89, width =  8.61)
-
 
 fns <- list.files(path = OUTPUTDIR, pattern = ".*cfx_Family_ID_list_cut_off.*")
 
