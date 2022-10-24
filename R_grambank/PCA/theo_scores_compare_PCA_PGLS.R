@@ -13,15 +13,15 @@ if(!file.exists(theo_scores_fn)){
 }
 
 theo_scores_df <- read_tsv(theo_scores_fn, show_col_types = F) %>%
-  inner_join(tree_tip_df,by = "Language_ID") %>% 
-  column_to_rownames("Language_ID") %>% 
-  as.data.frame() 
+  inner_join(tree_tip_df,by = "Language_ID") 
 
-#divide all theo scores by their standard deviation
-theo_scores_df <- apply(theo_scores_df,2, function(x) x/sd(x)) %>% as.data.frame()
+PCA_df <- read_tsv("output/PCA/PCA_language_values.tsv", show_col_types = F) %>% 
+  dplyr::select(Language_ID, PC1, PC2, PC3)
 
 theo_scores_df <- theo_scores_df %>% 
-  rownames_to_column("Language_ID")
+  left_join(PCA_df, by = "Language_ID") %>% 
+  mutate_if(is.numeric, scale) %>% 
+  as.data.frame()
 
 #setting up the comparative data object for caper
 comp_data <- caper::comparative.data(phy = tree, data = theo_scores_df, names.col = "Language_ID")
@@ -31,15 +31,13 @@ comp_data <- caper::comparative.data(phy = tree, data = theo_scores_df, names.co
 theo_scores_cols <- c("word order"   ,       "Flexivity"      ,     "Gender/\nnoun class", "locus of\nmarking"  ,
                       "Fusion"        ,      "Informativity" )
 
-PCS <- c("PC1_scaled" ,         "PC2_scaled"     ,     "PC3_scaled"         )
-
-results_df <- matrix(nrow = 0, ncol = 4) %>% 
+results_df <- matrix(nrow = 0, ncol = 5) %>% 
   as.data.frame()
 
 colnames(results_df) <- c(
   "theo_score", 
     "PC", "coef" , 
-  "p_value"  
+  "p_value"  , "t_value"
 )
 
 results_df <- results_df %>% 
@@ -57,22 +55,25 @@ for(theo_score in theo_scores_cols){
 PC1_df <- data.frame(PC = "PC1",
   theo_score = theo_score,
   coef = output_PC1$coefficients[2,1] ,
-  p_value = output_PC1$coefficients[2,4] )
+  p_value = output_PC1$coefficients[2,4] ,
+  t_value =  output_PC1$coefficients[2,3])
 
 PC2_df <- data.frame(PC = "PC2",
                      theo_score = theo_score,
   coef = output_PC2$coefficients[2,1] ,
-  p_value = output_PC2$coefficients[2,4] )
+  p_value = output_PC2$coefficients[2,4] ,
+  t_value =  output_PC1$coefficients[2,3])
   
 PC3_df <- data.frame(PC = "PC3",
                      theo_score = theo_score,
                      coef = output_PC3$coefficients[2,1] ,
-                     p_value = output_PC3$coefficients[2,4] )
+                     p_value = output_PC3$coefficients[2,4] ,
+                     t_value =  output_PC1$coefficients[2,3])
 
 results_df <- results_df  %>% 
-  full_join(PC1_df, by = c("theo_score", "PC", "coef", "p_value")) %>% 
-  full_join(PC2_df, by = c("theo_score", "PC", "coef", "p_value")) %>% 
-  full_join(PC3_df, by = c("theo_score", "PC", "coef", "p_value"))
+  full_join(PC1_df, by = c("theo_score", "PC", "coef", "p_value", "t_value")) %>% 
+  full_join(PC2_df, by = c("theo_score", "PC", "coef", "p_value", "t_value")) %>% 
+  full_join(PC3_df, by = c("theo_score", "PC", "coef", "p_value", "t_value"))
 }
 
 results_df <- results_df %>% 
@@ -81,8 +82,8 @@ results_df <- results_df %>%
 results_df  %>% 
   mutate(p_value = round(p_value, 5)) %>% 
   mutate(coef = round(coef, 5)) %>% 
-  mutate(theo_score = str_replace_all(theo_score, "\n", "")) %>%
+  mutate(theo_score = str_replace_all(theo_score, "\n", "")) %>% 
   arrange(PC) %>% 
-    dplyr::select(PC, `Theoretical score` = theo_score, coef, `p-value (of t)` =p_value) %>% 
+    dplyr::select(PC, `Theoretical score` = theo_score, coef, `t-value` = t_value, `p-value (of t)` =p_value) %>% 
   write_tsv("output/PCA/PGLS_theo_score_correlations.tsv")
 
