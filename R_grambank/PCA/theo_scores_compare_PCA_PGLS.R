@@ -82,7 +82,8 @@ results_df <- results_df %>%
 results_df  %>% 
   mutate(p_value = round(p_value, 5)) %>% 
   mutate(coef = round(coef, 5)) %>% 
-  mutate(theo_score = str_replace_all(theo_score, "\n", "")) %>% 
+  mutate(t_value = round(t_value, 5)) %>% 
+    mutate(theo_score = str_replace_all(theo_score, "\n", "")) %>% 
   arrange(PC) %>% 
     dplyr::select(PC, `Theoretical score` = theo_score, coef, `t-value` = t_value, `p-value (of t)` =p_value) %>% 
   write_tsv("output/PCA/PGLS_theo_score_correlations.tsv")
