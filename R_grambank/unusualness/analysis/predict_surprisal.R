@@ -93,8 +93,9 @@ regression_surprisal<-function(df,s_cov,p_cov) {
          iter = 6000,
          warmup = 2000,
          cores = 4,
-         control = list(adapt_delta=0.99),
-         backend="cmdstanr")
+         control = list(adapt_delta=0.99)#,
+#         backend="cmdstanr"
+)
   return(m)}
 
 
