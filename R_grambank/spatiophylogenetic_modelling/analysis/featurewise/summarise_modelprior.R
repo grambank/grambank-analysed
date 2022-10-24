@@ -50,8 +50,7 @@ p =   ggplot(model_long, aes(x = prior, y = value, group = feature, color = name
                               '0.99')) +
   theme_classic() +
   scale_color_manual(values = col_vector) +
-  theme(legend.position = 'None',
-        axis.text.x = element_text(angle = 45, hjust=1)) + 
+  theme(legend.position = 'None') + 
   facet_wrap(~name)
 
 ggsave(plot = p, 
