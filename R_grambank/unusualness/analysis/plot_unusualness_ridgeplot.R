@@ -36,10 +36,10 @@ gb %>%
   geom_label(data = median_df , aes(x = median_surprisal, y = AUTOTYP_area,
                                      label = round(median_surprisal, 2)), size = 3, nudge_x = 0, nudge_y = 0.4, alpha = 0.7, label.padding = unit(0.1, "lines")) +
   theme_classic() +
-  theme(axis.title = element_blank(), 
+  theme(axis.title.y  = element_blank(), 
         legend.position = "None", 
         axis.text = element_text(size = 12)) +
-  scale_fill_viridis(option="magma", discrete = F, begin = 0.3) 
+  scale_fill_viridis(option="magma", discrete = F, begin = 0.3, direction = -1) +
+  xlab("Unusualness")
 
 ggsave(filename = paste0(OUTPUTDIR_plots, "/unusualness_ridgeplot.png"), height = 8, width = 6)
-  
