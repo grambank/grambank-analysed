@@ -7,7 +7,7 @@ OUTPUTDIR <- file.path("MDS")
 if (!dir.exists(OUTPUTDIR)) { dir.create(OUTPUTDIR) }		
 
 #reading in GB
-GB <- read.delim(file.path("GB_wide", "GB_cropped_for_missing.tsv"), sep ="\t") %>%
+GB <- read.delim(file.path("output", "GB_wide", "GB_cropped_for_missing.tsv"), sep ="\t") %>%
   column_to_rownames("Language_ID") %>%
   as.matrix()
 
