@@ -7,6 +7,8 @@ if (!dir.exists(OUTPUTDIR)) {dir.create(OUTPUTDIR)}
 
 cfx_macroarea_list <-   read_tsv("output/dists/cfx_Macroarea_cut_off_0_list.tsv", show_col_types = F)
 
+cfx_macroarea_list$Vars <- fct_reorder(cfx_macroarea_list$Vars, cfx_macroarea_list$Value_cfx)
+
 cfx_macroarea_list %>% 
   ggplot(aes(x = Vars, y = Value_cfx)) +
   geom_bar(aes(fill = 1 - Value_cfx), stat = "identity") +
