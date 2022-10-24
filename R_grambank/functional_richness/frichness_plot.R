@@ -23,14 +23,17 @@ languages <- languages[languages$Language_ID %in% gb$Language_ID, ]
 
 # which languages have no endangerment?
 languages[is.na(languages$aes), c("Name", "Glottocode", "Countries")]
-# assume these are all safe, non-endangered languages
-languages[is.na(languages$aes), ]$aes <- 'not_endangered'
+# rm these langauges from the subsequent analysis
+languages <- languages %>% 
+  filter(!is.na(aes))
 
 languages <- languages %>% left_join(aes2numbers, by='aes')
 
 table(languages$aes)
 
-gb <- languages %>% dplyr::select('Language_ID', 'Family_ID') %>% left_join(gb, by="Language_ID")
+gb <- languages %>% 
+  dplyr::select('Language_ID', 'Family_ID') %>% 
+  inner_join(gb, by="Language_ID")
 
 autotyp <- read.delim('output/non_GB_datasets/glottolog_AUTOTYP_areas.tsv', na.strings="NA", header=TRUE) %>%
   dplyr::select(c("Language_ID", "AUTOTYP_area"))
