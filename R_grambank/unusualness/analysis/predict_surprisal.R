@@ -120,7 +120,7 @@ surprisal_predictions<-predict(model_surprisal)
 gb$Pred_Surprisal<-surprisal_predictions[,1]
 gb$Pred_Error<-surprisal_predictions[,2]
 gb$Res_Surprisal<-with(gb,Surprisal-Pred_Surprisal)
-gb$Z_Surprisal<-with(gb,Res_Surprisal/)
+gb$Z_Surprisal<-with(gb,Res_Surprisal)
 
 
 # Plot this
@@ -196,4 +196,4 @@ simplified_model <- brms::brm(unusualness_score ~ 1 + (1 | gr(Glottocode, cov = 
 ) %>% add_criterion("waic")
 simplified_model %>% broom.mixed::tidy() %>% write_csv("unusualness/analysis/simplified_model.csv")
 
-loo_compare(full_model, simplified_model, criterion="waic") %>% as.tibble() %>% write_csv("unusualness/analysis/model_comparison.csv
+loo_compare(full_model, simplified_model, criterion="waic") %>% as.tibble() %>% write_csv("unusualness/analysis/model_comparison.csv")
