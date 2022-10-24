@@ -174,7 +174,7 @@ frich_df<-frich_df %>%
 frich_plot<-frich_df %>%
   ggplot(aes(x=Area,y=FRichness,fill=Languages))+
   geom_bar(stat="identity",
-           width=0.3,
+           width=0.7,
            position="stack")+
   coord_flip()+
   labs(x="",y="Functional richness")+
