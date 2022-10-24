@@ -1,7 +1,6 @@
 # Load pkgs
 source("requirements.R")
 
-source('spatiophylogenetic_modelling/analysis/functions/varcov_spatial.R')
 
 # Set working directory for output
 #setup outpur dirs
@@ -18,7 +17,7 @@ surprisal_fn <- paste0(OUTPUTDIR_tables, "/surprisal.tsv")
 if(!file.exists(surprisal_fn)){
   source("unusualness/analysis/get_unusualness_bayesLCA.R")
 }
-gb <- read_tsv(file = surprisal_fn)
+gb <- read_tsv(file = surprisal_fn, show_col_types = F)
 
 # Recode endangerment
 gb<-gb %>%
@@ -58,7 +57,7 @@ phylo_covar_mat  %>%
 ###################################
 
 # Source functions relevant to the spatial variance-covariance matrices
-source('spatiophylogenetic_modelling/analysis/varcov_spatial.R')
+source('spatiophylogenetic_modelling/analysis/functions/varcov_spatial.R')
 
 kappa = 2 # smoothness parameter as recommended by Dinnage et al. (2020)
 sigma = c(1, 1.15) # Sigma parameter. First value is not used. 
