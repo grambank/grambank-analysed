@@ -101,23 +101,5 @@ model_surprisal<-regression_surprisal(gb,
                                       s_cov=spatial_covar_mat,
                                       p_cov=phylo_covar_mat)
 
-qs::qsave(model_surprisal, "output/unusualness/model_surprisal.qs")
-
-# Check summary and estimate Bayesian  R2
-summary(model_surprisal)
-bayes_R2(model_surprisal)
-
-#########################################
-## (6) Predictive model
-#########################################
-
-# Add predictions and residuals
-surprisal_predictions<-predict(model_surprisal)
-gb$Pred_Surprisal<-surprisal_predictions[,1]
-gb$Pred_Error<-surprisal_predictions[,2]
-gb$Res_Surprisal<-with(gb,Surprisal-Pred_Surprisal)
-gb$Z_Surprisal<-with(gb,Res_Surprisal)
 
 
-# Plot this
-ggplot(gb,aes(x=Res_Surprisal))+geom_histogram()
