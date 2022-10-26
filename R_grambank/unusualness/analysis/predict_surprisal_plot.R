@@ -1,3 +1,5 @@
+source("requirements.R")
+
 model_surprisal <- qs::qread("output/unusualness/model_surprisal.qs")
 
 # Check summary and estimate Bayesian  R2
