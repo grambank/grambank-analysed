@@ -107,6 +107,8 @@ model_surprisal<-regression_surprisal(gb,
                                       s_cov=spatial_covar_mat,
                                       p_cov=phylo_covar_mat)
 
+qs::qsave(model_surprisal, "output/unusualness/model_surprisal.qs")
+
 # Check summary and estimate Bayesian  R2
 summary(model_surprisal)
 bayes_R2(model_surprisal)
@@ -181,7 +183,7 @@ full_model <- brms::brm(formula = formula_for_brms,
                         data = filter(inner_joined_df, !is.na(L1), !is.na(L2)),
                         data2 = list(vcv_tree= vcv_tree),
                         iter = 7500,
-                        iter = 10000,
+#                        iter = 10000,
                         cores = 4,
                         control = list(adapt_delta =0.99, max_treedepth=15)
 ) %>% add_criterion("waic")
@@ -191,7 +193,7 @@ simplified_model <- brms::brm(unusualness_score ~ 1 + (1 | gr(Glottocode, cov = 
                               data = filter(inner_joined_df, !is.na(L1), !is.na(L2)),
                               data2 = list(vcv_tree= vcv_tree),
                               iter = 7500,
-                              iter = 25000,
+                         #     iter = 25000,
                               control = list(adapt_delta =0.99, max_treedepth=15)
 ) %>% add_criterion("waic")
 simplified_model %>% broom.mixed::tidy() %>% write_csv("unusualness/analysis/simplified_model.csv")
