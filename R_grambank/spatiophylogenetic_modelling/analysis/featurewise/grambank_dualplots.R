@@ -16,7 +16,7 @@ feature_groupings <- read_csv("feature_grouping_for_analysis.csv", show_col_type
 ## Identify results by spatial decay
 # filename_suffix = "_kappa_2.5_sigma_3..qs"
 # filename_suffix = "_kappa_2_sigma_2.RD.qs"
-filename_suffix = "_kappa_2_sigma_1.15.qs"
+filename_suffix = "_kappa_2_sigma_1.15_pcprior0.1.qs"
 
 ## Read in model posteriors
 model_output_files = list.files(path = "output/spatiophylogenetic_modelling/featurewise/",
@@ -45,7 +45,7 @@ colnames(dual_posterior) = c(
   "phylogenetic"
 )
 
-dual_posterior$Feature_ID = str_extract(dual_posterior$Feature_ID, "GB[0-9]{3}")
+dual_posterior$Feature_ID = str_extract(dual_posterior$Feature_ID, "[:alnum:]*")
 
 # join feature metadata to posterior
 dual_posterior = left_join(dual_posterior, feature_groupings, by ="Feature_ID")
@@ -124,6 +124,7 @@ plot_function <- function(label = c("letter_plot_label", "domain", "Nichols_1995
     rename(label = 2) %>% 
     filter(!is.na(label))
   
+
 center_plot =   ggplot(data = dual_summary,
                        aes(x = mean_phylogenetic,
                            y = mean_spatial)) +
