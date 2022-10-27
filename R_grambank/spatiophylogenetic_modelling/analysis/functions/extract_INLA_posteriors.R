@@ -103,7 +103,7 @@ for(fn in fns){
 
 index <- index + 1
 qs <- qs::qread(fn)
-Feature_ID <- basename(fn) %>% str_replace_all(".qs", "")
+fn <- basename(fn) %>% str_replace_all(".qs", "")
 cat(paste0("I'm on ", Feature_ID, ", i.e. index ", index, ".\n"))
 
 #phylo_only
@@ -127,7 +127,7 @@ posteriors_df_spec <- cbind(#hyper_sample_phylo_only_posterior,
                        hyper_sample_dual_posterior, 
                        hyper_sample_trial_posterior) %>% 
   as.data.frame() %>% 
-  mutate(Feature_ID = Feature_ID)
+  mutate(fn = fn)
 
 
 posteriors_df <- posteriors_df %>% 
@@ -139,7 +139,7 @@ posteriors_df <- posteriors_df %>%
                                        "Precision for spatial_id_in_trial", 
                                        "Precision for phylo_id_in_trial",
                                        "Precision for AUTOTYP_area_id_iid_model_in_trial", 
-                                       "Feature_ID"))
+                                       "fn"))
 }
 
 posteriors_df %>% 
