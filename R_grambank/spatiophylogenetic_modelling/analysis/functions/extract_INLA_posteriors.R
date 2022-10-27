@@ -143,4 +143,5 @@ posteriors_df <- posteriors_df %>%
 }
 
 posteriors_df %>% 
+  mutate(Feature_ID = str_extract(fn, pattern = "[:alnum:]*")) %>% 
   write_tsv("output/spatiophylogenetic_modelling/featurewise/posteriors_df.tsv", na = "")
