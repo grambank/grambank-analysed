@@ -43,9 +43,10 @@ dual_summary %>%
   arrange(desc(`Phylogenetic effect (mean)`)) %>% 
   write_tsv("output/spatiophylogenetic_modelling/featurewise/dual_summary_effects.tsv", na = "")
 
-trinf <- data.frame(x=c(0,1,1),y=c(1,0,1))
 
 ## make upper triangle work on log plot
+trinf <- data.frame(x=c(0,1,1),y=c(1,0,1))
+
 trinf_sf <- st_linestring(as.matrix(rbind(trinf, trinf[1, ]))) %>%
   st_segmentize(0.01)
 
