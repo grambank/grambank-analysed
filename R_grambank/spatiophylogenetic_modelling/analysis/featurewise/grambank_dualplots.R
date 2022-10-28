@@ -16,18 +16,11 @@ feature_groupings <- read_csv("feature_grouping_for_analysis.csv", show_col_type
 ## Identify results by spatial decay
 # filename_suffix = "_kappa_2.5_sigma_3..qs"
 # filename_suffix = "_kappa_2_sigma_2.RD.qs"
-filename_suffix = "_kappa_2_sigma_1.15_pcprior0.1.qs"
+filename_suffix = "_kappa_2_sigma_1.15_pcprior0.1"
 
 ## Read in model posteriors
-model_output_files = list.files(path = "output/spatiophylogenetic_modelling/featurewise/",
-                                pattern = filename_suffix,
-                                full.names = TRUE)
-
-model_output = lapply(model_output_files, qread)
-names(model_output) = basename(model_output_files) %>%
-  tools::file_path_sans_ext(.)
-
 posteriors_df <- read_tsv("output/spatiophylogenetic_modelling/featurewise/posteriors_df.tsv", show_col_types = F) %>% 
+  filter(str_detect(fn, filename_suffix)) %>% 
   dplyr::select(Feature_ID, spatial = `Precision for spatial_id_in_dual`, phylogenetic = `Precision for phylo_id_in_dual`)
 
 # join feature metadata to posterior
