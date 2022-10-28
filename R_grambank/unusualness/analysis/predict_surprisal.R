@@ -102,4 +102,25 @@ model_surprisal<-regression_surprisal(gb,
                                       p_cov=phylo_covar_mat)
 
 
+model_surprisal %>% qs::qsave("output/unusualness/model_surprisal.qs")
+
+#model_surprisal <- qs::qread("output/unusualness/model_surprisal.qs")
+
+# Check summary and estimate Bayesian  R2
+summary(model_surprisal)
+bayes_R2(model_surprisal)
+
+#########################################
+## (6) Predictive model
+#########################################
+
+# Add predictions and residuals
+surprisal_predictions<-predict(model_surprisal)
+gb$Pred_Surprisal<-surprisal_predictions[,1]
+gb$Pred_Error<-surprisal_predictions[,2]
+gb$Res_Surprisal<-with(gb,Surprisal-Pred_Surprisal)
+gb$Z_Surprisal<-with(gb,Res_Surprisal)
+
+gb %>% 
+  write_tsv("output/unusualness/tables/model_df.tsv", na = "")
 
