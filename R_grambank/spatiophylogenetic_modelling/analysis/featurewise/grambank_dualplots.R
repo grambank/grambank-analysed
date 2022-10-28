@@ -27,28 +27,11 @@ model_output = lapply(model_output_files, qread)
 names(model_output) = basename(model_output_files) %>%
   tools::file_path_sans_ext(.)
 
-## Extract the posterior distrubtions for each dual_process model from the hypersample
-dual_posterior = lapply(model_output, function(m) {
-  dd = m[[1]]$hyper_sample
-  binomial_error = pi^2 / 3
-  # Calculate h^2
-  posterior = (1 / dd) / (rowSums(1 / dd) + 1 + binomial_error)
-
-  posterior
-})
-# Convert this to a dataframe
-dual_posterior = map_df(dual_posterior, ~as.data.frame(.x), .id="id")
-
-colnames(dual_posterior) = c(
-  "Feature_ID",
-  "spatial",
-  "phylogenetic"
-)
-
-dual_posterior$Feature_ID = str_extract(dual_posterior$Feature_ID, "[:alnum:]*")
+posteriors_df <- read_tsv("output/spatiophylogenetic_modelling/featurewise/posteriors_df.tsv", show_col_types = F) %>% 
+  dplyr::select(Feature_ID, spatial = `Precision for spatial_id_in_dual`, phylogenetic = `Precision for phylo_id_in_dual`)
 
 # join feature metadata to posterior
-dual_posterior = left_join(dual_posterior, feature_groupings, by ="Feature_ID")
+dual_posterior = left_join(posteriors_df, feature_groupings, by ="Feature_ID")
 
 # Summarise the posterior distributions
 dual_summary = dual_posterior %>%
@@ -156,6 +139,8 @@ center_plot =   ggplot(data = dual_summary,
                              b = 5,  # Bottom margin
                              l = 5)) 
 
+
+##IFS 
 if(facet == T){
 center_plot  <- center_plot  +
   lemon::facet_rep_wrap(~label,nrow = 2, repeat.tick.labels = T) + 
