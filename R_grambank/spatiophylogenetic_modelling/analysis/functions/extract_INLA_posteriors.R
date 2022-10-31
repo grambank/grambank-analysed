@@ -104,7 +104,7 @@ for(fn in fns){
 index <- index + 1
 qs <- qs::qread(fn)
 fn <- basename(fn) %>% str_replace_all(".qs", "")
-cat(paste0("I'm on ", fn, ", i.e. index ", index, ".\n"))
+cat(paste0("I'm on ", fn, ", i.e. index ", index, " out of ", length(fns), ".\n"))
 
 #phylo_only
 #hyper_sample_phylo_only_posterior <- get_icc_posterior(hyper_sample = qs[[1]][[1]], ncol = 1)
@@ -128,7 +128,6 @@ posteriors_df_spec <- cbind(#hyper_sample_phylo_only_posterior,
                        hyper_sample_trial_posterior) %>% 
   as.data.frame() %>% 
   mutate(fn = fn)
-
 
 posteriors_df <- posteriors_df %>% 
   full_join(posteriors_df_spec, by = c(#"Precision for phylo_id_in_single", 
