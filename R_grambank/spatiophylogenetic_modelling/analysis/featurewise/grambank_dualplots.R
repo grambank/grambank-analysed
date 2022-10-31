@@ -167,17 +167,17 @@ ggsave(plot = center_plot,
 
 plot_function(label = "letter_plot_label", 
               facet = T, 
-              fn = paste0("spatiophylogenetic_figure_panels_ellipses_", filename_suffix)
+              fn = paste0("output/spatiophylogenetic_modelling/effect_plots/spatiophylogenetic_figure_panels_ellipses_", filename_suffix)
 )
 
 plot_function(label = "domain", 
               facet = T, 
-              fn = paste0("spatiophylogenetic_figure_panels_ellipses_domain_", filename_suffix)
+              fn = paste0("output/spatiophylogenetic_modelling/effect_plots/spatiophylogenetic_figure_panels_ellipses_domain_", filename_suffix)
 )
 
 plot_function(label = "Nichols_1995_prediction", 
               facet = F, 
-              fn = paste0("spatiophylogenetic_figure_panels_ellipses_nichols_prediction_", filename_suffix)
+              fn = paste0("output/spatiophylogenetic_modelling/effect_plots/spatiophylogenetic_figure_panels_ellipses_nichols_prediction_", filename_suffix)
 )
 
 #tables for supplementary
