@@ -3,6 +3,7 @@ source('requirements.R')
 
 ## Change this vector to change the colour palette of the plots
 col_vector <- c("#039e37", "purple4",  "#c23c3c", "turquoise3")
+shape_vector <- c(21, 22, 23, 24)
 
 #make outputdir
 if(!dir.exists("output/spatiophylogenetic_modelling/effect_plots")){
@@ -42,7 +43,6 @@ dual_summary %>%
   mutate_if(is.numeric, round,3) %>% 
   arrange(desc(`Phylogenetic effect (mean)`)) %>% 
   write_tsv("output/spatiophylogenetic_modelling/featurewise/dual_summary_effects.tsv", na = "")
-
 
 ## make upper triangle work on log plot
 trinf <- data.frame(x=c(0,1,1),y=c(1,0,1))
@@ -101,25 +101,25 @@ plot_function <- function(label = c("letter_plot_label", "domain", "Nichols_1995
     rename(label = 2) %>% 
     filter(!is.na(label))
   
-
 center_plot =   ggplot(data = dual_summary,
                        aes(x = mean_phylogenetic,
                            y = mean_spatial)) +
-  geom_polygon(aes(x, y,
-                   fill = label,
-                   group = Feature_ID),
-               data = ellipses,
-               alpha = 0.1,
-               color = NA) +
-  geom_point(aes(col = label, fill = label),
-             size = 0.5) +
+#  geom_polygon(aes(x, y,
+#                   fill = label,
+#                   group = Feature_ID),
+#               data = ellipses,
+#               alpha = 0.1,
+#               color = NA) +
+  geom_point(aes(col = label, fill = label, shape = label),
+             size = 3, alpha = 0.6) +
+  scale_shape_manual(values = shape_vector) +
   theme_classic(base_size = 10) +
   xlab("Variance explained by Phylogeny") +
   ylab("Variance explained by Geography") +
   scale_colour_manual(values = col_vector) +
   scale_fill_manual(values = col_vector) +
   scale_x_continuous(expand=c(0,0), breaks=c(0.25, 0.5, 0.75, 1), labels = scales::percent_format(scale = 100)) +
-  scale_y_continuous(expand=c(0,0), breaks=c(0, 0.25, 0.5, 0.7), limits = c(0, 0.7), labels = scales::percent_format(scale = 100)) +
+  scale_y_continuous(expand=c(0,0), breaks=c(0, 0.25, 0.5, 0.75, 1), limits = c(0, 01), labels = scales::percent_format(scale = 100)) +
   coord_equal() +
   geom_path(aes(x, y), data = data.frame(x = seq(0, 1, length.out = 100),
                                          y = seq(1, 0, length.out = 100)),
@@ -158,7 +158,7 @@ if(str_detect(fn, "ichols")){
 plot(center_plot)
 
 ggsave(plot = center_plot,
-       filename = paste0("output/spatiophylogenetic_modelling/effect_plots/", fn, ".jpg"),
+       filename = paste0(fn, ".jpg"),
        width = 230 / 2,
        height = 210 / 2,
        units = "mm")
