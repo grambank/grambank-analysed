@@ -3,7 +3,7 @@
 source('requirements.R')
 
 model_files = list.files('output/spatiophylogenetic_modelling/featurewise/', 
-                         pattern = "GB[0-9]{3}_kappa_\\d+([.,]\\d+)?_sigma_\\d+([.,]\\d+)?_pcprior.*.qs", 
+                         pattern = "[:alnum:]*_kappa_2_sigma_1.15_pcprior.*.qs", 
                          full.names = TRUE)
 
 model_output_list = lapply(model_files, function(m){
@@ -17,7 +17,7 @@ names(model_output_list) = basename(model_files)
 
 model_output = map_df(model_output_list, ~as.data.frame(.x), .id="id")
 
-model_output$feature = str_extract(model_output$id, "GB[0-9]{3}")
+model_output$feature = str_extract(model_output$id, pattern = "[:alnum:]*")
 model_output$settings = str_extract(model_output$id, "kappa_\\d+([.,]\\d+)?_sigma_\\d+([.,]\\d+)?")
 model_output$prior = str_extract(model_output$id, "pcprior\\d+([.,]\\d+)?")
 
@@ -30,7 +30,7 @@ model_summary =
   group_by(feature, prior) %>% 
   summarise(Spatial_estimate = mean(Precision.for.spatial_id),
             Phylogenetic_estimate = mean(Precision.for.phylo_id),
-  )
+    .groups = "drop")
 
 model_long = pivot_longer(model_summary, cols = c("Spatial_estimate", "Phylogenetic_estimate"))
 

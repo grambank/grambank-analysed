@@ -3,7 +3,7 @@
 source('requirements.R')
 
 model_files = list.files('output/spatiophylogenetic_modelling/featurewise/', 
-                         pattern = "GB[0-9]{3}_kappa_.*_pcprior0.1.*.qs", 
+                         pattern = "[:alnum:]*_kappa_.*_pcprior0.1.*.qs", 
                          full.names = TRUE)
 
 model_output_list = lapply(model_files, function(m){
@@ -18,7 +18,7 @@ names(model_output_list) = basename(model_files)
 model_output = map_df(model_output_list, ~as.data.frame(.x), .id="id")
 
 # parameters
-model_output$feature = str_extract(model_output$id, "GB[0-9]{3}")
+model_output$feature = str_extract(model_output$id, "[:alnum:]*")
 model_output$settings = str_extract(model_output$id, "kappa_\\d+([.,]\\d+)?_sigma_\\d+([.,]\\d+)?")
 
 colnames(model_output) = str_replace_all(colnames(model_output), 
