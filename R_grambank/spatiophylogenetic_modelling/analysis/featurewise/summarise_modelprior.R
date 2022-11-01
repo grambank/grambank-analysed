@@ -39,8 +39,8 @@ col_vector <- c("purple4", "turquoise3")
 model_long$name <- str_replace_all(model_long$name, "_", " ")
 
 p =   ggplot(model_long, aes(x = prior, y = value, group = feature, color = name)) + 
-  geom_point() + 
-  geom_line() + 
+  geom_point(alpha = 0.6) + 
+  geom_line(alpha = 0.4, size = 1) + 
   ylim(c(0, 1)) + 
   ylab("Spatiophylogenetic parameter estimates") + 
   xlab("Penalizing Complexity Priors") + 
