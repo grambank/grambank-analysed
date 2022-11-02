@@ -2,7 +2,7 @@
 source('requirements.R')
 
 ## Change this vector to change the colour palette of the plots
-col_vector <- c("#039e37", "purple4",  "#c23c3c", "turquoise3")
+col_vector <- c("#c23c3c","orange", "purple4", "turquoise3")
 shape_vector <- c(21, 22, 23, 24)
 
 #make outputdir
@@ -57,11 +57,10 @@ trinf <- trinf_sf %>%
 
 #make col for plot labels with a, b, c, d
 dual_summary <- dual_summary %>% 
-  mutate(letter_plot_label = str_replace(domain, "clause", "a")) %>% 
-  mutate(letter_plot_label = str_replace(letter_plot_label, "nominal domain", "b")) %>% 
-  mutate(letter_plot_label = str_replace(letter_plot_label, "pronoun", "c")) %>% 
-  mutate(letter_plot_label = str_replace(letter_plot_label, "verbal domain", "d"))
-
+  mutate(letter_plot_label = str_replace(domain, "clause", "a\\) clause")) %>% 
+  mutate(letter_plot_label = str_replace(letter_plot_label, "nominal domain", "b\\) nominal domain")) %>% 
+  mutate(letter_plot_label = str_replace(letter_plot_label, "pronoun", "c\\) pronoun")) %>% 
+  mutate(letter_plot_label = str_replace(letter_plot_label, "verbal domain", "d\\) verbal domain"))
 
 dual_summary_summary <- dual_posterior %>%
   summarise(mean_phylogenetic = mean(phylogenetic),
@@ -88,7 +87,7 @@ ellipses <- dual_summary %>%
          y = ifelse(y > 1, 1, y)) %>%
   ungroup()
 
-plot_function <- function(label = c("letter_plot_label", "domain", "Nichols_1995_prediction"), facet, fn = spatiophylogenetic_figure_panels_ellipses){
+plot_function <- function(label = c("letter_plot_label", "domain", "Nichols_1995_prediction"), facet, fn = spatiophylogenetic_figure_panels_){
   #label <- "letter_plot_label"
   
   dual_summary <- dual_summary %>% 
@@ -111,7 +110,7 @@ center_plot =   ggplot(data = dual_summary,
 #               alpha = 0.1,
 #               color = NA) +
   geom_point(aes(col = label, fill = label, shape = label),
-             size = 3, alpha = 0.6) +
+             size = 1.5, alpha = 0.6) +
   scale_shape_manual(values = shape_vector) +
   theme_classic(base_size = 10) +
   xlab("Variance explained by Phylogeny") +
@@ -167,17 +166,17 @@ ggsave(plot = center_plot,
 
 plot_function(label = "letter_plot_label", 
               facet = T, 
-              fn = paste0("output/spatiophylogenetic_modelling/effect_plots/spatiophylogenetic_figure_panels_ellipses_", filename_suffix)
+              fn = paste0("output/spatiophylogenetic_modelling/effect_plots/spatiophylogenetic_figure_panels__", filename_suffix)
 )
 
 plot_function(label = "domain", 
               facet = T, 
-              fn = paste0("output/spatiophylogenetic_modelling/effect_plots/spatiophylogenetic_figure_panels_ellipses_domain_", filename_suffix)
+              fn = paste0("output/spatiophylogenetic_modelling/effect_plots/spatiophylogenetic_figure_panels__domain_", filename_suffix)
 )
 
 plot_function(label = "Nichols_1995_prediction", 
               facet = F, 
-              fn = paste0("output/spatiophylogenetic_modelling/effect_plots/spatiophylogenetic_figure_panels_ellipses_nichols_prediction_", filename_suffix)
+              fn = paste0("output/spatiophylogenetic_modelling/effect_plots/spatiophylogenetic_figure_panels__nichols_prediction_", filename_suffix)
 )
 
 #tables for supplementary
