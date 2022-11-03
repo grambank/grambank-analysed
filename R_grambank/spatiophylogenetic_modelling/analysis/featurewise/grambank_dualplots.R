@@ -24,6 +24,14 @@ posteriors_df <- read_tsv("output/spatiophylogenetic_modelling/featurewise/poste
   filter(str_detect(fn, filename_suffix)) %>% 
   dplyr::select(Feature_ID, spatial = `Precision for spatial_id_in_dual`, phylogenetic = `Precision for phylo_id_in_dual`)
 
+posteriors_df_reruns <- read_tsv("output/spatiophylogenetic_modelling/featurewise/posteriors_df_reruns.tsv") %>% 
+  filter(str_detect(fn, filename_suffix)) %>% 
+  dplyr::select(Feature_ID, spatial = `Precision for spatial_id_in_dual`, phylogenetic = `Precision for phylo_id_in_dual`)
+
+posteriors_df  <-posteriors_df %>% 
+    filter(Feature_ID != "GB197" |Feature_ID != "GB129") %>% 
+  full_join(posteriors_df_reruns)
+
 # join feature metadata to posterior
 dual_posterior = left_join(posteriors_df, feature_groupings, by ="Feature_ID")
 
