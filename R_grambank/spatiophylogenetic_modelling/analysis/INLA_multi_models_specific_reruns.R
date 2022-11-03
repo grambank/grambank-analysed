@@ -84,7 +84,7 @@ data$obs_id = 1:nrow(data)
     cat(paste0("I'm on ", feature, " and the time is ", Sys.time(), ".\n"))
     cat(paste0("Precision matrix = ", basename(precision_matrices_fn), ".\n"))
     
-    saved_file =   paste0(OUTPUTDIR, feature,"_",   substr(x = basename(precision_matrices_fn), 20, 37), "_pcprior",   pcprior[2], ".qs")
+    saved_file =   paste0(OUTPUTDIR, "/", feature,"_",   substr(x = basename(precision_matrices_fn), 20, 37), "_pcprior",   pcprior[2], ".qs")
     
       # #### Dual Model ####
       # 
