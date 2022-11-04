@@ -124,7 +124,7 @@ endangerment_analysis:
 
 #step 6
 ## INLA 
-INLA: data INLA_featurewise
+INLA: data INLA_featurewise INLA_extract_posteriors
 
 INLA_featurewise:
 	@echo "## Running INLA-analysis featurewise. #"
@@ -153,6 +153,8 @@ INLA_featurewise_spatial_params_2_5_3_all_priors_third_part:
 INLA_featurewise_spatial_params_2_5_3_all_priors_fourth_part:
 	Rscript spatiophylogenetic_modelling/analysis/INLA_multi_models.R "real" 100 113 precision_matrices_kappa_2.5_sigma_3.RDS "loop_all_priors" 
 
+INLA_extract_posteriors:
+	Rscript sspatiophylogenetic_modelling/analysis/functions/extract_INLA_posteriors.R
 
 #generate cultural fixation scores and do mds plots
 make_cultural_fixation_scores:

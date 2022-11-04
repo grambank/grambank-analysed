@@ -3,7 +3,7 @@
 source('requirements.R')
 
 model_files = list.files('output/spatiophylogenetic_modelling/featurewise/', 
-                         pattern = "GB[0-9]{3}_kappa_.*_pcprior0.1.*.qs", 
+                         pattern = "[:alnum:]*_kappa_.*_pcprior0.1.*.qs", 
                          full.names = TRUE)
 
 model_output_list = lapply(model_files, function(m){
@@ -18,7 +18,7 @@ names(model_output_list) = basename(model_files)
 model_output = map_df(model_output_list, ~as.data.frame(.x), .id="id")
 
 # parameters
-model_output$feature = str_extract(model_output$id, "GB[0-9]{3}")
+model_output$feature = str_extract(model_output$id, "[:alnum:]*")
 model_output$settings = str_extract(model_output$id, "kappa_\\d+([.,]\\d+)?_sigma_\\d+([.,]\\d+)?")
 
 colnames(model_output) = str_replace_all(colnames(model_output), 
@@ -31,7 +31,7 @@ model_summary =
   group_by(feature, settings) %>% 
   summarise(Spatial_estimate = mean(Precision.for.spatial_id),
             Phylogenetic_estimate = mean(Precision.for.phylo_id),
-            )
+            .groups = "drop")
 
 model_long = pivot_longer(model_summary, cols = c("Spatial_estimate", "Phylogenetic_estimate"))
 
@@ -40,8 +40,8 @@ col_vector <- c("purple4", "turquoise3")
 model_long$name <- str_replace_all(model_long$name, "_", " ")
 
 p =   ggplot(model_long, aes(x = settings, y = value, group = feature, color = name)) + 
-  geom_point() + 
-  geom_line() + 
+  geom_point(alpha = 0.6) + 
+  geom_line(alpha = 0.4, size = 1) + 
   ylim(c(0, 1)) + 
   ylab("Spatiophylogenetic parameter estimates") + 
   xlab("Matern spatial parameters") + 

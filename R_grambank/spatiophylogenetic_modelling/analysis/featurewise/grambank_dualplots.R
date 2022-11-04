@@ -2,7 +2,8 @@
 source('requirements.R')
 
 ## Change this vector to change the colour palette of the plots
-col_vector <- c("#039e37", "purple4",  "#c23c3c", "turquoise3")
+col_vector <- c("#c23c3c","orange", "purple4", "turquoise3")
+shape_vector <- c(21, 22, 23, 24)
 
 #make outputdir
 if(!dir.exists("output/spatiophylogenetic_modelling/effect_plots")){
@@ -16,39 +17,23 @@ feature_groupings <- read_csv("feature_grouping_for_analysis.csv", show_col_type
 ## Identify results by spatial decay
 # filename_suffix = "_kappa_2.5_sigma_3..qs"
 # filename_suffix = "_kappa_2_sigma_2.RD.qs"
-filename_suffix = "_kappa_2_sigma_1.15.qs"
+filename_suffix = "_kappa_2_sigma_1.15_pcprior0.1"
 
 ## Read in model posteriors
-model_output_files = list.files(path = "output/spatiophylogenetic_modelling/featurewise/",
-                                pattern = filename_suffix,
-                                full.names = TRUE)
+posteriors_df <- read_tsv("output/spatiophylogenetic_modelling/featurewise/posteriors_df.tsv", show_col_types = F) %>% 
+  filter(str_detect(fn, filename_suffix)) %>% 
+  dplyr::select(Feature_ID, spatial = `Precision for spatial_id_in_dual`, phylogenetic = `Precision for phylo_id_in_dual`)
 
-model_output = lapply(model_output_files, qread)
-names(model_output) = basename(model_output_files) %>%
-  tools::file_path_sans_ext(.)
+posteriors_df_reruns <- read_tsv("output/spatiophylogenetic_modelling/featurewise/posteriors_df_reruns.tsv") %>% 
+  filter(str_detect(fn, filename_suffix)) %>% 
+  dplyr::select(Feature_ID, spatial = `Precision for spatial_id_in_dual`, phylogenetic = `Precision for phylo_id_in_dual`)
 
-## Extract the posterior distrubtions for each dual_process model from the hypersample
-dual_posterior = lapply(model_output, function(m) {
-  dd = m[[1]]$hyper_sample
-  binomial_error = pi^2 / 3
-  # Calculate h^2
-  posterior = (1 / dd) / (rowSums(1 / dd) + 1 + binomial_error)
-
-  posterior
-})
-# Convert this to a dataframe
-dual_posterior = map_df(dual_posterior, ~as.data.frame(.x), .id="id")
-
-colnames(dual_posterior) = c(
-  "Feature_ID",
-  "spatial",
-  "phylogenetic"
-)
-
-dual_posterior$Feature_ID = str_extract(dual_posterior$Feature_ID, "GB[0-9]{3}")
+posteriors_df  <-posteriors_df %>% 
+    filter(Feature_ID != "GB197" |Feature_ID != "GB129") %>% 
+  full_join(posteriors_df_reruns)
 
 # join feature metadata to posterior
-dual_posterior = left_join(dual_posterior, feature_groupings, by ="Feature_ID")
+dual_posterior = left_join(posteriors_df, feature_groupings, by ="Feature_ID")
 
 # Summarise the posterior distributions
 dual_summary = dual_posterior %>%
@@ -67,9 +52,9 @@ dual_summary %>%
   arrange(desc(`Phylogenetic effect (mean)`)) %>% 
   write_tsv("output/spatiophylogenetic_modelling/featurewise/dual_summary_effects.tsv", na = "")
 
+## make upper triangle work on log plot
 trinf <- data.frame(x=c(0,1,1),y=c(1,0,1))
 
-## make upper triangle work on log plot
 trinf_sf <- st_linestring(as.matrix(rbind(trinf, trinf[1, ]))) %>%
   st_segmentize(0.01)
 
@@ -80,11 +65,10 @@ trinf <- trinf_sf %>%
 
 #make col for plot labels with a, b, c, d
 dual_summary <- dual_summary %>% 
-  mutate(letter_plot_label = str_replace(domain, "clause", "a")) %>% 
-  mutate(letter_plot_label = str_replace(letter_plot_label, "nominal domain", "b")) %>% 
-  mutate(letter_plot_label = str_replace(letter_plot_label, "pronoun", "c")) %>% 
-  mutate(letter_plot_label = str_replace(letter_plot_label, "verbal domain", "d"))
-
+  mutate(letter_plot_label = str_replace(domain, "clause", "a\\) clause")) %>% 
+  mutate(letter_plot_label = str_replace(letter_plot_label, "nominal domain", "b\\) nominal domain")) %>% 
+  mutate(letter_plot_label = str_replace(letter_plot_label, "pronoun", "c\\) pronoun")) %>% 
+  mutate(letter_plot_label = str_replace(letter_plot_label, "verbal domain", "d\\) verbal domain"))
 
 dual_summary_summary <- dual_posterior %>%
   summarise(mean_phylogenetic = mean(phylogenetic),
@@ -111,7 +95,7 @@ ellipses <- dual_summary %>%
          y = ifelse(y > 1, 1, y)) %>%
   ungroup()
 
-plot_function <- function(label = c("letter_plot_label", "domain", "Nichols_1995_prediction"), facet, fn = spatiophylogenetic_figure_panels_ellipses){
+plot_function <- function(label = c("letter_plot_label", "domain", "Nichols_1995_prediction"), facet, fn = spatiophylogenetic_figure_panels_){
   #label <- "letter_plot_label"
   
   dual_summary <- dual_summary %>% 
@@ -127,21 +111,22 @@ plot_function <- function(label = c("letter_plot_label", "domain", "Nichols_1995
 center_plot =   ggplot(data = dual_summary,
                        aes(x = mean_phylogenetic,
                            y = mean_spatial)) +
-  geom_polygon(aes(x, y,
-                   fill = label,
-                   group = Feature_ID),
-               data = ellipses,
-               alpha = 0.1,
-               color = NA) +
-  geom_point(aes(col = label, fill = label),
-             size = 0.5) +
+#  geom_polygon(aes(x, y,
+#                   fill = label,
+#                   group = Feature_ID),
+#               data = ellipses,
+#               alpha = 0.1,
+#               color = NA) +
+  geom_point(aes(col = label, fill = label, shape = label),
+             size = 1.5, alpha = 0.6) +
+  scale_shape_manual(values = shape_vector) +
   theme_classic(base_size = 10) +
   xlab("Variance explained by Phylogeny") +
   ylab("Variance explained by Geography") +
   scale_colour_manual(values = col_vector) +
   scale_fill_manual(values = col_vector) +
   scale_x_continuous(expand=c(0,0), breaks=c(0.25, 0.5, 0.75, 1), labels = scales::percent_format(scale = 100)) +
-  scale_y_continuous(expand=c(0,0), breaks=c(0, 0.25, 0.5, 0.7), limits = c(0, 0.7), labels = scales::percent_format(scale = 100)) +
+  scale_y_continuous(expand=c(0,0), breaks=c(0, 0.25, 0.5, 0.75, 1), limits = c(0, 01), labels = scales::percent_format(scale = 100)) +
   coord_equal() +
   geom_path(aes(x, y), data = data.frame(x = seq(0, 1, length.out = 100),
                                          y = seq(1, 0, length.out = 100)),
@@ -155,6 +140,8 @@ center_plot =   ggplot(data = dual_summary,
                              b = 5,  # Bottom margin
                              l = 5)) 
 
+
+##IFS 
 if(facet == T){
 center_plot  <- center_plot  +
   lemon::facet_rep_wrap(~label,nrow = 2, repeat.tick.labels = T) + 
@@ -178,7 +165,7 @@ if(str_detect(fn, "ichols")){
 plot(center_plot)
 
 ggsave(plot = center_plot,
-       filename = paste0("output/spatiophylogenetic_modelling/effect_plots/", fn, ".jpg"),
+       filename = paste0(fn, ".jpg"),
        width = 230 / 2,
        height = 210 / 2,
        units = "mm")
@@ -187,17 +174,17 @@ ggsave(plot = center_plot,
 
 plot_function(label = "letter_plot_label", 
               facet = T, 
-              fn = paste0("spatiophylogenetic_figure_panels_ellipses_", filename_suffix)
+              fn = paste0("output/spatiophylogenetic_modelling/effect_plots/spatiophylogenetic_figure_panels__", filename_suffix)
 )
 
 plot_function(label = "domain", 
               facet = T, 
-              fn = paste0("spatiophylogenetic_figure_panels_ellipses_domain_", filename_suffix)
+              fn = paste0("output/spatiophylogenetic_modelling/effect_plots/spatiophylogenetic_figure_panels__domain_", filename_suffix)
 )
 
 plot_function(label = "Nichols_1995_prediction", 
               facet = F, 
-              fn = paste0("spatiophylogenetic_figure_panels_ellipses_nichols_prediction_", filename_suffix)
+              fn = paste0("output/spatiophylogenetic_modelling/effect_plots/spatiophylogenetic_figure_panels__nichols_prediction_", filename_suffix)
 )
 
 #tables for supplementary

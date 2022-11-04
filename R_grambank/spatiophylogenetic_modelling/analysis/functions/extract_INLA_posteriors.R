@@ -82,16 +82,20 @@ get_icc_posterior <- function(hyper_sample, ncol= NULL) {
 
 #empty df to bind to
 
-posteriors_df <- data.frame(matrix(ncol = 8, nrow = 0))
-colnames(posteriors_df) <- c( "Precision for phylo_id_in_single"      ,           "Precision for spatial_id_in_single"     ,          
-"Precision for AUTOTYP_area_id_iid_model_in_single", "Precision for spatial_id_in_dual"   ,              
- "Precision for phylo_id_in_dual"          ,          "Precision for spatial_id_in_trial"  ,              
- "Precision for phylo_id_in_trial"               ,    "Precision for AUTOTYP_area_id_iid_model_in_trial")
+posteriors_df <- data.frame(matrix(ncol = 6, nrow = 0))
+colnames(posteriors_df) <- c( #"Precision for phylo_id_in_single"      ,
+                              #"Precision for spatial_id_in_single"     ,          
+                              #"Precision for AUTOTYP_area_id_iid_model_in_single", 
+                              "Precision for spatial_id_in_dual"   ,              
+                              "Precision for phylo_id_in_dual"          ,   
+                              "Precision for spatial_id_in_trial"  ,              
+                              "Precision for phylo_id_in_trial"               ,    
+                              "Precision for AUTOTYP_area_id_iid_model_in_trial", "fn")
 
 posteriors_df <- posteriors_df %>% 
   mutate_all(as.numeric)
 
-posteriors_df$Feature_ID <- as.character() 
+posteriors_df$fn <- as.character() 
 
 index <- 0
 for(fn in fns){
@@ -99,38 +103,45 @@ for(fn in fns){
 
 index <- index + 1
 qs <- qs::qread(fn)
-Feature_ID <- basename(fn) %>% str_replace_all(".qs", "")
-cat(paste0("I'm on  ", Feature_ID, ", i.e. index ", index, ".\n"))
+fn <- basename(fn) %>% str_replace_all(".qs", "")
+cat(paste0("I'm on ", fn, ", i.e. index ", index, " out of ", length(fns), ".\n"))
 
 #phylo_only
-hyper_sample_phylo_only_posterior <- get_icc_posterior(hyper_sample = qs[[1]][[1]], ncol = 1)
+#hyper_sample_phylo_only_posterior <- get_icc_posterior(hyper_sample = qs[[1]][[1]], ncol = 1)
 
 #spatial only
-hyper_sample_spatial_only_posterior <- get_icc_posterior(hyper_sample = qs[[2]][[1]], ncol = 1)
+#hyper_sample_spatial_only_posterior <- get_icc_posterior(hyper_sample = qs[[2]][[1]], ncol = 1)
 
 #autotyp-area
-hyper_sample_autotyp_area_only_posterior <- get_icc_posterior(hyper_sample = qs[[3]][[1]], ncol = 1)
+#hyper_sample_autotyp_area_only_posterior <- get_icc_posterior(hyper_sample = qs[[3]][[1]], ncol = 1)
 
 #dual
-hyper_sample_dual_posterior <- get_icc_posterior(hyper_sample = qs[[4]][[1]], ncol = 2)
+hyper_sample_dual_posterior <- get_icc_posterior(hyper_sample = qs[[1]][[1]], ncol = 2)
 
 #trial
-hyper_sample_trial_posterior <- get_icc_posterior(hyper_sample = qs[[5]][[1]], ncol = 3)
+hyper_sample_trial_posterior <- get_icc_posterior(hyper_sample = qs[[2]][[1]], ncol = 3)
 
-posteriors_df_spec <- cbind(hyper_sample_phylo_only_posterior, 
-                       hyper_sample_spatial_only_posterior, 
-                       hyper_sample_autotyp_area_only_posterior, 
+posteriors_df_spec <- cbind(#hyper_sample_phylo_only_posterior, 
+                       #hyper_sample_spatial_only_posterior, 
+                       #hyper_sample_autotyp_area_only_posterior, 
                        hyper_sample_dual_posterior, 
                        hyper_sample_trial_posterior) %>% 
   as.data.frame() %>% 
-  mutate(Feature_ID = Feature_ID)
-
+  mutate(fn = fn)
 
 posteriors_df <- posteriors_df %>% 
-  full_join(posteriors_df_spec, by = c("Precision for phylo_id_in_single", "Precision for spatial_id_in_single", "Precision for AUTOTYP_area_id_iid_model_in_single",
-                                       "Precision for spatial_id_in_dual", "Precision for phylo_id_in_dual", "Precision for spatial_id_in_trial", "Precision for phylo_id_in_trial",
-                                       "Precision for AUTOTYP_area_id_iid_model_in_trial", "Feature_ID"))
+  full_join(posteriors_df_spec, by = c(#"Precision for phylo_id_in_single", 
+                                       #"Precision for spatial_id_in_single", 
+                                       #"Precision for AUTOTYP_area_id_iid_model_in_single",
+                                       "Precision for spatial_id_in_dual", 
+                                       "Precision for phylo_id_in_dual", 
+                                       "Precision for spatial_id_in_trial", 
+                                       "Precision for phylo_id_in_trial",
+                                       "Precision for AUTOTYP_area_id_iid_model_in_trial", 
+                                       "fn"))
 }
 
 posteriors_df %>% 
+  as.data.frame() %>% 
+  mutate(Feature_ID = str_extract(fn, pattern = "[:alnum:]*")) %>% 
   write_tsv("output/spatiophylogenetic_modelling/featurewise/posteriors_df.tsv", na = "")

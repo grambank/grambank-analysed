@@ -5,6 +5,8 @@ source("fun_def_h_load.R")
 h_load(c("tidyverse", "missForest", "reshape2"))
 source('global_variables.R')
 
+source("set_random_seed.R")
+
 OUTPUTFILE <- file.path("output", "GB_wide", "GB_wide_imputed_binarized.tsv")
 
 #CUTOFFS
