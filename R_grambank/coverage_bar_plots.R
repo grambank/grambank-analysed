@@ -46,8 +46,7 @@ families_sum <- df_for_family_plot %>%
   distinct(Family_ID, plot_value, n, sum) %>% 
   arrange(desc(sum)) %>% 
   .[1:45,] %>% 
-  left_join(family_names_df, by = "Family_ID") %>% 
-  mutate(position_text = ifelse(plot_value == "in Grambank" & Family_name == "Sign Language", n-3, n))
+  left_join(family_names_df, by = "Family_ID") 
 
 families_sum$Family_name <- fct_reorder(families_sum $Family_name, families_sum $sum)
 #families_sum$plot_value <- factor(families_sum$plot_value, levels = c("no grammar exists/unknown", "grammar exists","in Grambank"))
