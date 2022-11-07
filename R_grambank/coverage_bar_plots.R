@@ -5,6 +5,8 @@ h_load(c("tidyverse"))
 
 cat("Making bar plots of the coverage of Grambank per macroarea and largest families.\n")
 
+autotyp_area <- read_tsv("output/non_GB_datasets/glottolog_AUTOTYP_areas.tsv", show_col_types = F)
+
 #getting table from Glottolog which contains information on the med level of the languoids
 glottolog_cldf_df <- read_tsv("output/non_GB_datasets/glottolog-cldf_wide_df.tsv",col_types = cols()) %>% 
   mutate(Language_level_ID = ifelse(is.na(Language_level_ID), Language_ID, Language_level_ID)) %>%  #making language-level entities their own parent, so that we can use this column for aggregation easier.
