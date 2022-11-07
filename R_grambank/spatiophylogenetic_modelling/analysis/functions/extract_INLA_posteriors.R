@@ -13,12 +13,14 @@ if(length(args) != 0){
 }
 
 if(sim_or_real == "sim"){ #running the simulated data
-  fns <- list.files("output/spatiophylogenetic_modelling/simulated_output/", pattern = "*.qs", full.names = T)
+  dir <- "output/spatiophylogenetic_modelling/simulated_output/"
 }
 
 if(sim_or_real == "real"){ #running the on the real data
-  fns <- list.files("output/spatiophylogenetic_modelling/featurewise/", pattern = "*.qs", full.names = T) 
+  dir <- "output/spatiophylogenetic_modelling/featurewise_old/"
 }
+fns <- list.files(path = dir, pattern = "*.qs", full.names = T) 
+
 
 #This script takes the output of strip_inla() and calculates the appropriate posteriors. 
 
@@ -144,4 +146,4 @@ posteriors_df <- posteriors_df %>%
 posteriors_df %>% 
   as.data.frame() %>% 
   mutate(Feature_ID = str_extract(fn, pattern = "[:alnum:]*")) %>% 
-  write_tsv("output/spatiophylogenetic_modelling/featurewise/posteriors_df.tsv", na = "")
+  write_tsv(file = paste0(dir, "/posteriors_df.tsv"), na = "")
