@@ -50,7 +50,7 @@ if(sim_or_real == "real"){
     source("impute_missing_values.R")
   }  
   df <- readr::read_tsv(file =   df_fn,show_col_types = F)
-  OUTPUTDIR <- "output/spatiophylogenetic_modelling/featurewise_new_home_2/"
+  OUTPUTDIR <- "output/spatiophylogenetic_modelling/featurewise/"
 }
 
 #dir setup
