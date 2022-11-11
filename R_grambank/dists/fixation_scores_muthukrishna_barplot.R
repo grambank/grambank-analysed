@@ -1,6 +1,4 @@
-source("fun_def_h_load.R")
-
-h_load(pkg = c("tidyverse", "reshape2", "ggplot2"))
+source("requirements.R")
 
 OUTPUTDIR <- "output/dists/"
 if (!dir.exists(OUTPUTDIR)) {dir.create(OUTPUTDIR)}
