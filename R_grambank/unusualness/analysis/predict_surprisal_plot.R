@@ -2,8 +2,31 @@ source("requirements.R")
 
 model_surprisal <- qs::qread("output/unusualness/model_surprisal.qs")
 
-summary(model_surprisal)
+model_summary <- summary(model_surprisal)
 bayes_R2(model_surprisal)
+
+
+Coefficient <- c("Intercept", "SD", "SD (phylogeny)", "SD (area)")
+
+Estimate <- c(model_summary$fixed$Estimate, 
+              model_summary$spec_pars$Estimate, 
+              model_summary$random$Language_ID$Estimate, 
+              model_summary$random$Language_ID2$Estimate)
+
+
+`Estimated error` <- c(model_summary$fixed$Est.Error,
+                       model_summary$spec_pars$Estimate, 
+                       model_summary$random$Language_ID$Est.Error, 
+                       model_summary$random$Language_ID2$Est.Error)
+
+brms_table_unusualness <- cbind(Coefficient, Estimate, `Estimated error`)
+
+brms_table_unusualness %>% 
+as.data.frame() %>% 
+  mutate(Estimate = as.numeric(Estimate) %>% round(2)) %>% 
+  mutate(`Estimated error` = as.numeric(`Estimated error`) %>% round(2)) %>% 
+  write_tsv("output/unusualness/tables/unsualness_brms_predict_table.tsv", na = "")
+  
 
 gb <- read_tsv("output/unusualness/tables/model_df.tsv", na = "")
 
