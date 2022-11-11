@@ -5,8 +5,7 @@ model_surprisal <- qs::qread("output/unusualness/model_surprisal.qs")
 model_summary <- summary(model_surprisal)
 bayes_R2(model_surprisal)
 
-
-Coefficient <- c("Intercept", "SD", "SD (phylogeny)", "SD (area)")
+Coefficient <- c("Intercept", "SD", "SD (phylogeny)", "SD (spatial)")
 
 Estimate <- c(model_summary$fixed$Estimate, 
               model_summary$spec_pars$Estimate, 
