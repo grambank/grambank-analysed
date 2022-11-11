@@ -3,6 +3,8 @@ source("requirements.R")
 Language_meta_data <-  read_tsv("output/non_GB_datasets/glottolog-cldf_wide_df.tsv", show_col_types = F) %>% 
   dplyr::select(Language_ID, level, Family_ID, Name, Macroarea) 
 
+#first we determine which autotyp-areas as in the americas and which are not.
+
 #sometimes languages in an autotyp-area are not classified all as the same macroarea. we take the macroarea per autotyp-area that is the most common. for example, N Coast Asia has 58 languages glottolog puts in Eurasia and 2 in North Americas. We assign N Coast Asia to Eurasia macroarea
 
 autotyp_area <- read_tsv("output/non_GB_datasets/glottolog_AUTOTYP_areas.tsv", col_types = cols()) %>%
@@ -28,6 +30,7 @@ left <- Language_meta_data %>%
 right <- Language_meta_data %>% 
   dplyr::select(Var2 = AUTOTYP_area, americas_var2 = americas)
 
+#reading in cultural fixation score data
 df_long <- read_tsv("output/dists/cfx_AUTOTYP_area_cut_off_0_list.tsv", show_col_types = F) %>% 
   separate("Vars", into = c("Var1", "Var2"), sep = " - ") 
 
@@ -41,8 +44,6 @@ left_join(left, by = "Var1") %>%
   dplyr::select(Group_Var1 = "Var1", Group_Var2 = "Var2", `Cultural Fixation Score` = Value_cfx, Americas_Var1 = americas_var1, Americas_Var2 = americas_var2) %>% 
   write_tsv("output/dists/cfx_list_autotyp_areas_SM.tsv", na = "")
   
-  
-
 
 #recover symmetric distance matrix
 h_load("igraph")
