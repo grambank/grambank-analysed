@@ -9,10 +9,7 @@ cut_off = args[[2]]
 #cut_off = 50
 }
 
-source("fun_def_h_load.R")
-
-h_load(pkg = c("tidyverse", "reshape2", "txtplot"))
-
+source("requirements.R")
 OUTPUTDIR <- "output/dists/"
 if (!dir.exists(OUTPUTDIR)) {dir.create(OUTPUTDIR)}
 
