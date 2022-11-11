@@ -89,7 +89,7 @@ ellipses <- dual_summary %>%
 
 
 plot_function <- function(label = c("letter_plot_label", "domain", "Nichols_1995_prediction"), facet, fn = spatiophylogenetic_figure_panels_){
-  #label <- "letter_plot_label"
+  #label <- "Nichols_1995_prediction"
   
   dual_summary <- dual_summary %>% 
     dplyr::select(Feature_ID, all_of(label), mean_phylogenetic, mean_spatial) %>% 
@@ -111,7 +111,7 @@ center_plot =   ggplot(data = dual_summary,
                alpha = 0.1,
                color = NA) +
   geom_point(aes(col = label, fill = label, shape = label),
-             size = 1.5, alpha = 0.6) +
+             size = 2, alpha = 0.6) +
   scale_shape_manual(values = shape_vector) +
   theme_classic(base_size = 10) +
   xlab("Variance explained by Phylogeny") +
