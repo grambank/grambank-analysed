@@ -2,9 +2,7 @@
 
 source("requirements.R")
 
-source("make_wide.R")
-
-wide <- read_tsv("GB_wide/GB_wide_strict.tsv") %>% 
+wide <- read_tsv("output/GB_wide/GB_wide_strict.tsv", show_col_types = F) %>% 
   dplyr::select(-na_prop) %>% 
   column_to_rownames("Language_ID")
 
