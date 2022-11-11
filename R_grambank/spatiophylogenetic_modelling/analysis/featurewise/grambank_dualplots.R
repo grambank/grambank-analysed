@@ -17,20 +17,12 @@ feature_groupings <- read_csv("feature_grouping_for_analysis.csv", show_col_type
 ## Identify results by spatial decay
 # filename_suffix = "_kappa_2.5_sigma_3..qs"
 # filename_suffix = "_kappa_2_sigma_2.RD.qs"
-filename_suffix = "_kappa_2_sigma_1.15_pcprior0.1"
+filename_suffix = "kappa_2_sigma_1.15_pcprior0.1"
 
 ## Read in model posteriors
 posteriors_df <- read_tsv("output/spatiophylogenetic_modelling/featurewise/posteriors_df.tsv", show_col_types = F) %>% 
   filter(str_detect(fn, filename_suffix)) %>% 
   dplyr::select(Feature_ID, spatial = `Precision for spatial_id_in_dual`, phylogenetic = `Precision for phylo_id_in_dual`)
-
-posteriors_df_reruns <- read_tsv("output/spatiophylogenetic_modelling/featurewise/posteriors_df_reruns.tsv") %>% 
-  filter(str_detect(fn, filename_suffix)) %>% 
-  dplyr::select(Feature_ID, spatial = `Precision for spatial_id_in_dual`, phylogenetic = `Precision for phylo_id_in_dual`)
-
-posteriors_df  <-posteriors_df %>% 
-    filter(Feature_ID != "GB197" |Feature_ID != "GB129") %>% 
-  full_join(posteriors_df_reruns)
 
 # join feature metadata to posterior
 dual_posterior = left_join(posteriors_df, feature_groupings, by ="Feature_ID")
@@ -89,11 +81,12 @@ ellipses <- dual_summary %>%
                                        level = 0.68)) %>%
   mutate(x = ellipse[ , 1],
          y = ellipse[ , 2]) %>%
-  mutate(x = ifelse(x <= 0.001, 0.001, x),
-         y = ifelse(y <= 0.001, 0.001, y)) %>%
-  mutate(x = ifelse(x > 1, 1, x),
-         y = ifelse(y > 1, 1, y)) %>%
+#  mutate(x = ifelse(x <= 0.001, 0.001, x),
+#         y = ifelse(y <= 0.001, 0.001, y)) %>%
+#  mutate(x = ifelse(x > 1, 1, x),
+#         y = ifelse(y > 1, 1, y)) %>%
   ungroup()
+
 
 plot_function <- function(label = c("letter_plot_label", "domain", "Nichols_1995_prediction"), facet, fn = spatiophylogenetic_figure_panels_){
   #label <- "letter_plot_label"
@@ -111,12 +104,12 @@ plot_function <- function(label = c("letter_plot_label", "domain", "Nichols_1995
 center_plot =   ggplot(data = dual_summary,
                        aes(x = mean_phylogenetic,
                            y = mean_spatial)) +
-#  geom_polygon(aes(x, y,
-#                   fill = label,
-#                   group = Feature_ID),
-#               data = ellipses,
-#               alpha = 0.1,
-#               color = NA) +
+  geom_polygon(aes(x, y,
+                   fill = label,
+                   group = Feature_ID),
+               data = ellipses,
+               alpha = 0.1,
+               color = NA) +
   geom_point(aes(col = label, fill = label, shape = label),
              size = 1.5, alpha = 0.6) +
   scale_shape_manual(values = shape_vector) +
@@ -126,7 +119,7 @@ center_plot =   ggplot(data = dual_summary,
   scale_colour_manual(values = col_vector) +
   scale_fill_manual(values = col_vector) +
   scale_x_continuous(expand=c(0,0), breaks=c(0.25, 0.5, 0.75, 1), labels = scales::percent_format(scale = 100)) +
-  scale_y_continuous(expand=c(0,0), breaks=c(0, 0.25, 0.5, 0.75, 1), limits = c(0, 01), labels = scales::percent_format(scale = 100)) +
+  scale_y_continuous(expand=c(0,0), breaks=c(0, 0.25, 0.5, 0.75, 1), labels = scales::percent_format(scale = 100)) +
   coord_equal() +
   geom_path(aes(x, y), data = data.frame(x = seq(0, 1, length.out = 100),
                                          y = seq(1, 0, length.out = 100)),
@@ -174,17 +167,17 @@ ggsave(plot = center_plot,
 
 plot_function(label = "letter_plot_label", 
               facet = T, 
-              fn = paste0("output/spatiophylogenetic_modelling/effect_plots/spatiophylogenetic_figure_panels__", filename_suffix)
+              fn = paste0("output/spatiophylogenetic_modelling/effect_plots/spatiophylogenetic_figure_panels_", filename_suffix)
 )
 
 plot_function(label = "domain", 
               facet = T, 
-              fn = paste0("output/spatiophylogenetic_modelling/effect_plots/spatiophylogenetic_figure_panels__domain_", filename_suffix)
+              fn = paste0("output/spatiophylogenetic_modelling/effect_plots/spatiophylogenetic_figure_panels_domain_", filename_suffix)
 )
 
 plot_function(label = "Nichols_1995_prediction", 
               facet = F, 
-              fn = paste0("output/spatiophylogenetic_modelling/effect_plots/spatiophylogenetic_figure_panels__nichols_prediction_", filename_suffix)
+              fn = paste0("output/spatiophylogenetic_modelling/effect_plots/spatiophylogenetic_figure_panels_nichols_prediction_", filename_suffix)
 )
 
 #tables for supplementary
