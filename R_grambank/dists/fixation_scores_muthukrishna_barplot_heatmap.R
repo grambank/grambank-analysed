@@ -23,6 +23,7 @@ ggsave(filename = file.path(OUTPUTDIR, "cfx_barplot_macroarea.png"), height =  7
 
 #heatmap
 
+#macroarea
 cfx_macroarea_list_separated <- cfx_macroarea_list %>%
   separate(Vars, into = c("Var1", "Var2"), sep = " - ")
 
@@ -49,3 +50,29 @@ cfx_dist_matrix_sym %>%
   scale_x_discrete(limits=rev)
 
 ggsave(file.path(OUTPUTDIR, "cfx_heatmap_macroarea.png"), height =  7.89, width =  8.61)
+
+#heatmap for autotyp-areas
+cfx_autotyp_list <-   read_tsv("output/dists/cfx_AUTOTYP_area_cut_off_0_list.tsv", show_col_types = F) %>%
+  separate(Vars, into = c("Var1", "Var2"), sep = " - ")
+
+g <- igraph::graph.data.frame(cfx_autotyp_list, directed=FALSE)
+
+cfx_dist_matrix_sym <- igraph::get.adjacency(g, attr="Value_cfx", sparse=FALSE)
+
+cfx_dist_matrix_sym[upper.tri(cfx_dist_matrix_sym, diag = T)] <- NA
+
+cfx_dist_matrix_sym %>% 
+reshape2::melt() %>% 
+  filter(!is.na(value)) %>% 
+  ggplot(aes(Var1, Var2)) +
+  theme_classic() +
+  geom_tile(aes(fill = value), color='white', size = 0.6) +
+  scale_fill_viridis(direction = -1) +
+  geom_text(aes(label = round(value, 2)),color = "white", size = 3.5) +
+  theme(axis.title = element_blank(),
+        legend.position = "none", 
+        axis.text.y = element_text(size = 12),
+        axis.text.x = element_text(size = 12, angle = 50, hjust =1)) +
+  scale_x_discrete(limits=rev)
+
+ggsave(file.path(OUTPUTDIR, "cfx_heatmap_autotyp.png"), height =  10, width =  11)
