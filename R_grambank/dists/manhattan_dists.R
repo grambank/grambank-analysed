@@ -48,6 +48,35 @@ GB_dist_list_binned <- GB_dist_list %>%
   mutate(second = str_replace_all(second, "[\\(|\\[|\\]]", "") %>% as.numeric() %>% round(digits = 0)) %>% 
   unite("order", "second",col = "bin_display", sep = "-", remove = F, )
  
+#list of languages that have zero dist
+
+glottolog_df <- read_tsv("output/non_GB_datasets/glottolog-cldf_wide_df.tsv", show_col_types = F) %>% 
+  dplyr::select(Language_ID, Name, Macroarea, Family_ID, level)
+
+glottolog_fam<- glottolog_df %>% 
+  filter(level == "family") %>% 
+  dplyr::select(Family_ID = Language_ID, Family_name = Name) 
+
+glottolog_df <- glottolog_df %>% 
+  left_join(glottolog_fam, by = "Family_ID")
+  
+zeros <- GB_dist_list %>% 
+  filter(value ==0) %>% 
+  dplyr::select(Var1) 
+
+zeros_2 <- GB_dist_list %>% 
+  filter(value ==0) %>% 
+  dplyr::select(Var2) %>% 
+  rename(Var1 = Var2)
+
+zeros_df <- rbind(zeros, zeros_2) %>% 
+  as.data.frame() %>%
+  rename(Language_ID = "Var1") %>% 
+  left_join(glottolog_df, by = "Language_ID") %>% 
+  dplyr::select(Name, Language_ID, Macroarea, Family_name)
+
+zeros_df %>% 
+  write_tsv("output/dists/manhattan_dist_0.tsv", na = "")
 
 GB_dist_list_binned$bin_display <- fct_reorder(GB_dist_list_binned$bin_display, GB_dist_list_binned$order)
 
