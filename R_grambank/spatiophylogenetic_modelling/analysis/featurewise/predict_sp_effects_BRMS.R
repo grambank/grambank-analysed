@@ -34,3 +34,27 @@ m_spatial_null <- add_criterion(m_spatial_null, "waic")
 m_spatial_full <- brm(spatial ~ 0 + Main_domain, prior=full_prior, data=d, family="beta")
 m_spatial_full <- add_criterion(m_spatial_full, "waic")
 loo_compare(m_spatial_null, m_spatial_full, criterion="waic")
+
+`Model` <- c("null model (spatial)",
+                 "domain model (spatial)",
+                 "null model (phylogenetic)",
+                 "domain model (phylogenetic)")
+
+WAIC <- c(waic(m_spatial_null)$estimates[3,1],
+           waic(m_spatial_full)$estimates[3,1],  
+           waic(m_phylo_null)$estimates[3,1],  
+           waic(m_phylo_full)$estimates[3,1])
+
+`SE (WAIC)` <- c(waic(m_spatial_null)$estimates[3,2],
+              waic(m_spatial_full)$estimates[3,2],  
+              waic(m_phylo_null)$estimates[3,2],  
+              waic(m_phylo_full)$estimates[3,2])
+
+table_for_sm <- cbind(Model, WAIC, `SE (WAIC)`)
+
+table_for_sm %>% 
+  as.data.frame() %>% 
+  mutate(WAIC = as.numeric(WAIC) %>% round(2)) %>% 
+  mutate(`SE (WAIC)` = as.numeric(`SE (WAIC)`) %>% round(2)) %>% 
+write_tsv("output/spatiophylogenetic_modelling/predict_sp_table_sm.tsv", na = "")
+                 
