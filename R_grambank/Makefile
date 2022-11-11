@@ -158,8 +158,10 @@ INLA_extract_posteriors:
 
 #generate cultural fixation scores and do mds plots
 make_cultural_fixation_scores:
-	Rscript dists/fixation_scores_muthukrishna_autotyp.R
+	Rscript dists/fixation_scores_muthukrishna_run.R
 	Rscript dists/fixation_scores_muthukrishna_mds_americas.R
+	Rscript dists/fixation_scores_muthukrishna_network_americas.R
+	Rscript dists/fixation_scores_muthukrishna_barplot_heatmap.R
 
 #step 7
 ## BRMS-analysis of unsualness scores
