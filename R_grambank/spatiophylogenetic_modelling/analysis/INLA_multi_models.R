@@ -120,7 +120,7 @@ if(pcprior_choice == "loop_all_priors"){
   }
 
 #reading in AUTOTYP-area
-if (!file.exists("output/non_GB_datasets/glottolog_AUTOTYP_areas.tsv")) { s
+if (!file.exists("output/non_GB_datasets/glottolog_AUTOTYP_areas.tsv")) { 
   source("unusualness/processing/assigning_AUTOTYP_areas.R") }		
 autotyp_area <- read.delim("output/non_GB_datasets/glottolog_AUTOTYP_areas.tsv", sep = "\t") %>%
   dplyr::select(Language_ID, AUTOTYP_area_id_iid_model = AUTOTYP_area)
