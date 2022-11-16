@@ -1,7 +1,8 @@
 source("requirements.R")
-pacman::p_load("fields")
-p_load("wesanderson")
-p_load("adephylo")
+
+h_load("fields")
+h_load("wesanderson")
+h_load("adephylo")
 
 #reading in lg meta data
 Language_meta_data <-  read_csv(GRAMBANK_LANGUAGES, col_types=LANGUAGES_COLSPEC) %>%		
@@ -16,7 +17,7 @@ right <- Language_meta_data %>%
   dplyr::select(Var2 = Language_ID , Family_name_var2 = Family_name) 
 
 #reading in GB
-GB <- read.delim(file.path("GB_wide", "GB_cropped_for_missing.tsv"), sep ="\t") %>%
+GB <- read.delim(file.path("output", "GB_wide", "GB_cropped_for_missing.tsv"), sep ="\t") %>%
   column_to_rownames("Language_ID") %>%
   as.matrix()
 
@@ -57,8 +58,7 @@ if (!dir.exists("spatiophylogenetic_modelling/processed_data")) {
   dir.create("spatiophylogenetic_modelling/processed_data")
   source("spatiophylogenetic_modelling/processing/pruning_jagertree.R")}		
 
-tree <- read.tree("spatiophylogenetic_modelling/processed_data/jaeger_pruned.tree")
-
+tree <- read.tree("output/spatiophylogenetic_modelling/processed_data/jaeger_pruned.tree")
 
 tree_dist <- adephylo::distTips(tree) %>% 
   as.matrix() 
@@ -70,8 +70,8 @@ tree_dist_list <- tree_dist %>%
   rownames_to_column("Language_ID") %>% 
   reshape2::melt(id.vars = "Language_ID") %>% 
   filter(!is.na(value)) %>% 
-  rename(tree_dist = value, Var1 = Language_ID, Var2 = variable) %>% 
-  mutate(tree_dist = log10(tree_dist))
+  rename(tree_dist = value, Var1 = Language_ID, Var2 = variable) #%>% 
+#  mutate(tree_dist = log10(tree_dist))
 
 #joined 
 
@@ -81,24 +81,31 @@ joined <- full_join(GB_dist_list, geo_dist_list) %>%
   left_join(right) %>% 
   mutate(same_fam = ifelse(Family_name_var1 == Family_name_var2, "same", "diff"))
 
-png("temp_scripts_for_meetings/geo_GB_dist.png", height = 10.6, width = 11.3)
+png("output/dists/geo_GB_dist.png", height = 10.6, width = 11.3)
 joined %>% 
   ggplot(aes(x = geo_dist, y = GB_dist)) +
-  geom_point(aes(color = same_fam), alpha = 0.6) +
+  geom_point(alpha = 0.6, color = "orange") +
+  ggpubr::stat_cor(method = "pearson", p.digits = 2, geom = "label", color = "blue",
+                   label.y.npc="top", label.x.npc = "left", alpha = 0.8) +
   theme_classic() +
-  geom_smooth(aes(group=same_fam), color = "black") +
-  scale_color_manual(values= wes_palette("GrandBudapest2", n = 2))
+#  geom_smooth(aes(group=same_fam), color = "black") +
+#  scale_color_manual(values= wes_palette("GrandBudapest2", n = 2))
 
 x <- dev.off()
 
 
-png("temp_scripts_for_meetings/tree_GB_dist.png", height = 10.6, width = 11.3)
+png("output/dists/tree_GB_dist.png", height = 10.6, width = 11.3)
 
 joined %>% 
-  ggplot(aes(x = tree_dist, y = GB_dist)) +
-  geom_point(aes(color = same_fam), alpha = 0.6) +
-  theme_classic() +
-  geom_smooth(aes(group=same_fam), color = "black") +
-  scale_color_manual(values= wes_palette("GrandBudapest2", n = 2))
+  filter(!is.na(tree_dist)) %>%
+  filter(!is.na(GB_dist)) %>%
+    ggplot(aes(x = tree_dist, y = GB_dist)) +
+  geom_point(alpha = 0.6, color = "turquoise3") +
+  ggpubr::stat_cor(method = "pearson", p.digits = 2, geom = "label", color = "blue",
+                   label.y.npc="top", label.x.npc = "left", alpha = 0.8) +
+  theme_classic() #+
+#  geom_smooth(aes(group=same_fam), color = "black") +
+#  scale_color_manual(values= wes_palette("GrandBudapest2", n = 2))
 
 x <- dev.off()
+
