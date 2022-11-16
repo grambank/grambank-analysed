@@ -1,5 +1,4 @@
-source("fun_def_h_load.R")
-h_load(c("tidyverse", "ape"))
+source("requirements.R")
 
 source("set_random_seed.R")
 
