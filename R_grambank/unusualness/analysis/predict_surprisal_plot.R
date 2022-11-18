@@ -14,14 +14,14 @@ Estimate <- c(model_summary$fixed$Estimate,
 
 
 `Estimated error` <- c(model_summary$fixed$Est.Error,
-                       model_summary$spec_pars$Estimate, 
+                       model_summary$spec_pars$Est.Error, 
                        model_summary$random$Language_ID$Est.Error, 
                        model_summary$random$Language_ID2$Est.Error)
 
 brms_table_unusualness <- cbind(Coefficient, Estimate, `Estimated error`)
 
 brms_table_unusualness %>% 
-as.data.frame() %>% 
+  as.data.frame() %>% 
   mutate(Estimate = as.numeric(Estimate) %>% round(2)) %>% 
   mutate(`Estimated error` = as.numeric(`Estimated error`) %>% round(2)) %>% 
   write_tsv("output/unusualness/tables/unsualness_brms_predict_table.tsv", na = "")
