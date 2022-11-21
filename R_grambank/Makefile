@@ -87,7 +87,7 @@ pca:
 	@$(MAKE) -f $(THIS_MAKEFILE) theoretical
 
 output/PCA/PCA_df.tsv:
-	Rscript PCA/CA.R
+	Rscript PCA/PCA.R
 
 output/PCA/PCA_contributions_PCA1_PCA2.png: 
 	Rscript PCA/PCA_plot_contributions.R
