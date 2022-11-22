@@ -71,6 +71,10 @@ zeros <- GB_dist_list %>%
   dplyr::select(Var1, Var2, Var1_name, Var2_name, Var1_Family_name, Var2_Family_name)
   
 zeros %>% 
+  unite(Var1, Var2, col = "Glottocodes", sep = "-") %>% 
+  unite(Var1_name, Var2_name, col = "Names", sep = "-") %>%
+  mutate(`Family names` = ifelse(Var1_Family_name == Var2_Family_name, Var1_Family_name, pasteo(Var1_Family_name, "-", Var2_Family_name))) %>% 
+  dplyr::select(-Var1_Family_name, -Var2_Family_name) %>% 
   write_tsv("output/dists/manhattan_dist_0.tsv", na = "")
 
 GB_dist_list_binned$bin_display <- fct_reorder(GB_dist_list_binned$bin_display, GB_dist_list_binned$order)
