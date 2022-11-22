@@ -3,6 +3,8 @@
 # This script wrangles a csv-table of author names into a correctly formatted author list for journal publication.
 # Written by Johannes Englisch.
 
+# python3 wrangle_author_list.py author_list.csv > author_list.html
+
 from collections import OrderedDict
 import re
 import sys
