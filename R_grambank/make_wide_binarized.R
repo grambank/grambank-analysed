@@ -1,5 +1,4 @@
-source("fun_def_h_load.R")
-h_load("tidyverse")
+source("requirements.R")
 source("global_variables.R")
 source("set_random_seed.R")
 
@@ -154,6 +153,6 @@ Binary_Multistate = c("binarised","binarised","binarised","binarised","binarised
 Parameter_desc_binary %>% 
   mutate(Binary_Multistate= ifelse(ID %in% multistate_features, "Multi", Binary_Multistate)) %>% 
   mutate(Binary_Multistate = ifelse(is.na(Binary_Multistate), "Binary", Binary_Multistate)) %>% 
-  dplyr::select(-Description) %>% 
+  dplyr::select(-Description) %>%
   write_tsv(file.path("output/GB_wide/parameters_binary.tsv"))
 
