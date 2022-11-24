@@ -1,8 +1,6 @@
-source("fun_def_h_load.R")
-h_load("tidyverse")
+source("requirements.R")
 source("global_variables.R")
 source("set_random_seed.R")
-
 
 #The CLDF-format is long, but for PCA, imputation and distances it is better with wide formatted data. 
 # This script takes the CLDF dataset and makes it wide. 
