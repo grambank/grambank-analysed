@@ -1,8 +1,7 @@
 #This is a script for imputing values with missForest in GB.
 
 #script written by Hedvig Skirgård
-source("fun_def_h_load.R")
-h_load(c("tidyverse", "missForest", "reshape2"))
+source("requirements.R")
 source('global_variables.R')
 
 source("set_random_seed.R")
