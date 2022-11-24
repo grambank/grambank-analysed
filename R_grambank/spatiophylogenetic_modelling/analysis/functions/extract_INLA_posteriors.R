@@ -17,7 +17,7 @@ if(sim_or_real == "sim"){ #running the simulated data
 }
 
 if(sim_or_real == "real"){ #running the on the real data
-  dir <- "output/spatiophylogenetic_modelling/featurewise_old/"
+  dir <- "output/spatiophylogenetic_modelling/featurewise/"
 }
 fns <- list.files(path = dir, pattern = "*.qs", full.names = T) 
 
