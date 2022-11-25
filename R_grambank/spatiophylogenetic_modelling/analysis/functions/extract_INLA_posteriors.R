@@ -8,8 +8,10 @@ source("requirements.R")
 args = commandArgs(trailingOnly = TRUE)
 if(length(args) != 0){
   sim_or_real <- args[1] #you'd set this by going Rscript script.R "real"
+  verbose = args[2]
 } else { #if you're running this script chunkwise in Rstudio or similar instead of via command line, you'll read in the parameters this way:
   sim_or_real <- "real"
+  verbose = "quiet"
 }
 
 if(sim_or_real == "sim"){ #running the simulated data
@@ -106,7 +108,10 @@ for(fn in fns){
 index <- index + 1
 qs <- qs::qread(fn)
 fn <- basename(fn) %>% str_replace_all(".qs", "")
+
+if(verbose == "verbose"){
 cat(paste0("I'm on ", fn, ", i.e. index ", index, " out of ", length(fns), ".\n"))
+  }
 
 #phylo_only
 #hyper_sample_phylo_only_posterior <- get_icc_posterior(hyper_sample = qs[[1]][[1]], ncol = 1)
