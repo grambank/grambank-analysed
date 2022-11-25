@@ -21,7 +21,7 @@ gb <- read_tsv(file = surprisal_fn, show_col_types = F)
 # Plot the pairwise relations between probabilities
 pair_lower <- function(data, mapping, ...){
   p <- ggplot(data = data, mapping = mapping) + 
-    geom_smooth(method=loess, fill="purple4", color="purple4", ...)
+    geom_smooth(formula = 'y ~ x', method=loess, fill="purple4", color="purple4", ...)
   p
 }
 
@@ -42,7 +42,6 @@ pair_upp <- function(data, mapping, method, ...){
   ggally_text(
     label = as.character(round(corr, 2)), 
     mapping = aes(),
-    label.size = 14,
     xP = 0.5, yP = 0.5,
     color = 'purple4',
     size=8,
@@ -63,4 +62,4 @@ p <- gb %>%
   theme(panel.grid= element_blank(),
         axis.text = element_blank())
 
-ggsave(plot = p, filename = paste0(OUTPUTDIR_plots, "/unsualenss_SLOM_compare_kernels.png"))
+ggsave(plot = p, filename = paste0(OUTPUTDIR_plots, "/unsualenss_SLOM_compare_kernels.png"), height = 7, width = 7)
