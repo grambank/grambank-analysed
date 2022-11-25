@@ -169,7 +169,7 @@ INLA_featurewise_spatial_params_2_5_3_all_priors_fourth_part:
 	Rscript spatiophylogenetic_modelling/analysis/INLA_multi_models.R "real" 100 113 precision_matrices_kappa_2.5_sigma_3.RDS "loop_all_priors" 
 
 INLA_extract_posteriors:
-	Rscript spatiophylogenetic_modelling/analysis/functions/extract_INLA_posteriors.R
+	Rscript spatiophylogenetic_modelling/analysis/functions/extract_INLA_posteriors.R "real" "quiet"
 	
 INLA_plots:
 	Rscript spatiophylogenetic_modelling/analysis/featurewise/grambank_dualplots.R
