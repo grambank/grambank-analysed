@@ -13,7 +13,7 @@ almost_all_fast: requirements.log data pca
 
 long_ones: almost_all_fast INLA get_unusualness predict_unusualness INLA_ASR INLA_simulation_binary_data
 
-if_long_ones_are_finished: INLA_compare_settings INLA_plots INLA_extract_posteriors plot_unusualness plot_predict_unusualness INLA_ASR_plot
+if_long_ones_are_finished: INLA_compare_settings INLA_plots INLA_extract_posteriors plot_unusualness plot_predict_unusualness INLA_ASR_plot INLA_compare_settings
 
 ## clean 
 clean:
@@ -148,7 +148,6 @@ INLA_featurewise:
 	@echo "## Running INLA-analysis featurewise. #"
 	Rscript spatiophylogenetic_modelling/analysis/INLA_multi_models.R "real" 1 113 precision_matrices_kappa_2_sigma_1.15.RDS "default"
 
-
 INLA_featurewise_all_spatial_params_all_priors: INLA_featurewise_spatial_params_2_1_15_all_priors INLA_featurewise_spatial_params_2_2_all_priors INLA_featurewise_spatial_params_2_5_3_all_priors
 
 INLA_featurewise_spatial_params_2_1_15_all_priors:
@@ -187,8 +186,6 @@ INLA_ASR:
 	
 INLA_ASR_plot: 
 	Rscript spatiophylogenetic_modelling/analysis/featurewise/INLA_results_ASR_plot.R
-
-
 
 #generate cultural fixation scores and do mds plots
 make_cultural_fixation_scores:
