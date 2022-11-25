@@ -13,7 +13,7 @@ quick_ones: requirements.log data pca manhattan_dists
 
 medium_length: get_unusualness make_cultural_fixation_scores
 
-if_medium_are_finished: plot_unusualness 
+if_medium_are_finished: plot_unusualness make_cultural_fixation_scores_plot
 
 long_ones: INLA get_unusualness predict_unusualness INLA_ASR INLA_simulation_binary_data INLA_predict_BRMS functional_richness_get
 
@@ -203,6 +203,8 @@ INLA_predict_BRMS:
 #generate cultural fixation scores and do mds plots
 make_cultural_fixation_scores:
 	Rscript dists/fixation_scores_muthukrishna_run.R
+	
+make_cultural_fixation_scores_plot:
 	Rscript dists/fixation_scores_muthukrishna_mds_americas.R
 	Rscript dists/fixation_scores_muthukrishna_network_americas.R
 	Rscript dists/fixation_scores_muthukrishna_barplot_heatmap.R
