@@ -6,10 +6,14 @@ THIS_MAKEFILE := $(lastword $(MAKEFILE_LIST))
 
 ## Make everything.
 all:
-	 requirements.log data pca get_unusualness predict_unusualness sp_models sensitivity_testing  test
+	 requirements.log data pca get_unusualness predict_unusualness INLA sensitivity_testing  test
 
 # runs almost all analysis from the release paper, excluding the analysis that takes a long time and/or more computational resources than a regular domestic computer tends to have (the BRMS-analysis for predicting unusualness score is best run on a cluster and the INLA analysis of the spatiophylogenetic modelling takes a long time)
-almost_all_fast: requirements.log data pca plot_unusualness plot_predict_unusualness
+almost_all_fast: requirements.log data pca 
+
+long_ones: almost_all_fast INLA get_unusualness predict_unusualness INLA_ASR INLA_simulation_binary_data
+
+if_long_ones_are_finished: INLA_compare_settings INLA_plots INLA_extract_posteriors plot_unusualness plot_predict_unusualness INLA_ASR_plot
 
 ## clean 
 clean:
@@ -144,8 +148,6 @@ INLA_featurewise:
 	@echo "## Running INLA-analysis featurewise. #"
 	Rscript spatiophylogenetic_modelling/analysis/INLA_multi_models.R "real" 1 113 precision_matrices_kappa_2_sigma_1.15.RDS "default"
 
-INLA_simulation_binary_data:
-	Rscript spatiophylogenetic_modelling/analysis/INLA_multi_models.R "sim" 1 160 precision_matrices_kappa_2_sigma_1.15.RDS "default"
 
 INLA_featurewise_all_spatial_params_all_priors: INLA_featurewise_spatial_params_2_1_15_all_priors INLA_featurewise_spatial_params_2_2_all_priors INLA_featurewise_spatial_params_2_5_3_all_priors
 
@@ -169,6 +171,24 @@ INLA_featurewise_spatial_params_2_5_3_all_priors_fourth_part:
 
 INLA_extract_posteriors:
 	Rscript sspatiophylogenetic_modelling/analysis/functions/extract_INLA_posteriors.R
+	
+INLA_plots:
+	Rscript sspatiophylogenetic_modelling/analysis/featurewise/grambank_dualplots.R
+
+INLA_simulation_binary_data:
+	Rscript spatiophylogenetic_modelling/analysis/INLA_multi_models.R "sim" 1 160 precision_matrices_kappa_2_sigma_1.15.RDS "default"
+
+INLA_compare_settings: 
+	Rscript spatiophylogenetic_modelling/analysis/featurewise/summarise_modelprior.R
+	Rscript spatiophylogenetic_modelling/analysis/featurewise/summarise_spatialparameters.R
+	
+INLA_ASR:
+	Rscript spatiophylogenetic_modelling/analysis/featurewise/INLA_results_ASR_get.R
+	
+INLA_ASR_plot: 
+	Rscript spatiophylogenetic_modelling/analysis/featurewise/INLA_results_ASR_plot.R
+
+
 
 #generate cultural fixation scores and do mds plots
 make_cultural_fixation_scores:
