@@ -6,15 +6,18 @@ THIS_MAKEFILE := $(lastword $(MAKEFILE_LIST))
 
 ## Make everything.
 all:
-	 requirements.log data pca get_unusualness predict_unusualness INLA sensitivity_testing  test
+	 quick_ones medium_length if_medium_are_finished long_ones if_long_ones_are_finished
 
 # runs almost all analysis from the release paper, excluding the analysis that takes a long time and/or more computational resources than a regular domestic computer tends to have (the BRMS-analysis for predicting unusualness score is best run on a cluster and the INLA analysis of the spatiophylogenetic modelling takes a long time)
-almost_all_fast: requirements.log data pca manhattan_dists
+quick_ones: requirements.log data pca manhattan_dists
 
-long_ones: almost_all_fast INLA get_unusualness predict_unusualness INLA_ASR INLA_simulation_binary_data INLA_predict_BRMS functional_richness_get
+medium_length: get_unusualness make_cultural_fixation_scores
 
+if_medium_are_finished: plot_unusualness 
 
-if_long_ones_are_finished: INLA_extract_posteriors INLA_compare_settings INLA_plots  plot_unusualness plot_predict_unusualness INLA_ASR_plot INLA_compare_settings INLA_simulation_binary_data_plot functional_richness_plot
+long_ones: INLA get_unusualness predict_unusualness INLA_ASR INLA_simulation_binary_data INLA_predict_BRMS functional_richness_get
+
+if_long_ones_are_finished: INLA_extract_posteriors INLA_compare_settings INLA_plots plot_predict_unusualness INLA_ASR_plot INLA_compare_settings INLA_simulation_binary_data_plot functional_richness_plot
 
 
 ## clean 
@@ -170,12 +173,16 @@ INLA_featurewise_spatial_params_2_5_3_all_priors_fourth_part:
 
 INLA_extract_posteriors:
 	Rscript spatiophylogenetic_modelling/analysis/functions/extract_INLA_posteriors.R "real" "quiet"
-	
+
 INLA_plots:
 	Rscript spatiophylogenetic_modelling/analysis/featurewise/grambank_dualplots.R
 
 INLA_simulation_binary_data:
+	@$(MAKE) -f $(THIS_MAKEFILE) INLA_extract_posteriors_simulated
 	Rscript spatiophylogenetic_modelling/analysis/INLA_multi_models.R "sim" 1 160 precision_matrices_kappa_2_sigma_1.15.RDS "default"
+
+INLA_extract_posteriors_simulated:
+	Rscript spatiophylogenetic_modelling/analysis/functions/extract_INLA_posteriors.R "sim" "quiet"
 
 INLA_simulation_binary_data_plot:
 	Rscript spatiophylogenetic_modelling/analysis/simulations/simulated_INLA_viz.R
