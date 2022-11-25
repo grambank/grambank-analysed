@@ -6,10 +6,10 @@ THIS_MAKEFILE := $(lastword $(MAKEFILE_LIST))
 
 ## Make everything.
 all:
-	 requirements.log data pca get_unusualness predict_unusualness sp_models sensitivity_testing phylo_signal_per_feature endangerment_analysis test
+	 requirements.log data pca get_unusualness predict_unusualness sp_models sensitivity_testing  test
 
 # runs almost all analysis from the release paper, excluding the analysis that takes a long time and/or more computational resources than a regular domestic computer tends to have (the BRMS-analysis for predicting unusualness score is best run on a cluster and the INLA analysis of the spatiophylogenetic modelling takes a long time)
-almost_all_fast: requirements.log data pca get_unusualness phylo_signal_per_feature endangerment_analysis
+almost_all_fast: requirements.log data pca plot_unusualness plot_predict_unusualness
 
 ## clean 
 clean:
@@ -101,28 +101,42 @@ output/PCA/PCA_macroarea.png:
 ## Comparing PCA to theoretical scores
 theoretical:
 	@echo "# Comparing PCA to theoretical scores. #"
-	Rscript theo_score_fusion.R
+	Rscript make_theo_score_fusion.R
 	Rscript make_theo_scores.R
-	Rscript theo_scores_compare_PCA_loadings.R
+	Rscript PCA/theo_scores_compare_PCA_loadings.R
 
-#step 3
 ## Unusualness language analysis and generate plots.
-get_unusualness:
+get_unusualness: 
 #	@echo "# Calculating unsualness scores and making plots. Note: these scripts requires internet access.#"
+	Rscript unusualness/analysis/get_unusualness_bayesLCA.R
+			@$(MAKE) -f $(THIS_MAKEFILE) plot_unusualness
 
-#step 4
+## BRMS-analysis of unsualness scores
+predict_unusualness: 
+	@echo "## Running BRMS-analysis of unsualness scores (cluster recommended). #"
+	Rscript unusualness/analysis/predict_surprisal.R
+		@$(MAKE) -f $(THIS_MAKEFILE) plot_predict_unusualness
+
+plot_unusualness:
+	Rscript unusualness/analysis/plot_unusualness_splom.R
+	Rscript unusualness/analysis/plot_unusualness_worldmap.R
+	Rscript unusualness/analysis/plot_unusualness_ridgeplot.R
+
+plot_predict_unusualness: 
+	Rscript unusualness/analysis/predict_surprisal_plot.R
+	
+
+
 ## Phylogenetic signal per feature.
-phylo_signal_per_feature:
+#phylo_signal_per_feature:
 	@echo "## Running analysis of phylogenetic signal per feature. ##"
 	Rscript phylo_signal_features_d_stat.R
 
-#step 5
 ## Run endangerment and structural dissimilarity
-endangerment_analysis:
+#endangerment_analysis:
 	@echo "## Running analysis of endangerment and structural dissimilarity. ##"
 	Rscript diversity_endangerment.R
 
-#step 6
 ## INLA 
 INLA: data INLA_featurewise INLA_extract_posteriors
 
@@ -163,12 +177,7 @@ make_cultural_fixation_scores:
 	Rscript dists/fixation_scores_muthukrishna_network_americas.R
 	Rscript dists/fixation_scores_muthukrishna_barplot_heatmap.R
 
-#step 7
-## BRMS-analysis of unsualness scores
-predict_unusualness: 
-	@echo "## Running BRMS-analysis of unsualness scores (cluster recommended). #"
-	Rscript unusualness/analysis/predict_unusualness.R
-	
+
 
 ## Test functions
 test:
