@@ -1,6 +1,43 @@
-# R scripts for plotting Grambank Data.
+# Basic
 
-This directory contains the *R* scripts needed to generate the figures for the Grambank paper.
+This directory (R_grambank) contains the *R* scripts needed to generate the analysis, tables and figures for the Grambank paper: "Grambank reveals the importance of genealogical constraints on linguistic diversity and highlights the impact of language loss".
+
+The R-scripts can be run one by one, or called on from the Makefile in the directory R_grambank. `Makefile`: is a [GNU Make](https://www.gnu.org/software/make/) Makefile for compiling the analysis for the paper. We have organised the analysis in this repos into three categories: quick, medium and long. This represents the expected run time. The long analysis takes over 12h to compile, the quick just a few minutes and the medium under an hour on a typical personal computer.
+
+The Makefile is organised into rules by type of analysis, for example for PCA, spatiophylogenetic modelling etc. These rules have been further summarised into:
+
+1. quick_ones (wrangle data, PCA, coverage plots and Manhattan distances)
+2. medium_length (compute unusualness and cultural fixation scores)
+3. if_medium_are_finished (plotting  and cultural fixation scores)
+4. long_ones (spatiophylogenetic modelling of real and simulated data, functional richness, predict unusualness and predict spatiophylogenetic effects, ancestral state reconstruction by spatiophylogenetic modelling)
+5. if_long_ones_are_finished (plotting and summarising of various spatiophylogenetic output, functional richness etc in "long_ones")
+
+## The data
+
+Throughout these scripts "with question" refers to versions of the dataset where the datapoints that are coded as "?" are maintained as "?" and not coerced into missing values. These "?" values are instances where a coder has accessed descriptions and tried to make a coding judgment, but where the information was insufficient or non-existent.
+
+Fully missing data is when no attempt has been made yet (often the case with inherited data).
+
+The term "strict" refers to cases where "?" have indeed been coerced into missing data points, which is more appropriate for much of the analysis. These "with question" versions are mainly useful to calculate current coverage whereas "strict" should be used for actual analysis.
+
+In short:
+
+* "with question" = ? remain ?
+* "strict" = ? are turned into missing values.
+
+In these scripts, "na_prop" refers to the proportion of missing values. A high value means that many values are missing. The wide dataset both come with this information over each language in the second column. The imputed data does not come with a na_prop column, since there is not missing data because those gaps have been imputed.
+
+### Git submodules
+This Git repository contains git submodules. That means that this repository is linked to other git repositories in a principled way. In this instance this repository has git submodules for the following repostiroeies: grambank-cldf, AUTOTYP-data, glottolog-cldf and WALS.
+
+If you want to run scripts in this repository on your machine, it is necessary not only to clone this repository but also after cloning to run:
+
+`git submodule update --init`
+
+This command will initialise and update the git submodules appropriately. Note that this includes data from grambank-cldf, so no script will run without initalising the git submodules.
+
+You can read more about git submodules [here](https://git-scm.com/book/en/v2/Git-Tools-Submodules#_cloning_submodules).
+
 
 ## Requirements
 
@@ -95,49 +132,3 @@ The package versions needed to run these scripts are:
 * viridisLite 0.3.0
 * withr 2.1.2
 * xml2 1.2.0
-
-## The data
-
-Throughout these scripts "with question" refers to versions of the dataset where the datapoints that are coded as "?" are maintained as "?" and not coerced into missing values. These "?" values are instances where a coder has accessed descriptions and tried to make a coding judgment, but where the information was insufficient or non-existent.
-
-Fully missing data is when no attempt has been made yet (often the case with inherited data).
-
-The term "strict" refers to cases where "?" have indeed been coerced into missing data points, which is more appropriate for analysis. These "with question" versions are mainly useful to calculate current coverage whereas "strict" should be used for actual analysis.
-
-In short:
-
-* "with question" = ? remain ?
-* "strict" = ? are turned into missing values.
-
-In these scripts, "na_prop" refers to the proportion of missing values. A high value means that many values are missing. The wide dataset both come with this information over each language in the second column. The imputed data does not come with a na_prop column, since there is not missing data because those gaps have been imputed.
-
-## Files
-
-`Makefile`: is a [GNU Make](https://www.gnu.org/software/make/) Makefile for compiling and building all the plots. To build everything, run this from your terminal/console in the directory R_grambank:
-
-1. `make requirements.log`: installs all the required R packages.
-2. `make data`: renders wide data tables based on the CLDF-data. This step also generates the cropped and imputed dataframe as well as the glottolog-cldf table and pruning of the global Jäger-tree. This step also generates the data coverage comparison plot for WALS vs GB, which necessitates fetching WALS data from the git submodule.
-3. `make pca`: runs PCA and generate all PCA plots. Also compares PCA to theoretical scores
-4. `make get_unusualness`: calculates the unusualness scores per languages and generates plots.
-5. `make phylo_signal_per_feature`: calculates the D-value per feature (in the binarised, cropped and imputed dataset)
-6. `make endangerment_analysis`: calculates the dissimilarity scores per endangerment level
-
-If you want to run all steps 1:6, you can also use the Makefile rule `make almost_all_fast`. This will run all the steps which are reasonable to run on a personal computer and which do not take up a lot of time. The next steps are more computationally expensive, which is why you may want to elect to run them when there is more time or more computational resources (cluster).
-
-7. `make INLA`: runs the spatiophylogenetic modelling using the INLA-approach. This is feasible to run on a personal computer, but may take a few hours.
-8. `make predict_unsualness`: runs a BRMS-analysis of the unusualness score calculated in step 3. This is preferable to run on a cluster instead of on a personal computer.
-
-If you wish to run all analysis in one sweep, including step 6:7 and tests: `make all` will accomplish this.
-
-9. `make clean`: deletes all new files and directories from previous steps, wiping the slate clean for running scripts anew.
-
-### Git submodules
-This Git repository contains git submodules. That means that this repository is linked to other git repositories in a principled way. In this instance this repository has git submodules for the following repostiroeies: grambank-cldf, AUTOTYP-data, glottolog-cldf and WALS.
-
-If you want to run scripts in this repository on your machine, it is necessary not only to clone this repository but also after cloning to run:
-
-`git submodule update --init`
-
-This command will initialise and update the git submodules appropriately. Note that this includes data from grambank-cldf, so no script will run without initalising the git submodules.
-
-You can read more about git submodules [here](https://git-scm.com/book/en/v2/Git-Tools-Submodules#_cloning_submodules).
