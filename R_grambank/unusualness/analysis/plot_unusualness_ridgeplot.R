@@ -25,7 +25,7 @@ median_df <- gb %>%
   mutate(median_surprisal = median(Surprisal))
 
 gb <- gb %>% 
-  left_join(median_df)
+  left_join(median_df, by = c("Language_ID", "Surprisal", "Probability", "AUTOTYP_area"))
 
 gb$AUTOTYP_area <- fct_reorder(gb$AUTOTYP_area, gb$median_surprisal)
 
