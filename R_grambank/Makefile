@@ -131,18 +131,15 @@ plot_unusualness:
 plot_predict_unusualness: 
 	Rscript unusualness/analysis/predict_surprisal_plot.R
 	
-
-
-
 ## Phylogenetic signal per feature.
 #phylo_signal_per_feature:
-	@echo "## Running analysis of phylogenetic signal per feature. ##"
-	Rscript phylo_signal_features_d_stat.R
+#	@echo "## Running analysis of phylogenetic signal per feature. ##"
+#	Rscript phylo_signal_features_d_stat.R
 
 ## Run endangerment and structural dissimilarity
 #endangerment_analysis:
-	@echo "## Running analysis of endangerment and structural dissimilarity. ##"
-	Rscript diversity_endangerment.R
+#	@echo "## Running analysis of endangerment and structural dissimilarity. ##"
+#	Rscript diversity_endangerment.R
 
 ## INLA 
 INLA: data INLA_featurewise INLA_extract_posteriors
