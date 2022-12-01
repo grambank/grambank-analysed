@@ -95,7 +95,7 @@ for(iter in 1:iterations){
           dplyr::select(Language_ID, everything())
         
          
-          write_delim(x = df, file = paste(simulated_location, "simulated_data_df.tsv"),delim = "\t")  
+          write_delim(x = df, file = paste0(simulated_location, "simulated_data_df.tsv"),delim = "\t")  
       }
         
      
