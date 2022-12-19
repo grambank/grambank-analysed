@@ -35,6 +35,6 @@ Before the journal article is published, the grambank data is private. This mean
 ### Using grambank-analysed as a submodule in another project
 If you are working with grambank data for another project, you might find some of the scripts here useful. For example, there are R-scripts in this repos that takes the grambank data, reduces dialects and binarises it correctly. There are also scripts here that prune the EDGE-tree approrpiately.
 
-If you find that helpful, you can add this repos as a submodule in another project and then call on the scripts herein to do those tasks. If you do that, you will need to initalise not only the grambank-analused submodule but also the submodules of it. This is easiest done by navigating into each dir (`cd grambank-analysed/grambank`) and running `git submodule update --init`. In order to intialise all four submodules, this will need to be done four times in each dir.
+If you find that helpful, you can add this repos as a submodule in another project and then call on the scripts herein to do those tasks. This repos will be private until publication, so you will need to have at least read-access and use the access token set-up to progress. You will also need to initalise not only the grambank-analused submodule but also the submodules within it. This is easiest done by navigating into each dir (`cd grambank-analysed/grambank`) and running `git submodule update --init`. In order to intialise all four submodules, this will need to be done four times in each dir.
 
 
