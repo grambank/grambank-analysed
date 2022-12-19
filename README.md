@@ -30,7 +30,7 @@ Be aware that we have checked out glottolog-cldf with the tag `v4.4` in particul
 You can read more about git submodules [here](https://git-scm.com/book/en/v2/Git-Tools-Submodules#_cloning_submodules).
 
 ### Before publication
-Before the journal article is published, the grambank data is private. This means that the entire repos refering to the grambank data is private, and you will need at least read-access to it to clone it. Furthermore, you will need a access token (similar to a password) to clone this repos to your local machine. You can learn more about this [here](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token).
+Before the journal article is published, the grambank data is private. This means that the entire repos refering to the grambank data is private, and you will need at least read-access to it to clone it. Furthermore, you will need a access token (similar to a password) to clone this repos to your local machine. You can learn more about this [here](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token). This is also true for this repos, grambank-analysed.
 
 ### Using grambank-analysed as a submodule in another project
 If you are working with grambank data for another project, you might find some of the scripts here useful. For example, there are R-scripts in this repos that takes the grambank data, reduces dialects and binarises it correctly. There are also scripts here that prune the EDGE-tree approrpiately.
