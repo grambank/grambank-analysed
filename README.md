@@ -6,7 +6,7 @@ Skirgård, H., Haynie, H. J.,  Blasi, D. E., Hammarström, H., Collins, J., Lata
 
 This repository also includes analysis and/or plots which requires data from glottolog, AUTOTYP and WALS. All data, including grambank data, is made available in this repository through the use of git submodules.
 
-You can run almost all the scripts in this repository on your personal computer, with the exception of the BRMS analysis and also possibly the INLA-analysis (depending on if it's possible to install INLA on your machine). You can read more about the possible Makefile rules you can run [here](https://github.com/grambank/grambank-analysed/blob/main/R_grambank/README.md).
+You can run almost all the scripts in this repository on a standard personal computer, with the exception of the BRMS analysis and also possibly the INLA-analysis (depending on if it's possible to install INLA on your machine). You may want to run BRMS and INLA analysis on a cluster or a more powerful computer. You can read more about the possible Makefile rules you can run [here](https://github.com/grambank/grambank-analysed/blob/main/R_grambank/README.md).
 
 ## Grambank reposes general
 Within the Grambank project we have several Git reposes. You can see an overview [here](https://github.com/grambank/grambank/wiki/Git-repos-structure)
