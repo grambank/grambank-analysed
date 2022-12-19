@@ -8,6 +8,9 @@ This repository also includes analysis and/or plots which requires data from glo
 
 You can run almost all the scripts in this repository on your personal computer, with the exception of the BRMS analysis and also possibly the INLA-analysis (depending on if it's possible to install INLA on your machine). You can read more about the possible Makefile rules you can run [here](https://github.com/grambank/grambank-analysed/blob/main/R_grambank/README.md).
 
+## Grambank reposes general
+Within the Grambank project we have several Git reposes. You can see an overview [here](https://github.com/grambank/grambank/wiki/Git-repos-structure)
+
 ## Git submodules
 This Git repository contains git submodules. That means that this repository is linked to other git repositories in a principled way. In this instance this repository has git submodules for the following repostiroeies: grambank-cldf, AUTOTYP-data, glottolog-cldf and WALS.
 
