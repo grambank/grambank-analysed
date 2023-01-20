@@ -74,7 +74,7 @@ for(iter in 1:iterations){
            observed_proportion < desired_proportion + allowable_variation)
           searching = FALSE
         
-        cat(paste0("I'm on try ", try, " out of max ", try_times,".\n"))
+        cat(paste0("I'm on try ", try, " out of max ", try_times," on prop = ",i, "/" , length(proportions)," lambda = ",j, "/", length(lambda_transformations) , " on iter = ", iter, "/", iterations, ".\n"))
         try = try + 1
         
       }
@@ -95,7 +95,7 @@ for(iter in 1:iterations){
           dplyr::select(Language_ID, everything())
         
          
-          write_delim(x = df, file = paste(simulated_location, "simulated_data_df.tsv"),delim = "\t")  
+          write_delim(x = df, file = paste0(simulated_location, "simulated_data_df.tsv"),delim = "\t")  
       }
         
      

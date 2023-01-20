@@ -1,5 +1,6 @@
-source("fun_def_h_load.R")
-h_load(pkg = c("qs", "unglue", "tidyverse"))
+source("requirements.R")
+h_load(pkg = c( "unglue"))
+h_load(pkg = c("qs"))
 
 #written by Russell Dinnage and Sam Passmore.
 

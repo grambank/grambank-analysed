@@ -6,10 +6,19 @@ THIS_MAKEFILE := $(lastword $(MAKEFILE_LIST))
 
 ## Make everything.
 all:
-	 requirements.log data pca get_unusualness predict_unusualness sp_models sensitivity_testing phylo_signal_per_feature endangerment_analysis test
+	 quick_ones medium_length if_medium_are_finished long_ones if_long_ones_are_finished
 
 # runs almost all analysis from the release paper, excluding the analysis that takes a long time and/or more computational resources than a regular domestic computer tends to have (the BRMS-analysis for predicting unusualness score is best run on a cluster and the INLA analysis of the spatiophylogenetic modelling takes a long time)
-almost_all_fast: requirements.log data pca get_unusualness phylo_signal_per_feature endangerment_analysis
+quick_ones: requirements.log data pca manhattan_dists
+
+medium_length: get_unusualness make_cultural_fixation_scores
+
+if_medium_are_finished: plot_unusualness make_cultural_fixation_scores_plot
+
+long_ones: INLA get_unusualness predict_unusualness INLA_ASR INLA_simulation_binary_data INLA_predict_BRMS functional_richness_get
+
+if_long_ones_are_finished: INLA_extract_posteriors INLA_compare_settings INLA_plots plot_predict_unusualness INLA_ASR_plot INLA_compare_settings INLA_simulation_binary_data_plot functional_richness_plot
+
 
 ## clean 
 clean:
@@ -101,37 +110,46 @@ output/PCA/PCA_macroarea.png:
 ## Comparing PCA to theoretical scores
 theoretical:
 	@echo "# Comparing PCA to theoretical scores. #"
-	Rscript theo_score_fusion.R
+	Rscript make_theo_score_fusion.R
 	Rscript make_theo_scores.R
-	Rscript theo_scores_compare_PCA_loadings.R
+	Rscript PCA/theo_scores_compare_PCA_loadings.R
 
-#step 3
 ## Unusualness language analysis and generate plots.
-get_unusualness:
+get_unusualness: 
 #	@echo "# Calculating unsualness scores and making plots. Note: these scripts requires internet access.#"
+	Rscript unusualness/analysis/get_unusualness_bayesLCA.R
+			@$(MAKE) -f $(THIS_MAKEFILE) plot_unusualness
 
-#step 4
+## BRMS-analysis of unsualness scores
+predict_unusualness: 
+	@echo "## Running BRMS-analysis of unsualness scores (cluster recommended). #"
+	Rscript unusualness/analysis/predict_surprisal.R
+		@$(MAKE) -f $(THIS_MAKEFILE) plot_predict_unusualness
+
+plot_unusualness:
+	Rscript unusualness/analysis/plot_unusualness_splom.R
+	Rscript unusualness/analysis/plot_unusualness_worldmap.R
+	Rscript unusualness/analysis/plot_unusualness_ridgeplot.R
+
+plot_predict_unusualness: 
+	Rscript unusualness/analysis/predict_surprisal_plot.R
+	
 ## Phylogenetic signal per feature.
-phylo_signal_per_feature:
-	@echo "## Running analysis of phylogenetic signal per feature. ##"
-	Rscript phylo_signal_features_d_stat.R
+#phylo_signal_per_feature:
+#	@echo "## Running analysis of phylogenetic signal per feature. ##"
+#	Rscript phylo_signal_features_d_stat.R
 
-#step 5
 ## Run endangerment and structural dissimilarity
-endangerment_analysis:
-	@echo "## Running analysis of endangerment and structural dissimilarity. ##"
-	Rscript diversity_endangerment.R
+#endangerment_analysis:
+#	@echo "## Running analysis of endangerment and structural dissimilarity. ##"
+#	Rscript diversity_endangerment.R
 
-#step 6
 ## INLA 
 INLA: data INLA_featurewise INLA_extract_posteriors
 
 INLA_featurewise:
 	@echo "## Running INLA-analysis featurewise. #"
 	Rscript spatiophylogenetic_modelling/analysis/INLA_multi_models.R "real" 1 113 precision_matrices_kappa_2_sigma_1.15.RDS "default"
-
-INLA_simulation_binary_data:
-	Rscript spatiophylogenetic_modelling/analysis/INLA_multi_models.R "sim" 1 160 precision_matrices_kappa_2_sigma_1.15.RDS "default"
 
 INLA_featurewise_all_spatial_params_all_priors: INLA_featurewise_spatial_params_2_1_15_all_priors INLA_featurewise_spatial_params_2_2_all_priors INLA_featurewise_spatial_params_2_5_3_all_priors
 
@@ -154,21 +172,51 @@ INLA_featurewise_spatial_params_2_5_3_all_priors_fourth_part:
 	Rscript spatiophylogenetic_modelling/analysis/INLA_multi_models.R "real" 100 113 precision_matrices_kappa_2.5_sigma_3.RDS "loop_all_priors" 
 
 INLA_extract_posteriors:
-	Rscript sspatiophylogenetic_modelling/analysis/functions/extract_INLA_posteriors.R
+	Rscript spatiophylogenetic_modelling/analysis/functions/extract_INLA_posteriors.R "real" "quiet"
+
+INLA_plots:
+	Rscript spatiophylogenetic_modelling/analysis/featurewise/grambank_dualplots.R
+
+INLA_simulation_binary_data:
+	@$(MAKE) -f $(THIS_MAKEFILE) INLA_extract_posteriors_simulated
+	Rscript spatiophylogenetic_modelling/analysis/INLA_multi_models.R "sim" 1 160 precision_matrices_kappa_2_sigma_1.15.RDS "default"
+
+INLA_extract_posteriors_simulated:
+	Rscript spatiophylogenetic_modelling/analysis/functions/extract_INLA_posteriors.R "sim" "quiet"
+
+INLA_simulation_binary_data_plot:
+	Rscript spatiophylogenetic_modelling/analysis/simulations/simulated_INLA_viz.R
+	
+INLA_compare_settings: 
+	Rscript spatiophylogenetic_modelling/analysis/featurewise/summarise_modelprior.R
+	Rscript spatiophylogenetic_modelling/analysis/featurewise/summarise_spatialparameters.R
+	
+INLA_ASR:
+	Rscript spatiophylogenetic_modelling/analysis/featurewise/INLA_results_ASR_get.R
+	
+INLA_ASR_plot: 
+	Rscript spatiophylogenetic_modelling/analysis/featurewise/INLA_results_ASR_plot.R
+
+INLA_predict_BRMS:
+	Rscript spatiophylogenetic_modelling/analysis/featurewise/predict_sp_effects_BRMS.R
 
 #generate cultural fixation scores and do mds plots
 make_cultural_fixation_scores:
 	Rscript dists/fixation_scores_muthukrishna_run.R
+	
+make_cultural_fixation_scores_plot:
 	Rscript dists/fixation_scores_muthukrishna_mds_americas.R
 	Rscript dists/fixation_scores_muthukrishna_network_americas.R
 	Rscript dists/fixation_scores_muthukrishna_barplot_heatmap.R
 
-#step 7
-## BRMS-analysis of unsualness scores
-predict_unusualness: 
-	@echo "## Running BRMS-analysis of unsualness scores (cluster recommended). #"
-	Rscript unusualness/analysis/predict_unusualness.R
+manhattan_dists:
+	Rscript dists/manhattan_dists
 	
+functional_richness_get:
+	Rscript functional_richness/make_gower_mfd.R
+
+functional_richness_plot:
+	Rscript functional_richness/frischness_plot.R
 
 ## Test functions
 test:

@@ -158,7 +158,7 @@ if(str_detect(fn, "ichols")){
 plot(center_plot)
 
 ggsave(plot = center_plot,
-       filename = paste0(fn, ".jpg"),
+       filename = paste0(fn, ".tiff"),
        width = 230 / 2,
        height = 210 / 2,
        units = "mm")

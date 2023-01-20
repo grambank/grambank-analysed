@@ -3,7 +3,7 @@ source("requirements.R")
 model_surprisal <- qs::qread("output/unusualness/model_surprisal.qs")
 
 model_summary <- summary(model_surprisal)
-bayes_R2(model_surprisal)
+bayes_R2 <- bayes_R2(model_surprisal)
 
 Coefficient <- c("Intercept", "SD", "SD (phylogeny)", "SD (spatial)")
 
@@ -27,7 +27,7 @@ brms_table_unusualness %>%
   write_tsv("output/unusualness/tables/unsualness_brms_predict_table.tsv", na = "")
   
 
-gb <- read_tsv("output/unusualness/tables/model_df.tsv", na = "")
+gb <- read_tsv("output/unusualness/tables/model_df.tsv", na = "", show_col_types = F)
 
 # Plot this
 ggplot(gb,aes(x=Res_Surprisal))+geom_histogram(bins = 30)
@@ -36,7 +36,7 @@ language_meta <- read_tsv("output/non_GB_datasets/glottolog_AUTOTYP_areas.tsv", 
   dplyr::select(Language_ID, AUTOTYP_area)
 
 gb <- gb %>% 
-  left_join(language_meta)
+  left_join(language_meta, by = c("Language_ID", "AUTOTYP_area"))
 
 gb$AUTOTYP_area <- fct_reorder(gb$AUTOTYP_area, gb$Surprisal)
 
