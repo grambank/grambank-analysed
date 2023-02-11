@@ -83,7 +83,7 @@ GB_PCA_Families <- list(
 for (p in GB_PCA_Families) {
     filename <- file.path(OUTPUTDIR, sprintf("PCA_family_%s.tiff",  p$labels$title))
     cat(paste("writing", filename, "\n"))
-    ggsave(filename, p, width = 4, height = 4)
+    ggsave(filename, p, width = 4, height = 4, dpi = 600)
 }
 
 
@@ -116,8 +116,8 @@ GB_PCA_multiGrid_family <- annotate_figure(
 filename <- file.path(OUTPUTDIR, "PCA_multigrid_major_families.tiff")
 filename_png <- file.path(OUTPUTDIR, "PCA_multigrid_major_families.png")
 cat(paste("writing", filename, "\n"))
-ggsave(filename, GB_PCA_multiGrid_family, width = 8, height = 10)
-ggsave(filename_png, GB_PCA_multiGrid_family, width = 8, height = 10)
+ggsave(filename, GB_PCA_multiGrid_family, width = 8, height = 10, dpi = 600)
+ggsave(filename_png, GB_PCA_multiGrid_family, width = 8, height = 10, dpi = 600)
 
 
 GB_PCA_all_families <- ggplot(GB_PCA_df, aes(x = PC1, y = PC2, color = Family_name), size = 2, alpha = 0.6, na.rm = FALSE)
@@ -133,7 +133,7 @@ GB_PCA_all_families <- GB_PCA_all_families + ggtitle("All families")
 
 filename <- file.path(OUTPUTDIR, "PCA_all_families.tiff")
 cat(paste("writing", filename, "\n"))
-ggsave(filename, GB_PCA_all_families, width = 7, height = 7)
+ggsave(filename, GB_PCA_all_families, width = 7, height = 7, dpi = 600)
 
 
 
@@ -155,7 +155,7 @@ GB_PCA_multiGrid_macroareas <- annotate_figure(GB_PCA_multiGrid_macroareas,
 
 filename <- file.path(OUTPUTDIR, "PCA_multigrid_macroareas.tiff")
 cat(paste("writing", filename, "\n"))
-ggsave(filename, GB_PCA_multiGrid_macroareas, width = 7, height = 7)
+ggsave(filename, GB_PCA_multiGrid_macroareas, width = 7, height = 7, dpi = 600)
 
 
 GB_PCA_macroarea <- ggplot(GB_PCA_df,
@@ -167,7 +167,7 @@ GB_PCA_macroarea <- ggplot(GB_PCA_df,
 
 filename <- file.path(OUTPUTDIR, "PCA_macroarea.tiff")
 cat(paste("writing", filename, "\n"))
-ggsave(filename, GB_PCA_macroarea, width = 7, height = 7)
+ggsave(filename, GB_PCA_macroarea, width = 7, height = 7, dpi = 600)
 
 
 ##plots with specific languages highlighted
@@ -230,8 +230,8 @@ plotPCAFamily_highlights(GB_PCA_df, "Indo-European", "seagreen") +
     axis.title.x = element_text(size = 14),
     axis.title.y = element_text(size = 14,angle = 90))
   
-ggsave(file.path(OUTPUTDIR, "PCA_family_Indo-European_highlights.tiff"), width = 7, height = 7)
-ggsave(file.path(OUTPUTDIR, "PCA_family_Indo-European_highlights.png"), width = 7, height = 7)
+ggsave(file.path(OUTPUTDIR, "PCA_family_Indo-European_highlights.tiff"), width = 7, height = 7, dpi = 600)
+ggsave(file.path(OUTPUTDIR, "PCA_family_Indo-European_highlights.png"), width = 7, height = 7, dpi = 600)
 
 
 #Austroasiatic
@@ -247,5 +247,5 @@ plotPCAFamily_highlights(GB_PCA_df, "Austroasiatic", "midnightblue")+
         axis.title.x = element_text(size = 14),
         axis.title.y = element_text(size = 14,angle = 90))
 
-ggsave(file.path(OUTPUTDIR, "PCA_family_Austroasiatic_highlights.tiff"), width = 7, height = 7)
-ggsave(file.path(OUTPUTDIR, "PCA_family_Austroasiatic_highlights.png"), width = 7, height = 7)
+ggsave(file.path(OUTPUTDIR, "PCA_family_Austroasiatic_highlights.tiff"), width = 7, height = 7, dpi = 600)
+ggsave(file.path(OUTPUTDIR, "PCA_family_Austroasiatic_highlights.png"), width = 7, height = 7, dpi = 600)
