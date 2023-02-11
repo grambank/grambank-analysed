@@ -75,7 +75,7 @@ pc1 <- basemap +
     scale_color_viridis() +
     ggtitle(paste("a:", PCA_prop_variance_df[1,3])) +
   theme(title = element_text(face = "bold"))
-ggsave(filename, pc1, height = 5, width = 8)
+ggsave(filename, pc1, height = 5, width = 8, dpi=600)
 
 
 filename <- file.path(OUTPUTDIR, "worldmap_PC2.tiff")
@@ -85,7 +85,7 @@ pc2 <- basemap +
     scale_color_viridis() +
     ggtitle(paste("b:", PCA_prop_variance_df[2,3]))+
   theme(title = element_text(face = "bold"))
-ggsave(filename, pc2, height = 5, width = 8)
+ggsave(filename, pc2, height = 5, width = 8, dpi=600)
 
 
 filename <- file.path(OUTPUTDIR, "worldmap_PC3.tiff")
@@ -95,12 +95,12 @@ pc3 <- basemap +
     scale_color_viridis() +
     ggtitle(paste("c:", PCA_prop_variance_df[3,3]))+
   theme(title = element_text(face = "bold"))
-ggsave(filename, pc3, height = 5, width = 8)
+ggsave(filename, pc3, height = 5, width = 8, dpi = 600)
 
 filename <- file.path(OUTPUTDIR, "worldmap_all_three_PC.tiff")
 cat(paste("writing", filename, "\n"))
 map4 <- pc1 / pc2 / pc3
-ggsave(filename, map4, height = 16, width = 8)
+ggsave(filename, map4, height = 16, width = 8, dpi = 600)
 
 
 ###Map first 3 PCA components to RGB
@@ -117,4 +117,4 @@ filename_png <- file.path(OUTPUTDIR, "PCA_RGB_worldmap.png")
 rgbmap <- basemap + geom_jitter(aes(x=Longitude, y=Latitude), color = GB_PCA_df$RGB)
 cat(paste("writing", filename, "\n"))
 ggsave(filename, rgbmap, height = 5, width = 8)
-ggsave(filename_png, rgbmap, height = 5, width = 8)
+ggsave(filename_png, rgbmap, height = 5, width = 8, dpi =600)
