@@ -123,7 +123,7 @@ center_plot =   ggplot(data = dual_summary,
   coord_equal() +
   geom_path(aes(x, y), data = data.frame(x = seq(0, 1, length.out = 100),
                                          y = seq(1, 0, length.out = 100)),
-            linetype = "dashed", color = "#e6e6e6", size = 1.5) +
+            linetype = "dashed", color = "#e6e6e6", linewidth = 1.5) +
   geom_polygon(aes(x=x, y=y), data=trinf, fill="#F9F9F9") +
   theme(legend.title = element_blank(),
         panel.spacing = unit(2, "lines"), 
@@ -161,7 +161,7 @@ ggsave(plot = center_plot,
        filename = paste0(fn, ".tiff"),
        width = 230 / 2,
        height = 210 / 2,
-       units = "mm")
+       units = "mm", dpi = 600)
 
 }
 
