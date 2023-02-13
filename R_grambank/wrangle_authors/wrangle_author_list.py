@@ -55,8 +55,8 @@ def format_author(person, people_affiliations, people_notes):
    notes = ''.join(
        map(note_symbol, people_notes.get(person['index'], ())))
 
-   return '{last_name}, {first_name}{affils}{notes}'.format(
-       first_name=initials(person['first name']),
+   return '{first_name} {last_name}{affils}{notes}'.format(
+       first_name=person['first name'],
        last_name=person['last name'],
        affils='<sup>{}</sup>'.format(affiliations) if affiliations else '',
        notes=notes)
