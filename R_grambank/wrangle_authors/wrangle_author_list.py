@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 
-# This script wrangles a csv-table of author names into a correctly formatted author list for journal publication.
+# This script wrangles a csv-table of author names into a correctly formatted
+# author list for journal publication.
 # Written by Johannes Englisch.
 
 # python3 wrangle_author_list.py author_list.csv > author_list.html
 
 from collections import OrderedDict
-import re
+import csv
+from itertools import islice
 import sys
-
-from csvw import dsv
 
 
 AFFILIATION_COLS = [
@@ -35,7 +35,7 @@ HTMLDOC = """\
 </html>"""
 
 
-def note_symbol(note_index):
+def get_note_symbol(note_index):
     return (
         NOTE_SYMBOLS[note_index % len(NOTE_SYMBOLS)]
         * (note_index // len(NOTE_SYMBOLS) + 1))
@@ -53,13 +53,19 @@ def format_author(person, people_affiliations, people_notes):
     affiliations = ','.join(
         map(str, people_affiliations.get(person['index'], ())))
     notes = ''.join(
-        map(note_symbol, people_notes.get(person['index'], ())))
+        map(get_note_symbol, people_notes.get(person['index'], ())))
 
     return '{first_name} {last_name}{affils}{notes}'.format(
         first_name=person['first name'],
         last_name=person['last name'],
         affils='<sup>{}</sup>'.format(affiliations) if affiliations else '',
         notes=notes)
+
+
+def format_corresponding_email(person):
+    return '<a href="mailto:{email}">{email}</a> ({id_})'.format(
+        email=person['email'],
+        id_=person['id'])
 
 
 def main():
@@ -71,14 +77,21 @@ def main():
 
     # read data
 
-    rows = dsv.reader(file_name, encoding='utf-8', dicts=True)
+    with open(file_name, encoding='utf-8') as f:
+        rows = list(csv.reader(f))
+
+    header = [cell.lstrip('\ufeff').strip() for cell in rows[0]]
+    # strip trailing empty cols
+    while header and not header[-1].strip():
+        header.pop()
+
     rows = [
         OrderedDict(
-            (k.strip(), v.strip())
-            for k ,v in row.items()
-            if k and v and k.strip() and v.strip())
-        for row in rows]
-    rows = list(filter(None, rows))
+            (k, v.strip())
+            for k, v in zip(header, row)
+            if v and v.strip())
+        for row in islice(rows, 1, len(rows))]
+    rows = [row for row in rows if 'index' in row]
 
     # collect affiliations
 
@@ -116,6 +129,19 @@ def main():
 
     # output
 
+    # FIXME: a bit too ad-hoc more my taste (<_<)
+    def format_note(note_no, note):
+        note_symbol = get_note_symbol(note_no)
+        if note_no == 0:
+            note_text = 'Corresponding author. Email: {}'.format(
+                '; '.join(
+                    format_corresponding_email(person)
+                    for person in rows
+                    if 'Corresponding author' in person.get(NOTE_COLUMN, '')))
+        else:
+            note_text = note
+        return '<p>{}{}</p>'.format(note_symbol, note_text)
+
     print(HTMLDOC.format('\n'.join((
         '<p>',
         ',\n'.join(
@@ -132,9 +158,9 @@ def main():
         '<p><strong>Notes:</strong></p>',
 
         '\n'.join(
-            '<p>{}{}</p>'.format(note_symbol(i), n)
-            for n, i in note_indices.items())))))
+            format_note(note_no, note)
+            for note, note_no in note_indices.items())))))
 
 
 if __name__ == '__main__':
-   main()
+    main()
