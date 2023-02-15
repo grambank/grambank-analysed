@@ -194,6 +194,6 @@ frich_plot<-frich_df %>%
 
 mds_grid <- plot_grid(frich_plot,mds_plots,nrow=2, rel_heights = c(0.7, 1))
 
-save_plot("output/functional_richness/frichness_paper.tiff",mds_grid,base_height = 13,base_width = 9, dpi = 600)
+save_plot("output/functional_richness/frichness_paper.tiff",mds_grid,base_height = 13,base_width = 9, dpi = 300)
 
-save_plot("output/functional_richness/frichness_paper.png",mds_grid,base_height = 13,base_width = 9, dpi = 600)
+save_plot("output/functional_richness/frichness_paper.png",mds_grid,base_height = 13,base_width = 9, dpi = 300)
