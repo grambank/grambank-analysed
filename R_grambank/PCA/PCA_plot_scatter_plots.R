@@ -114,9 +114,11 @@ GB_PCA_multiGrid_family <- annotate_figure(
 )
 
 filename <- file.path(OUTPUTDIR, "PCA_multigrid_major_families.tiff")
+filename_600 <- file.path(OUTPUTDIR, "PCA_multigrid_major_families_600_dpi.tiff")
 filename_png <- file.path(OUTPUTDIR, "PCA_multigrid_major_families.png")
 cat(paste("writing", filename, "\n"))
 ggsave(filename, GB_PCA_multiGrid_family, width = 8, height = 10, dpi = 400)
+ggsave(filename_600, GB_PCA_multiGrid_family, width = 8, height = 10, dpi = 600)
 ggsave(filename_png, GB_PCA_multiGrid_family, width = 8, height = 10, dpi = 400)
 
 
