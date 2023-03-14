@@ -13,13 +13,14 @@ import unicodedata
 import sys
 
 
+# # TODO: add volume and number once they're known
+# volume = {{{volume}}},
+# number = {{{number}}},
 BIBTEX_TEMPLATE = """@{bibtype}{{{bibkey},
   author = {{{author}}},
   year = {{{year}}},
   title = {{{title}}},
   journal = {{{journal}}},
-  volume = {{{volume}}},
-  number = {{{number}}},
 }}
 """
 
@@ -92,15 +93,15 @@ def main():
 
     # output
 
+    # volume='???',
+    # number='???',
     print(BIBTEX_TEMPLATE.format(
         bibtype='article',
         bibkey='Grambank2023',
         author=authors,
-        year='2023',
-        title='???',
-        journal='???',
-        volume='???',
-        number='???',
+        year='in press',
+        title='Grambank reveals the importance of genealogical constraints on linguistic diversity and highlights the impact of language loss',
+        journal='Science Advances',
     ))
 
 
