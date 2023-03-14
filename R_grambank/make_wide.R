@@ -5,7 +5,7 @@ source("set_random_seed.R")
 #The CLDF-format is long, but for PCA, imputation and distances it is better with wide formatted data. 
 # This script takes the CLDF dataset and makes it wide. 
 # It makes two versions, "with question" and "strict". The "*_with_question" table contains ?-values, "*_strict" does not. See README.md for details.
-# If there is more than one dialect for the same language, the dialect with the most features filled out is kept and the other one discarded. This is to optimise for matches to the Jäger-tree used later in the analysis.
+# If there is more than one dialect for the same language, the dialect with the most features filled out is kept and the other one discarded. This is to optimise for matches to the global tree used later in the analysis.
 
 #script written by Hedvig Skirgård
 
@@ -78,7 +78,7 @@ GB_wide_with_question_lg_levelled <- GB_wide_with_question %>%
   mutate(Language_ID = Language_level_ID) %>% 
   dplyr::select(-Language_level_ID, -level)
 
-GB_wide_with_question_lg_levelled %>% 
+GB_wide_with_question_lg_levelled %>%
   write_tsv(file.path(OUTPUTDIR, "GB_wide_with_question.tsv"))
 
 cat("Wrote ", OUTPUTDIR, "/GB_wide_with_question.tsv \n", sep = "")
