@@ -15,8 +15,6 @@ if(!dir.exists("output/spatiophylogenetic_modelling/effect_plots")){
 feature_groupings <- read_csv("feature_grouping_for_analysis.csv", show_col_types = F)
 
 ## Identify results by spatial decay
-# filename_suffix = "_kappa_2.5_sigma_3..qs"
-# filename_suffix = "_kappa_2_sigma_2.RD.qs"
 filename_suffix = "kappa_2_sigma_1.15_pcprior0.1"
 
 ## Read in model posteriors
@@ -81,16 +79,11 @@ ellipses <- dual_summary %>%
                                        level = 0.68)) %>%
   mutate(x = ellipse[ , 1],
          y = ellipse[ , 2]) %>%
-#  mutate(x = ifelse(x <= 0.001, 0.001, x),
-#         y = ifelse(y <= 0.001, 0.001, y)) %>%
-#  mutate(x = ifelse(x > 1, 1, x),
-#         y = ifelse(y > 1, 1, y)) %>%
   ungroup()
 
 
 plot_function <- function(label = c("letter_plot_label", "domain", "Nichols_1995_prediction"), facet, fn = spatiophylogenetic_figure_panels_){
-  #label <- "Nichols_1995_prediction"
-  
+
   dual_summary <- dual_summary %>% 
     dplyr::select(Feature_ID, all_of(label), mean_phylogenetic, mean_spatial) %>% 
     rename(label = 2) %>% 
@@ -101,7 +94,7 @@ plot_function <- function(label = c("letter_plot_label", "domain", "Nichols_1995
     rename(label = 2) %>% 
     filter(!is.na(label))
   
-center_plot =   ggplot(data = dual_summary,
+  center_plot <- ggplot(data = dual_summary,
                        aes(x = mean_phylogenetic,
                            y = mean_spatial)) +
   geom_polygon(aes(x, y,
@@ -129,31 +122,30 @@ center_plot =   ggplot(data = dual_summary,
         panel.spacing = unit(2, "lines"), 
         strip.text = element_text(size = 10),
         plot.margin = ggplot2::margin(t = 5,  # Top margin
-                             r = 12,  # Right margin
-                             b = 5,  # Bottom margin
-                             l = 5)) 
+                                      r = 12,  # Right margin
+                                      b = 5,  # Bottom margin
+                                      l = 5)) 
 
 
 ##IFS 
 if(facet == T){
-center_plot  <- center_plot  +
+center_plot  <- center_plot +
   lemon::facet_rep_wrap(~label,nrow = 2, repeat.tick.labels = T) + 
-#    facet_wrap(~label,nrow = 2) + 
-    theme(legend.position = "None",
+  theme(legend.position = "None",
         strip.background = element_blank())
 }
 
 
 if(facet == F ){
-  center_plot  <- center_plot  +
+  center_plot  <- center_plot +
     geom_point(aes(shape = label)) 
-  }
+}
 
 
 if(str_detect(fn, "ichols")){
-  center_plot  <- center_plot  +
+  center_plot  <- center_plot +
     ggtitle(label = "Nichols (1995) predictions")
-  }
+}
 
 plot(center_plot)
 

@@ -7,12 +7,10 @@ three_most_phylo_features <- dual_summary %>%
   as.matrix() %>%
   as.vector()
 
-
 index <- 0
 
 for(feature in c(three_most_phylo_features)) {
 
-#  feature <- three_most_phylo_features[1]
   index <- index + 1
   cat(paste0("I'm at feature ", feature, " which is index ", index, ".\n"))
 
@@ -73,16 +71,6 @@ for(feature in c(three_most_phylo_features)) {
     left_join(link_to_nodes, by = "Language_ID") %>%
     arrange(node_num)
 
-  #removing missing data
-  #missing <- which(is.na(feature_df[,2]))
-
-  #missing_language_IDs <- feature_df[which(is.na(feature_df[,2])), 1][[1]]
-  #tree_feature <- ape::drop.tip(tree, missing_language_IDs)
-
-  #feature_df <- feature_df[-missing,]
-  # x <- feature_df[,2][[1]]
-  # names(x) <- feature_df$Language_ID
-
   #generating plot title
   plot_title <- GB_id_desc %>%
     filter(Feature_ID == feature) %>%
@@ -96,21 +84,18 @@ for(feature in c(three_most_phylo_features)) {
   filename <- paste(OUTPUTDIR, "/most_signal_phylo_",index, "_" , feature, ".tiff", sep = "")
   filename_png <- paste(OUTPUTDIR, "/most_signal_phylo_",index, "_" , feature, ".png", sep = "")
 
-#running the contrasting algorithm reconstruction. Note: for the analysis we are using the tree with the original branch lengths even if we're visualizing using the imputed branch lengths.
-  # asr_most_signal<- ape::ace(x = x, phy = tree_feature, method = "ML", type = "discrete", model = "ARD")
-
   pred_df %>%
     write_tsv(paste0(OUTPUTDIR, "/INLA_ASR_pred_df_",index , "_" , feature, ".tsv"))
 
-output <- list(pred_df = pred_df, plot_title = plot_title, filename = filename, filename_png = filename_png, feature_df = feature_df, dual_model = dual_model)
+  output <- list(pred_df = pred_df, plot_title = plot_title, filename = filename, filename_png = filename_png, feature_df = feature_df, dual_model = dual_model)
 
-qs::qsave(x = output, file = paste0(OUTPUTDIR, "/INLA_ASR_OBJ_", feature, ".qs"))  
+  qs::qsave(x = output, file = paste0(OUTPUTDIR, "/INLA_ASR_OBJ_", feature, ".qs"))  
 }
 
 if(beep == 1){
   h_load("beepr")
   beep(2)
-  }
+}
 
 
 
