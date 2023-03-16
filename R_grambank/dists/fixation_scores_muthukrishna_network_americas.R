@@ -60,7 +60,7 @@ membership_vec <- g[8] %>%
   left_join(distinct(Language_meta_data, `AUTOTYP_area`, `americas`), by = "AUTOTYP_area") %>% 
   mutate(americas_num = ifelse(americas == "americas", 1, 2)) %>% 
   dplyr::select(americas_num) %>% 
-  as.matrix() %>% 
+  base::as.matrix() %>% 
   as.vector()
 
 igraph::modularity(g, membership = membership_vec, weights = df_long$Value_cfx)
@@ -82,7 +82,7 @@ groups<-  colnames(cfx_dist_matrix_sym) %>%
   left_join(distinct(Language_meta_data, `AUTOTYP_area`, `americas`), by = "AUTOTYP_area") %>% 
   mutate(americas_color = ifelse(americas == "americas", "orange", "turquoise3")) %>% 
   dplyr::select(americas_color) %>% 
-  as.matrix() %>% 
+  base::as.matrix() %>% 
   as.vector()
 
 qgraph_plot <- qgraph(cfx_dist_matrix_sym_inverse, 
@@ -124,9 +124,9 @@ df_long_sided <- cfx_dist_matrix_sym %>%
   filter(Var1 != Var2)
 
 df_long_sided %>% 
-  group_by(americas_var1, americas_var2) %>%
-  summarise(mean= mean(value), groups= "drop") %>% 
-  reshape2::dcast(americas_var1 ~ americas_var2) %>%
+  group_by(americas_var1, americas_var2) %>% 
+  summarise(mean= mean(value), .groups = "drop") %>%
+  reshape2::dcast(americas_var1 ~ americas_var2, value.var = "mean") %>%
   column_to_rownames("americas_var1") %>% 
   as.matrix() %>% 
   round(2)
