@@ -1,6 +1,3 @@
-[submodule "grambank-cldf"]
-	path = grambank
-	url = https://github.com/glottobank/grambank-cldf
 [submodule "glottolog-cldf"]
 	path = glottolog-cldf
 	url = https://github.com/glottolog/glottolog-cldf
@@ -10,3 +7,6 @@
 [submodule "autotyp-data"]
 	path = autotyp-data
 	url = https://github.com/autotyp/autotyp-data
+[submodule "grambank"]
+	path = grambank
+	url = https://github.com/grambank/grambank
