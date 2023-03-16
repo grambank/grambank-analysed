@@ -17,7 +17,7 @@ GB_fusion_points <- data.table::fread(GRAMBANK_PARAMETERS,
                                                       encoding = 'UTF-8', 
                                                       quote = "\"", header = TRUE, 
                                                       sep = ",") %>% 
-  dplyr::select(Parameter_ID = ID, Fusion = boundness,informativity) %>% 		
+  dplyr::select(Parameter_ID = ID, Fusion = Boundness, Informativity) %>% 		
   mutate(Fusion = as.numeric(Fusion)) 
 
 #remove features for which there is only a feature for the free or bound kind of marking, only keep those where there is one for each type of marking
@@ -64,7 +64,7 @@ GB_wide_morph_counts_summary <- GB_wide_morph_counts_summary %>%
   unite(low, high, col = bin_display, sep = "-") 		
 
 GB_morph_counts_plot <- GB_wide_morph_counts_summary %>% 		
-  ggplot() + geom_bar(aes(x = factor(bin_display), y = n, fill = factor(bin_display)), stat = "identity", colour = "grey25", size = 1) +		
+  ggplot() + geom_bar(aes(x = factor(bin_display), y = n, fill = factor(bin_display)), stat = "identity", colour = "grey25", linewidth = 1) +		
   theme_classic() +		
   theme(axis.title = element_text(size=18), 		
         axis.text.x = element_text(size = 18, angle = 90, hjust=0.95), 		
