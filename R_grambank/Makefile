@@ -205,7 +205,6 @@ make_cultural_fixation_scores:
 	Rscript dists/fixation_scores_muthukrishna_run.R
 	
 make_cultural_fixation_scores_plot:
-	Rscript dists/fixation_scores_muthukrishna_mds_americas.R
 	Rscript dists/fixation_scores_muthukrishna_network_americas.R
 	Rscript dists/fixation_scores_muthukrishna_barplot_heatmap.R
 
