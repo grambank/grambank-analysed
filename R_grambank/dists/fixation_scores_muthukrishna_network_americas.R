@@ -118,8 +118,8 @@ x <- dev.off()
 
 df_long_sided <- cfx_dist_matrix_sym %>% 
   reshape2::melt() %>% 
-  left_join(left) %>% 
-  left_join(right) %>% 
+  left_join(left, by = "Var1") %>% 
+  left_join(right, by = "Var2") %>% 
   distinct() %>% 
   filter(Var1 != Var2)
 
