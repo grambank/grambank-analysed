@@ -42,10 +42,10 @@ legend_breaks <- c(min(df_long_shifted$prop), 0.8, 0.85, 0.9, 0.95, 1)
 basemap <- ggplot(df_long_shifted) +
   geom_polygon(data=world, aes(x=long, y=lat, group=group),
                colour="gray87",
-               fill="gray87", size = 0.5) +
+               fill="gray87", linewidth = 0.5) +
   geom_polygon(data=lakes, aes(x=long, y=lat, group=group),
                colour="gray87",
-               fill="white", size = 0.3) +
+               fill="white", linewidth = 0.3) +
   viridis::scale_color_viridis( name='% of data', 
                                 breaks = legend_breaks, labels = percent(legend_breaks), begin = 0.5, end = 1) +
     theme(
