@@ -17,9 +17,9 @@ languages_df <- read_csv(GRAMBANK_LANGUAGES, col_types=LANGUAGES_COLSPEC) %>%
 limit <- quantile(surprisal_df$Surprisal, 0.98, na.rm = T)  # top 2 %
 
 h <- surprisal_df %>% 
-  ggplot(aes(x = Surprisal, fill=..x..)) +
+  ggplot(aes(x = Surprisal, fill=after_stat(x))) +
   geom_histogram(bins = 50) +
-  annotate("segment",col="black", alpha = 0.6, x = limit, xend = limit, y = 0, yend = 50, size = 0.5, linetype = "dashed") +
+  annotate("segment",col="black", alpha = 0.6, x = limit, xend = limit, y = 0, yend = 50, linewidth = 0.5, linetype = "dashed") +
   scale_fill_viridis('Surprisal', option="A", direction = -1) +
   guides(fill="none") +
   xlab("Unusualness") + ylab("Number of Languages") +
