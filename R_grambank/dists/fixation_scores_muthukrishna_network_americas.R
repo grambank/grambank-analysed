@@ -125,7 +125,7 @@ df_long_sided <- cfx_dist_matrix_sym %>%
 
 df_long_sided %>% 
   group_by(americas_var1, americas_var2) %>%
-  summarise(mean= mean(value)) %>% 
+  summarise(mean= mean(value), groups= "drop") %>% 
   reshape2::dcast(americas_var1 ~ americas_var2) %>%
   column_to_rownames("americas_var1") %>% 
   as.matrix() %>% 
