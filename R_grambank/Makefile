@@ -209,7 +209,7 @@ make_cultural_fixation_scores_plot:
 	Rscript dists/fixation_scores_muthukrishna_barplot_heatmap.R
 
 manhattan_dists:
-	Rscript dists/manhattan_dists
+	Rscript dists/manhattan_dists.R
 	
 functional_richness_get:
 	Rscript functional_richness/make_gower_mfd.R
