@@ -42,7 +42,7 @@ gb$AUTOTYP_area <- fct_reorder(gb$AUTOTYP_area, gb$Surprisal)
 
 gb %>% 
   ggplot() +
-  geom_violin(aes(x = Surprisal, y = AUTOTYP_area),fill = "turquoise3", color = "turquoise3", alpha = 0.3, size = 0.6, draw_quantiles = c(0.25, 0.5, 0.75))  +
+  geom_violin(aes(x = Surprisal, y = AUTOTYP_area),fill = "turquoise3", color = "turquoise3", alpha = 0.3, linewidth = 0.6, draw_quantiles = c(0.25, 0.5, 0.75))  +
   geom_violin(aes(x = Pred_Surprisal, y = AUTOTYP_area), color = "black", alpha = 0, fill = "turquoise3")  +
   theme_classic() +
   theme(text = element_text(size = 18), 
