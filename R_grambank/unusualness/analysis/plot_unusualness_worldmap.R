@@ -42,10 +42,10 @@ scores_joined_for_plotting <- surprisal_df %>%
 map <- ggplot(scores_joined_for_plotting) +
   geom_polygon(data=world, aes(x=long, y=lat, group=group),
                colour="gray87",
-               fill="gray87", size = 0.5) +
+               fill="gray87", linewidth = 0.5) +
   geom_polygon(data=lakes, aes(x=long, y=lat, group=group),
                colour="gray87",
-               fill="white", size = 0.3) +
+               fill="white", linewidth = 0.3) +
   geom_point(aes(x=Longitude, y=Latitude, color=Surprisal), alpha = 0.6) +
   geom_text_repel(
     data=scores_joined_for_plotting[scores_joined_for_plotting$Surprisal >= limit, ],
