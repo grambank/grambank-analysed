@@ -41,7 +41,7 @@ cfx_dist_matrix_sym %>%
   filter(!is.na(value)) %>% 
   ggplot(aes(Var1, Var2)) +
   theme_classic() +
-  geom_tile(aes(fill = value), color='white', size = 0.6) +
+  geom_tile(aes(fill = value), color='white', linewidth = 0.6) +
   scale_fill_viridis(direction = -1) +
   geom_text(aes(label = round(value, 2)),color = "white", size = 8) +
   theme(axis.title = element_blank(),
