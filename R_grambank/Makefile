@@ -215,7 +215,7 @@ functional_richness_get:
 	Rscript functional_richness/make_gower_mfd.R
 
 functional_richness_plot:
-	Rscript functional_richness/frischness_plot.R
+	Rscript functional_richness/frichness_plot.R
 
 ## Test functions
 test:
