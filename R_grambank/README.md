@@ -2,6 +2,10 @@
 
 This directory (R_grambank) contains the *R* scripts needed to generate the analysis, tables and figures for the Grambank paper: "Grambank reveals the importance of genealogical constraints on linguistic diversity and highlights the impact of language loss".
 
+These scripts rely on data from git submodules. Read more about that [here](https://github.com/grambank/grambank-analysed#git-submodules).
+
+This codebase is organised on the principle that we do not commit output of scripts to git that can be recreated by scripts here. For example, in order to run the scripts relating to PCA scatterplots you will first need to run the scripts to generate the PCA tables, which in turn rely on the make_wide scripts which bring in the Grambank data itself. The makefile rules "make data" and "make pca" run all the necessary scripts in the right order for this.
+
 The R-scripts can be run one by one, or called on from the Makefile in the directory R_grambank. `Makefile`: is a [GNU Make](https://www.gnu.org/software/make/) Makefile for compiling the analysis for the paper. We have organised the analysis in this repos into three categories: quick, medium and long. This represents the expected run time. The long analysis takes over 12h to compile, the quick just a few minutes and the medium under an hour on a typical personal computer.
 
 The Makefile is organised into rules by type of analysis, for example for PCA, spatiophylogenetic modelling etc. These rules have been further summarised into:
