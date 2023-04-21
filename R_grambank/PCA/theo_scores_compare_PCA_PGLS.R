@@ -28,7 +28,7 @@ comp_data <- caper::comparative.data(phy = tree, data = theo_scores_df, names.co
 
 #testing combinations
 
-theo_scores_cols <- c("word order"   ,       "Flexivity"      ,     "Gender_or_Noun_Class", "locus of\nmarking"  ,
+theo_scores_cols <- c("Word_Order"   ,       "Flexivity"      ,     "Gender_or_Noun_Class", "Locus_of_Marking"  ,
                       "Fusion"        ,      "Informativity" )
 
 results_df <- matrix(nrow = 0, ncol = 5) %>% 
