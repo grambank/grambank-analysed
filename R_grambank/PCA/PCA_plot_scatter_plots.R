@@ -4,22 +4,22 @@ source("requirements.R")
 
 OUTPUTDIR <- file.path('.',"output", 'PCA')
 
-Language_meta_data <-  read_csv(GRAMBANK_LANGUAGES, col_types=LANGUAGES_COLSPEC) %>%		
-  dplyr::select(Language_ID = Language_level_ID, Family_name, Name, Macroarea) %>% 
-  distinct(Language_ID, .keep_all = T) %>% 
+Language_meta_data <-  read_csv(GRAMBANK_LANGUAGES, col_types=LANGUAGES_COLSPEC) %>%
+  dplyr::select(Language_ID = Language_level_ID, Family_name, Name, Macroarea) %>%
+  distinct(Language_ID, .keep_all = T) %>%
   mutate(Family_name = ifelse(is.na(Family_name), "Isolate", Family_name))
 
 #reading in the dataframe with PCA values for each language
 GB_PCA_df <- suppressMessages(read_tsv(file.path(OUTPUTDIR, 'PCA_language_values.tsv'))) %>%
-  dplyr::select(Language_ID, PC1, PC2, PC3) %>% 
+  dplyr::select(Language_ID, PC1, PC2, PC3) %>%
   left_join(Language_meta_data, by = "Language_ID" ) %>%
   dplyr::select(Language_ID, everything())
 
-top_families <- GB_PCA_df %>% 
-  group_by(Family_name) %>% 
-  dplyr::summarise(n = n()) %>% 
+top_families <- GB_PCA_df %>%
+  group_by(Family_name) %>%
+  dplyr::summarise(n = n()) %>%
   arrange(-n) %>%
-  .[1:15,1] %>% 
+  .[1:15,1] %>%
   arrange(Family_name)
 
 tided_PCA_descs<- suppressMessages(read_tsv(
@@ -29,7 +29,7 @@ tided_PCA_descs<- suppressMessages(read_tsv(
 
 # function to plot the PCA locations of a given language `family``
 # highlighting the selected family using `color`.
-plotPCAFamily <- function(df, family, color="orange", key="Family_name") {
+plotPCAFamily <- function(df, family, color="orange", key="Family_name", label=FALSE) {
     df$InGroup <- df[[key]] == family
     p <- ggplot(df, aes(x = PC1, y = PC2), alpha = 1)
     p <- p + geom_jitter(color="snow3", size = 0.5, alpha = 0.4, shape = 16)
@@ -42,6 +42,15 @@ plotPCAFamily <- function(df, family, color="orange", key="Family_name") {
       data = filter(df, df$InGroup),
       aes(x = PC1, y = PC2), color = color, alpha=0.4
     )
+
+    if (label == TRUE) {
+        p <- p + geom_text_repel(
+            data = filter(df, df$InGroup),
+            aes(x = PC1, y = PC2, label = Name),
+            size=0.9,
+            max.overlaps=20)
+    }
+
     p <- p + coord_fixed()
     p <- p + theme_classic()
     p <- p + theme(
@@ -61,29 +70,33 @@ plotPCAFamily <- function(df, family, color="orange", key="Family_name") {
 
 #Mayan, Turkic, Ta-Ne-Omotic Algic, Chibchan
 GB_PCA_Families <- list(
-  plotPCAFamily(GB_PCA_df, "Afro-Asiatic", "#FF5733"),
-  plotPCAFamily(GB_PCA_df, "Atlantic-Congo", "steelblue2"),
-  plotPCAFamily(GB_PCA_df, "Austroasiatic", "midnightblue"),
-  plotPCAFamily(GB_PCA_df, "Austronesian", "turquoise3"),
-  plotPCAFamily(GB_PCA_df, "Central Sudanic", "purple4"),
-  plotPCAFamily(GB_PCA_df, "Chibchan", "#E08B00"),
-  plotPCAFamily(GB_PCA_df, "Dravidian", "blue"),
-  plotPCAFamily(GB_PCA_df, "Indo-European", "seagreen"),
-  plotPCAFamily(GB_PCA_df, "Mayan", "#00ABFD"),
-  plotPCAFamily(GB_PCA_df, "Nakh-Daghestanian", "orange"),
-  plotPCAFamily(GB_PCA_df, "Nuclear Trans New Guinea", "springgreen"),
-  plotPCAFamily(GB_PCA_df, "Pama-Nyungan", "darkgreen"),
-  plotPCAFamily(GB_PCA_df, "Sino-Tibetan", "violetred3"),
-  plotPCAFamily(GB_PCA_df, "Turkic", "#FF689F"),
-  plotPCAFamily(GB_PCA_df, "Uralic", "#DC71FA"),
-  plotPCAFamily(GB_PCA_df, "Uto-Aztecan", "red1")
+  plotPCAFamily(GB_PCA_df, "Afro-Asiatic", "#FF5733", label=TRUE),
+  plotPCAFamily(GB_PCA_df, "Atlantic-Congo", "steelblue2", label=TRUE),
+  plotPCAFamily(GB_PCA_df, "Austroasiatic", "midnightblue", label=TRUE),
+  plotPCAFamily(GB_PCA_df, "Austronesian", "turquoise3", label=TRUE),
+  plotPCAFamily(GB_PCA_df, "Central Sudanic", "purple4", label=TRUE),
+  plotPCAFamily(GB_PCA_df, "Chibchan", "#E08B00", label=TRUE),
+  plotPCAFamily(GB_PCA_df, "Dravidian", "blue", label=TRUE),
+  plotPCAFamily(GB_PCA_df, "Indo-European", "seagreen", label=TRUE),
+  plotPCAFamily(GB_PCA_df, "Mayan", "#00ABFD", label=TRUE),
+  plotPCAFamily(GB_PCA_df, "Nakh-Daghestanian", "orange", label=TRUE),
+  plotPCAFamily(GB_PCA_df, "Nuclear Trans New Guinea", "springgreen", label=TRUE),
+  plotPCAFamily(GB_PCA_df, "Pama-Nyungan", "darkgreen", label=TRUE),
+  plotPCAFamily(GB_PCA_df, "Sino-Tibetan", "violetred3", label=TRUE),
+  plotPCAFamily(GB_PCA_df, "Turkic", "#FF689F", label=TRUE),
+  plotPCAFamily(GB_PCA_df, "Uralic", "#DC71FA", label=TRUE),
+  plotPCAFamily(GB_PCA_df, "Uto-Aztecan", "red1", label=TRUE)
 )
 
 # save each one
 for (p in GB_PCA_Families) {
-    filename <- file.path(OUTPUTDIR, sprintf("PCA_family_%s.tiff",  p$labels$title))
+    filename <- file.path(OUTPUTDIR, sprintf("PCA_family_%s.pdf",  p$labels$title))
     cat(paste("writing", filename, "\n"))
-    ggsave(filename, p, width = 4, height = 4, dpi = 600)
+    ggsave(filename, p, width = 6, height = 6, dpi = 600)
+
+    # warnings here are ggrepel not labelling:
+    # ggrepel: xx unlabeled data points (too many overlaps). Consider increasing max.overlaps
+
 }
 
 
@@ -207,22 +220,22 @@ plotPCAFamily_highlights <- function(df, family, color="orange", key="Family_nam
 
 
 #Indo-European
-lgs_to_highlight<- tibble(Language_ID = c("stan1293", 
+lgs_to_highlight<- tibble(Language_ID = c("stan1293",
                                            "tokp1240",
                                            "hait1244",
                                            "swed1254",
                                            "lati1261",
                                            "ukra1253",
-                                           "mara1378", 
+                                           "mara1378",
                                           "dara1250",
-                                           "kumz1235", 
-                                          "west2386", 
-                                          "kash1277", 
-                                          "russ1263", 
-                                          "stan1290", 
-                                          "iris1253", 
+                                           "kumz1235",
+                                          "west2386",
+                                          "kash1277",
+                                          "russ1263",
+                                          "stan1290",
+                                          "iris1253",
                                           "sana1297"))
-df_IE_highlights <- GB_PCA_df %>% 
+df_IE_highlights <- GB_PCA_df %>%
   inner_join(lgs_to_highlight, by = "Language_ID")
 
 plotPCAFamily_highlights(GB_PCA_df, "Indo-European", "seagreen") +
@@ -231,7 +244,7 @@ plotPCAFamily_highlights(GB_PCA_df, "Indo-European", "seagreen") +
   theme(plot.title = element_text(size = 20, face = "bold"),
     axis.title.x = element_text(size = 14),
     axis.title.y = element_text(size = 14,angle = 90))
-  
+
 ggsave(file.path(OUTPUTDIR, "PCA_family_Indo-European_highlights.tiff"), width = 7, height = 7, dpi = 600)
 ggsave(file.path(OUTPUTDIR, "PCA_family_Indo-European_highlights.png"), width = 7, height = 7, dpi = 600)
 
@@ -239,7 +252,7 @@ ggsave(file.path(OUTPUTDIR, "PCA_family_Indo-European_highlights.png"), width = 
 #Austroasiatic
 lgs_to_highlight <- tibble(Language_ID = c("oldk1249", "lave1248", "seme1247", "mund1320", "pnar1238", "sant1410", "bond1245"))
 
-df_austroasiatic_highlights <- GB_PCA_df %>% 
+df_austroasiatic_highlights <- GB_PCA_df %>%
   inner_join(lgs_to_highlight, by = "Language_ID")
 
 plotPCAFamily_highlights(GB_PCA_df, "Austroasiatic", "midnightblue")+
