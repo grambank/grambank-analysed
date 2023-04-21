@@ -68,7 +68,7 @@ lg_df_informativity_score <-  GB_long_for_calc %>%
   mutate(value = if_else(Parameter_ID == "GB140", abs(value-1), value)) %>%
   #grouping per language and per informativity category 
   group_by(Language_ID, Informativity) %>%
-  #for each informativity cateogry for each langauge, how many are answered 1 ("yes")
+  #for each informativity category for each langauge, how many are answered 1 ("yes")
   #how many of the values per informativity category are missing
   dplyr::summarise(sum_informativity = sum(value, na.rm = TRUE),
                    sum_na = sum(is.na(value)), .groups = "drop_last" ) %>%
