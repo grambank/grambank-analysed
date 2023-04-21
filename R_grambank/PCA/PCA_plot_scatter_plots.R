@@ -90,7 +90,7 @@ GB_PCA_Families <- list(
 
 # save each one
 for (p in GB_PCA_Families) {
-    filename <- file.path(OUTPUTDIR, sprintf("PCA_family_%s.tiff",  p$labels$title))
+    filename <- file.path(OUTPUTDIR, sprintf("PCA_family_%s.pdf",  p$labels$title))
     cat(paste("writing", filename, "\n"))
     ggsave(filename, p, width = 6, height = 6, dpi = 600)
 
