@@ -182,6 +182,6 @@ parameters_binary <- data.table::fread(file.path("output", "GB_wide", "parameter
 
 feature_groupings %>% 
   full_join(parameters_binary, by = "Feature_ID") %>% 
-  dplyr::select(Feature_ID, Fusion = boundness, Flexivity, "Gender/noun class","locus of marking", "word order", "informativity", Main_domain, Nichols_1995_label, Nichols_1995_prediction) %>% 
+  dplyr::select(Feature_ID, Fusion = Boundness, Flexivity, "Gender_or_Noun_Class","Locus_of_Marking", "Word_Order", "Informativity", Main_domain, Nichols_1995_label, Nichols_1995_prediction) %>% 
   mutate(Fusion = ifelse(Fusion ==0, NA, Fusion)) %>% #we decided to not include 0 for fusion into the metric
 write_tsv(file ="output/GB_wide/table_theo_scores_supp.tsv", na = "")
