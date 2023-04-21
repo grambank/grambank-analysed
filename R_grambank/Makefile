@@ -6,7 +6,7 @@ THIS_MAKEFILE := $(lastword $(MAKEFILE_LIST))
 
 ## Make everything.
 all:
-	 quick_ones medium_length if_medium_are_finished long_ones if_long_ones_are_finished
+	quick_ones medium_length if_medium_are_finished long_ones if_long_ones_are_finished
 
 # runs almost all analysis from the release paper, excluding the analysis that takes a long time and/or more computational resources than a regular domestic computer tends to have (the BRMS-analysis for predicting unusualness score is best run on a cluster and the INLA analysis of the spatiophylogenetic modelling takes a long time)
 quick_ones: requirements.log data pca manhattan_dists
@@ -40,6 +40,8 @@ requirements.log:
 submodules:
 	git submodule update --init
 
+
+## Setup data for analysis
 data: submodules
 	@echo "# Preparing the dataset (including imputation and pruning of global tree. #"
 	@mkdir -p output/non_GB_datasets
@@ -86,7 +88,7 @@ output/pruning_EDGE_tree.R:
 
 #step 2
 ## PCA analysis and plots.
-pca:
+pca: output/non_GB_datasets/glottolog-cldf_wide_df.tsv
 	@echo "## Running PCA analysis and generating plots. ##"
 	mkdir -p output/PCA
 	@$(MAKE) -f $(THIS_MAKEFILE) output/PCA/PCA_df.tsv
@@ -118,13 +120,13 @@ theoretical:
 get_unusualness: 
 #	@echo "# Calculating unsualness scores and making plots. Note: these scripts requires internet access.#"
 	Rscript unusualness/analysis/get_unusualness_bayesLCA.R
-			@$(MAKE) -f $(THIS_MAKEFILE) plot_unusualness
+	@$(MAKE) -f $(THIS_MAKEFILE) plot_unusualness
 
 ## BRMS-analysis of unsualness scores
 predict_unusualness: 
 	@echo "## Running BRMS-analysis of unsualness scores (cluster recommended). #"
 	Rscript unusualness/analysis/predict_surprisal.R
-		@$(MAKE) -f $(THIS_MAKEFILE) plot_predict_unusualness
+	@$(MAKE) -f $(THIS_MAKEFILE) plot_predict_unusualness
 
 plot_unusualness:
 	Rscript unusualness/analysis/plot_unusualness_splom.R
@@ -135,14 +137,14 @@ plot_predict_unusualness:
 	Rscript unusualness/analysis/predict_surprisal_plot.R
 	
 ## Phylogenetic signal per feature.
-#phylo_signal_per_feature:
-#	@echo "## Running analysis of phylogenetic signal per feature. ##"
-#	Rscript phylo_signal_features_d_stat.R
+phylo_signal_per_feature:
+	@echo "## Running analysis of phylogenetic signal per feature. ##"
+	Rscript phylo_signal_features_d_stat.R
 
 ## Run endangerment and structural dissimilarity
-#endangerment_analysis:
-#	@echo "## Running analysis of endangerment and structural dissimilarity. ##"
-#	Rscript diversity_endangerment.R
+endangerment_analysis:
+	@echo "## Running analysis of endangerment and structural dissimilarity. ##"
+	Rscript diversity_endangerment.R
 
 ## INLA 
 INLA: data INLA_featurewise INLA_extract_posteriors
