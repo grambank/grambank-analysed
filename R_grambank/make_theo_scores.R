@@ -42,7 +42,7 @@ lg_df_for_HM_DM_count <- GB_long_for_calc %>%
   group_by(Language_ID) %>% 
   dplyr::summarise(Locus_of_Marking = mean(value_weighted), .groups = "drop_last")
 
-##`Gender/noun class`_scores
+##Gender_or_Noun_Class scores
 lg_df_for_gender_nc_count <- GB_long_for_calc %>% 
   filter(!is.na(Gender_or_Noun_Class)) %>% 
   filter(!is.na(value)) %>% 
