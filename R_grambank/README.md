@@ -6,7 +6,33 @@ These scripts rely on data from git submodules. Read more about that [here](http
 
 This codebase is organised on the principle that we do not commit output of scripts to git that can be recreated by scripts here. For example, in order to run the scripts relating to PCA scatterplots you will first need to run the scripts to generate the PCA tables, which in turn rely on the make_wide scripts which bring in the Grambank data itself. The makefile rules "make data" and "make pca" run all the necessary scripts in the right order for this.
 
-The R-scripts can be run one by one, or called on from the Makefile in the directory R_grambank. `Makefile`: is a [GNU Make](https://www.gnu.org/software/make/) Makefile for compiling the analysis for the paper. We have organised the analysis in this repos into three categories: quick, medium and long. This represents the expected run time. The long analysis takes over 12h to compile, the quick just a few minutes and the medium under an hour on a typical personal computer.
+## Running code in the right order
+The R-scripts can be run one by one, or called on from the Makefile in the directory R_grambank.
+
+### setting up the data
+In order to run all the scripts, we first need to just set-up the data-tables etc. This is the order to run those scripts in:
+1	make_glottolog-cldf_table.R                                                                 
+2	make_wide.R                                                                                 
+3	make_wide_binarized.R                                                                       
+4	impute_missing_values.R                                                                     
+5	make_theo_score_fusion.R                                                                    
+6	make_theo_scores.R                                                                          
+7	spatiophylogenetic_modelling/processing/pruning_EDGE_tree.R                                 
+8	unusualness/processing/assigning_AUTOTYP_areas.R                                            
+### PCA
+Once the data  is set up, you will ned to run PCA/PCA.R first in order to run any of the PCA scripts.                                                                   
+### Functional Richness
+The first script to run for the functional richness analysis is functional_richness/make_gower_mfd.R                                                        
+### Unusualness 
+The unsualness scripts to run first are:
+1   unusualness/analysis/get_unusualness_bayesLCA.R                                             
+2   unusualness/analysis/predict_surprisal.R                      
+### Spatiophylogenetic modelling (SP)
+The SP-scripts are the most complicated in this codebase, and involve running simulations and mutliple different values for the pcprior and spatial decay. The core script that the release paper relies most on is:
+1   spatiophylogenetic_modelling/analysis/INLA_multi_models.R     
+
+## Running code in the right order: Makefile
+`Makefile`: is a [GNU Make](https://www.gnu.org/software/make/) Makefile for compiling the analysis for the paper. We have organised the analysis in this repos into three categories: quick, medium and long. This represents the expected run time. The long analysis takes over 12h to compile, the quick just a few minutes and the medium under an hour on a typical personal computer.
 
 The Makefile is organised into rules by type of analysis, for example for PCA, spatiophylogenetic modelling etc. These rules have been further summarised into:
 
