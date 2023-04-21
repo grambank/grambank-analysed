@@ -70,16 +70,15 @@ cat("Scatterplot of PC and theoretical scores made.\n")
 #specific scatterplots for MS
 
 PCA2_vs_gender_plot <- lg_df_all_scores  %>% 
-  ggplot(aes(`Gender/\nnoun class` , PC2)) +
+  ggplot(aes(Gender_or_Noun_Class , PC2)) +
   geom_point(color = "turquoise3") +
   ggpubr::stat_cor(method = "pearson", p.digits = 2, geom = "label", color = "blue",
                    label.y.npc="top", label.x.npc = "left", alpha = 0.8) +
   geom_smooth(method='lm', formula = 'y ~ x') +
   theme_classic() +
   labs(title="",		
-       x ="Gender/\nnoun class", y = "PC2") + 		
-  xlim(c(0,max(lg_df_all_scores$`Gender/
-noun class`)))
+       x ="Gender_or_Noun_Class", y = "PC2") + 		
+  xlim(c(0,max(lg_df_all_scores$Gender_or_Noun_Class)))
 
 tiff(file.path("output", "PCA", "PC2_gender_cor_plot.tiff"), width = 5, height = 4,  units = "in", res = 300)
 plot(PCA2_vs_gender_plot)
