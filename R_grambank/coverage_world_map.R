@@ -33,10 +33,13 @@ lakes <- map_data("lakes", wrap=c(-25,335), col="white", border="gray", ylim=c(-
 
 #shifting the longlat of the dataframe to match the pacific centered map
 df_long_shifted <- df %>%
-  mutate(Longitude = if_else(Longitude <= -25, Longitude + 360, Longitude))
+  mutate(Longitude = if_else(Longitude <= -25, Longitude + 360, Longitude)) 
+
+#randomise order so the ones with little or no na_prop aren't on top of each other in a way that biases the perception
+df_long_shifted <-  df_long_shifted[sample(1:nrow(df_long_shifted)), ]
 
 df_long_shifted$prop <- 1 - df_long_shifted$na_prop 
-legend_breaks <- c(min(df_long_shifted$prop), 0.8, 0.85, 0.9, 0.95, 1)
+legend_breaks <- c(0, 0.25, 0.5, 0.75, 1)
 
 #basemap
 basemap <- ggplot(df_long_shifted) +
@@ -46,8 +49,8 @@ basemap <- ggplot(df_long_shifted) +
   geom_polygon(data=lakes, aes(x=long, y=lat, group=group),
                colour="gray87",
                fill="white", linewidth = 0.3) +
-  viridis::scale_color_viridis( name='% of data', 
-                                breaks = legend_breaks, labels = scales::percent(legend_breaks), begin = 0.5, end = 1) +
+  viridis::scale_color_viridis( #name='% of data', 
+                                breaks = legend_breaks, labels = scales::percent(legend_breaks), begin = 0.25, end = 1) +
     theme(
     # all of these lines are just removing default things like grid lines, axes etc
     panel.grid.major = element_blank(),
@@ -59,6 +62,7 @@ basemap <- ggplot(df_long_shifted) +
     panel.background = element_rect(fill = "white"),
     axis.text.x = element_blank(),
     axis.text.y = element_blank(),
+    legend.title = element_blank(),
     axis.ticks = element_blank()
   ) +
   coord_map(projection = "vandergrinten", ylim=c(-56,67)) +
