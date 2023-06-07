@@ -50,9 +50,11 @@ basemap <- ggplot(df_long_shifted) +
                colour="gray87",
                fill="white", linewidth = 0.3) +
   viridis::scale_color_viridis( #name='% of data', 
-                                breaks = legend_breaks, labels = scales::percent(legend_breaks), begin = 0, end = 0.95, direction = -1) +
+                                breaks = legend_breaks, 
+                              labels = scales::percent(legend_breaks), begin = 0, end = 0.95, direction = -1) +
   viridis::scale_fill_viridis( #name='% of data', 
-    breaks = legend_breaks, labels = scales::percent(legend_breaks), begin = 0, end = 0.95, direction = -1) +
+    breaks = legend_breaks, 
+    labels = scales::percent(legend_breaks), begin = 0, end = 0.95, direction = -1) +
     theme(
     # all of these lines are just removing default things like grid lines, axes etc
     panel.grid.major = element_blank(),
