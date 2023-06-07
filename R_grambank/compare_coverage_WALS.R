@@ -90,8 +90,8 @@ WALS_GB_coverage_overlay <- ggplot() +
   xlab("Languages") +
   ylab("Feature coverage") +
   theme(plot.title = element_text(size = 50, face = "bold", color = "black")) +
-  scale_y_continuous(labels = scales::percent)  +
-  scale_x_continuous(breaks = c( 500, 1000, 1500, 2000)) +
+  scale_y_continuous(labels = scales::percent, limits = c(0,1))  +
+  scale_x_continuous(breaks = c( 500, 1000, 1500, 2000), limits = c(0,2435)) +
   annotation_custom(grid::grid.text("WALS", x=0.17,  y=0.17, gp=grid::gpar(col = "white", fontsize=50, fontface="bold")))  +
   annotation_custom(grid::grid.text("Grambank", x=0.40,  y=0.40, gp=grid::gpar(col = "white", fontsize=50, fontface="bold")))  
 
@@ -105,10 +105,7 @@ x <- dev.off()
 
 cat("WALS-GB-comparison plot made.\n")
 
-
-
 #just WALS
-
 
 WALS_coverage <- ggplot() +
   geom_area(data = wals_wide_language_level, aes(x = x_ticks, y = wals_na_prop_reverse), stat = "identity", fill = "#2f2c9c") +
@@ -123,8 +120,8 @@ WALS_coverage <- ggplot() +
   xlab("Languages") +
   ylab("Feature coverage") +
   theme(plot.title = element_text(size = 50, face = "bold", color = "black")) +
-  scale_y_continuous(labels = scales::percent)  +
-  scale_x_continuous(breaks = c( 500, 1000, 1500, 2000)) +
+  scale_y_continuous(labels = scales::percent, limits = c(0,1))  +
+  scale_x_continuous(breaks = c( 500, 1000, 1500, 2000), limits = c(0,2435)) +
   annotation_custom(grid::grid.text("WALS", x=0.17,  y=0.17, gp=grid::gpar(col = "white", fontsize=50, fontface="bold")))  
 
 png(file.path(OUTPUTDIR, "WALS_coverage.png"), height = 1100, width = 1600,    units = "px",  bg = "white")
