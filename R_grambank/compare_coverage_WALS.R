@@ -78,7 +78,7 @@ wals_wide_language_level$x_ticks <- seq(1:nrow(wals_wide_language_level))
 #coverage plot with both distributions overlayed each other
 WALS_GB_coverage_overlay <- ggplot() +
   geom_area(data = GB_wide, aes(x = x_ticks, y = GB_na_prop_reverse), stat = "identity", fill = "turquoise3", alpha = 7) + 
-  geom_area(data = wals_wide_language_level, aes(x = x_ticks, y = wals_na_prop_reverse), stat = "identity", fill = "purple4", alpha = 0.8) +
+  geom_area(data = wals_wide_language_level, aes(x = x_ticks, y = wals_na_prop_reverse), stat = "identity", fill = "#2f2c9c", alpha = 1) +
   theme_classic() +
   theme(axis.line.x = element_blank(),
         axis.text.x = element_text(angle = 60, hjust = 1, size = 25), 
@@ -104,3 +104,32 @@ plot(WALS_GB_coverage_overlay)
 x <- dev.off()
 
 cat("WALS-GB-comparison plot made.\n")
+
+
+
+#just WALS
+
+
+WALS_coverage <- ggplot() +
+  geom_area(data = wals_wide_language_level, aes(x = x_ticks, y = wals_na_prop_reverse), stat = "identity", fill = "#2f2c9c") +
+  theme_classic() +
+  theme(axis.line.x = element_blank(),
+        axis.text.x = element_text(angle = 60, hjust = 1, size = 25), 
+        axis.text.y = element_text(hjust = 2, size = 25, angle = 30),
+        axis.title.x = element_text(size = 35),
+        axis.ticks = element_blank(),
+        axis.title.y = element_text(size = 35), 
+        axis.line = element_blank()) +
+  xlab("Languages") +
+  ylab("Feature coverage") +
+  theme(plot.title = element_text(size = 50, face = "bold", color = "black")) +
+  scale_y_continuous(labels = scales::percent)  +
+  scale_x_continuous(breaks = c( 500, 1000, 1500, 2000)) +
+  annotation_custom(grid::grid.text("WALS", x=0.17,  y=0.17, gp=grid::gpar(col = "white", fontsize=50, fontface="bold")))  
+
+png(file.path(OUTPUTDIR, "WALS_coverage.png"), height = 1100, width = 1600,    units = "px",  bg = "white")
+plot(WALS_coverage)
+x <- dev.off()
+
+
+WALS_GB_coverage_overlay
