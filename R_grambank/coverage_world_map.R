@@ -50,7 +50,9 @@ basemap <- ggplot(df_long_shifted) +
                colour="gray87",
                fill="white", linewidth = 0.3) +
   viridis::scale_color_viridis( #name='% of data', 
-                                breaks = legend_breaks, labels = scales::percent(legend_breaks), begin = 0.25, end = 1) +
+                                breaks = legend_breaks, labels = scales::percent(legend_breaks), begin = 0, end = 0.95, direction = -1) +
+  viridis::scale_fill_viridis( #name='% of data', 
+    breaks = legend_breaks, labels = scales::percent(legend_breaks), begin = 0, end = 0.95, direction = -1) +
     theme(
     # all of these lines are just removing default things like grid lines, axes etc
     panel.grid.major = element_blank(),
@@ -70,6 +72,6 @@ basemap <- ggplot(df_long_shifted) +
   theme(plot.margin=grid::unit(c(0,0,0,0), "mm"))
 
 basemap +
-  geom_jitter(mapping = aes(x = Longitude, y = Latitude, color = prop), alpha = 0.6, width = 2)
+  geom_jitter(mapping = aes(x = Longitude, y = Latitude, fill = prop, color = prop), alpha = 0.6, width = 2, shape = 21, height = 1, stroke = 1)
 
 ggsave(filename = "output/coverage_plots/worldmap_coverage.png", width = 10, height = 6)
