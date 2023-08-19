@@ -20,6 +20,7 @@ h_load(verbose = F, pkg = c(
     "readr",
     "fields",
     "reshape2",
+    "txtplot",
     "broom",
     #	"plyr",
     "broom.mixed",
