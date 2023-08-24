@@ -1,5 +1,5 @@
 source("fun_def_h_load.R")
-h_load(c("tidyverse", "viridis"))
+h_load(c("tidyverse", "viridis", "scales"))
 
 #read in grambank data
 df_fn <- "output/GB_wide/GB_wide_strict.tsv"
