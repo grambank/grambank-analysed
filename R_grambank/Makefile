@@ -48,13 +48,13 @@ data: submodules
 	@mkdir -p output/coverage_plots
 	@mkdir -p output/GB_wide
 	@$(MAKE) -f $(THIS_MAKEFILE) output/non_GB_datasets/glottolog-cldf_wide_df.tsv
+	Rscript unusualness/processing/assigning_AUTOTYP_areas.R
 	@$(MAKE) -f $(THIS_MAKEFILE) output/GB_wide/GB_wide_strict.tsv
 	@$(MAKE) -f $(THIS_MAKEFILE) output/GB_wide/GB_wide_binarized.tsv
 	@$(MAKE) -f $(THIS_MAKEFILE) output/GB_wide/GB_wide_imputed_binarized.tsv
 	@$(MAKE) -f $(THIS_MAKEFILE) output/coverage_plots/WALS_GB_coverage_overlay.png
 	@$(MAKE) -f $(THIS_MAKEFILE) output/coverage_plots/coverage_macroarea.png
 	@$(MAKE) -f $(THIS_MAKEFILE) output/pruning_EDGE_tree.R
-	Rscript unusualness/processing/assigning_AUTOTYP_areas.R
 
 output/non_GB_datasets/glottolog-cldf_wide_df.tsv:
 	@echo Fetching Glottolog language table. Note: this script requires the git submodule glottolog-cldf.
