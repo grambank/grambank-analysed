@@ -5,8 +5,7 @@ THIS_MAKEFILE := $(lastword $(MAKEFILE_LIST))
 .DEFAULT_GOAL := help
 
 ## Make everything.
-all:
-	quick_ones medium_length if_medium_are_finished long_ones if_long_ones_are_finished
+all: quick_ones medium_length if_medium_are_finished long_ones if_long_ones_are_finished
 
 # runs almost all analysis from the release paper, excluding the analysis that takes a long time and/or more computational resources than a regular domestic computer tends to have (the BRMS-analysis for predicting unusualness score is best run on a cluster and the INLA analysis of the spatiophylogenetic modelling takes a long time)
 quick_ones: requirements.log data pca manhattan_dists
