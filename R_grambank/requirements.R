@@ -13,6 +13,7 @@ h_load(verbose = F, pkg = c(
     "ggplot2",
     "tidyr",
     "forcats",
+    "fmesher",
     "magrittr",
     "purrr",
     "stringr",
