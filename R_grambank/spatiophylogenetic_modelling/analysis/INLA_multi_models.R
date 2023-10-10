@@ -27,7 +27,7 @@ if(length(args) != 0){
   start <- 1
   end <- 113
   range <- start:end
-  prec_matrices <- NULL
+  prec_matrices <- "precision_matrices_kappa_2_sigma_1.15.RDS"
   pcprior_choice <- "default"
 }
 
