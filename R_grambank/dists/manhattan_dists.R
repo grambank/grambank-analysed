@@ -64,6 +64,11 @@ left <- glottolog_df %>%
 right <- glottolog_df %>% 
   dplyr::select(Var2_name= Name, Var2 = Language_ID, Var2_macroarea = Macroarea, Var2_Family_name = Family_name)
 
+GB_dist_list %>% 
+  left_join(left, by = "Var1") %>% 
+  left_join(right, by = "Var2") %>% 
+  write_tsv("output/dists/manhattan_dist_all.tsv", na = "")
+
 zeros <- GB_dist_list %>% 
   filter(value ==0) %>% 
   left_join(left, by = "Var1") %>% 
