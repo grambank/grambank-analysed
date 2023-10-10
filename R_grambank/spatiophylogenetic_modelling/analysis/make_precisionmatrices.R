@@ -120,7 +120,13 @@ for(n in 1:3){
   kappa <- kappa_vec[n]
   sigma <- sigma_vec[[n]]
   
-  spatial_covar_mat = varcov.spatial(locations_df[,c("Longitude", "Latitude")],
+  rdist.earth_dists <- fields::rdist.earth(x1 = locations_df[,c("Longitude", "Latitude")], x2 = locations_df[,c("Longitude", "Latitude")], miles = FALSE)
+  
+  rdist.earth_dists[upper.tri(rdist.earth_dists, diag = TRUE)] <- NA
+  
+  dists_vector <- as.vector(rdist.earth_dists) %>% na.omit()
+  
+  spatial_covar_mat = varcov.spatial(dists.lowertri = dists_vector,
                                      cov.pars = sigma,
                                      kappa = kappa)$varcov
   
