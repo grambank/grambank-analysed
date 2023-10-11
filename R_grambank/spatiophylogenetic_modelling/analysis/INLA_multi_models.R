@@ -280,7 +280,15 @@ for(feature in features){
   index <- index + 1
   
   cat(paste0("I've finished ", feature, " and the time is ", Sys.time(), ".\n That means I'm ", round((index/length(range)), 2)*100, "% done.\n"))
-  rm(model_outputs, dual_model, trial_model)
+  
+  if(trial == "incl_trial"){
+    rm(model_outputs, dual_model, trial_model)
+    
+  }else{
+    rm(model_outputs, dual_model)
+    
+  }
+    
 } }
 
 
