@@ -9,9 +9,11 @@ args = commandArgs(trailingOnly = TRUE)
 if(length(args) != 0){
   sim_or_real <- args[1] #you'd set this by going Rscript script.R "real"
   verbose = args[2]
+  trial = args[3]
 } else { #if you're running this script chunkwise in Rstudio or similar instead of via command line, you'll read in the parameters this way:
   sim_or_real <- "real"
   verbose = "quiet"
+  trial <- "no_trial"
 }
 
 if(sim_or_real == "sim"){ #running the simulated data
@@ -125,6 +127,7 @@ cat(paste0("I'm on ", fn, ", i.e. index ", index, " out of ", length(fns), ".\n"
 #dual
 hyper_sample_dual_posterior <- get_icc_posterior(hyper_sample = qs[[1]][[1]], ncol = 2)
 
+if(trial == "incl_trial"){
 #trial
 hyper_sample_trial_posterior <- get_icc_posterior(hyper_sample = qs[[2]][[1]], ncol = 3)
 
@@ -136,6 +139,7 @@ posteriors_df_spec <- cbind(#hyper_sample_phylo_only_posterior,
   as.data.frame() %>% 
   mutate(fn = fn)
 
+
 posteriors_df <- posteriors_df %>% 
   full_join(posteriors_df_spec, by = c(#"Precision for phylo_id_in_single", 
                                        #"Precision for spatial_id_in_single", 
@@ -146,6 +150,27 @@ posteriors_df <- posteriors_df %>%
                                        "Precision for phylo_id_in_trial",
                                        "Precision for AUTOTYP_area_id_iid_model_in_trial", 
                                        "fn"))
+
+}else{
+  posteriors_df_spec <- cbind(#hyper_sample_phylo_only_posterior, 
+    #hyper_sample_spatial_only_posterior, 
+    #hyper_sample_autotyp_area_only_posterior, 
+    hyper_sample_dual_posterior) %>% 
+    as.data.frame() %>% 
+    mutate(fn = fn)
+  
+  
+  posteriors_df <- posteriors_df %>% 
+    full_join(posteriors_df_spec, by = c(#"Precision for phylo_id_in_single", 
+      #"Precision for spatial_id_in_single", 
+      #"Precision for AUTOTYP_area_id_iid_model_in_single",
+      "Precision for spatial_id_in_dual", 
+      "Precision for phylo_id_in_dual", 
+      "fn"))
+  
+  
+  
+}
 }
 
 posteriors_df %>% 
