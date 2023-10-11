@@ -22,6 +22,7 @@ if(length(args) != 0){
   range <- start:end
   prec_matrices <- args[4]
   pcprior_choice <- args[5]
+  trial <- args[6]
 } else { #if you're running this script chunkwise in Rstudio or similar instead of via command line, you'll read in the parameters this way:
   sim_or_real <- "real"
   start <- 1
@@ -29,6 +30,7 @@ if(length(args) != 0){
   range <- start:end
   prec_matrices <- "precision_matrices_kappa_2_sigma_1.15.RDS"
   pcprior_choice <- "default"
+  trial <- "no_trial"
 }
 
 if(sim_or_real == "sim"){
@@ -195,7 +197,7 @@ for(feature in features){
   
   cat(paste0("Finished running dual model on ", feature, " and the time is ", Sys.time(), ".\n"))
   
-  
+  if(trial == "incl_trial"){
   
   # #### Trial Model ####
   # 
@@ -225,6 +227,7 @@ for(feature in features){
                            data = data)
   
   cat(paste0("Finished running trial on ", feature, " and the time is ", Sys.time(), ".\n"))
+  }
   
 ############
   #######strip interesting information from the INLA objects
@@ -256,10 +259,13 @@ for(feature in features){
   cat(paste0("Finished running strip inla on trial model of  ", feature, " and the time is ", Sys.time(), ".\n"))
   
   
-  
+  if(trial == "incl_trial"){
   #### Save output ####
   model_outputs = list(dual_model_stripped, 
                        trial_model_stripped)
+  }else{  #### Save output ####
+    model_outputs = list(dual_model_stripped)
+  }
   
     qs::qsave(model_outputs, 
             file = saved_file) }

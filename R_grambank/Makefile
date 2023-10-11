@@ -150,27 +150,27 @@ INLA: data INLA_featurewise INLA_extract_posteriors
 
 INLA_featurewise:
 	@echo "## Running INLA-analysis featurewise. #"
-	Rscript spatiophylogenetic_modelling/analysis/INLA_multi_models.R "real" 1 113 precision_matrices_kappa_2_sigma_1.15.RDS "default"
+	Rscript spatiophylogenetic_modelling/analysis/INLA_multi_models.R "real" 1 113 precision_matrices_kappa_2_sigma_1.15.RDS "default" "incl_trial"
 
-INLA_featurewise_all_spatial_params_all_priors: INLA_featurewise_spatial_params_2_1_15_all_priors INLA_featurewise_spatial_params_2_2_all_priors INLA_featurewise_spatial_params_2_5_3_all_priors
+INLA_featurewise_all_spatial_params_all_priors: INLA_featurewise_spatial_params_2_1_15_all_priors INLA_featurewise_spatial_params_2_2_all_priors INLA_featurewise_spatial_params_2_5_3_all_priors 
 
 INLA_featurewise_spatial_params_2_1_15_all_priors:
-	Rscript spatiophylogenetic_modelling/analysis/INLA_multi_models.R "real" 1 113 precision_matrices_kappa_2_sigma_1.15.RDS "loop_all_priors" 
+	Rscript spatiophylogenetic_modelling/analysis/INLA_multi_models.R "real" 1 113 precision_matrices_kappa_2_sigma_1.15.RDS "loop_all_priors" "incl_trial"
 
 INLA_featurewise_spatial_params_2_2_all_priors:
-	Rscript spatiophylogenetic_modelling/analysis/INLA_multi_models.R "real" 1 113 precision_matrices_kappa_2_sigma_2.RDS "loop_all_priors" 
+	Rscript spatiophylogenetic_modelling/analysis/INLA_multi_models.R "real" 1 113 precision_matrices_kappa_2_sigma_2.RDS "loop_all_priors" "incl_trial"
 
 INLA_featurewise_spatial_params_2_5_3_all_priors_first_part:
-	Rscript spatiophylogenetic_modelling/analysis/INLA_multi_models.R "real" 1 37 precision_matrices_kappa_2.5_sigma_3.RDS "loop_all_priors" 
+	Rscript spatiophylogenetic_modelling/analysis/INLA_multi_models.R "real" 1 37 precision_matrices_kappa_2.5_sigma_3.RDS "loop_all_priors" "incl_trial"
 
 INLA_featurewise_spatial_params_2_5_3_all_priors_second_part:
-	Rscript spatiophylogenetic_modelling/analysis/INLA_multi_models.R "real" 38 75 precision_matrices_kappa_2.5_sigma_3.RDS "loop_all_priors" 
+	Rscript spatiophylogenetic_modelling/analysis/INLA_multi_models.R "real" 38 75 precision_matrices_kappa_2.5_sigma_3.RDS "loop_all_priors" "incl_trial"
 
 INLA_featurewise_spatial_params_2_5_3_all_priors_third_part:
-	Rscript spatiophylogenetic_modelling/analysis/INLA_multi_models.R "real" 75 100 precision_matrices_kappa_2.5_sigma_3.RDS "loop_all_priors" 
+	Rscript spatiophylogenetic_modelling/analysis/INLA_multi_models.R "real" 75 100 precision_matrices_kappa_2.5_sigma_3.RDS "loop_all_priors" "incl_trial"
 
 INLA_featurewise_spatial_params_2_5_3_all_priors_fourth_part:
-	Rscript spatiophylogenetic_modelling/analysis/INLA_multi_models.R "real" 100 113 precision_matrices_kappa_2.5_sigma_3.RDS "loop_all_priors" 
+	Rscript spatiophylogenetic_modelling/analysis/INLA_multi_models.R "real" 100 113 precision_matrices_kappa_2.5_sigma_3.RDS "loop_all_priors" "incl_trial"
 
 INLA_extract_posteriors:
 	Rscript spatiophylogenetic_modelling/analysis/functions/extract_INLA_posteriors.R "real" "quiet"
